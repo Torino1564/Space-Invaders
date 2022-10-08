@@ -42,4 +42,6 @@ ALLEGRO_EVENT_QUEUE* InputEventQueue;
 
 ALLEGRO_EVENT TempEvent;
 
+ALLEGRO_KEYBOARD_STATE KeyboardCurrentState;
+
 Entity Spaceship;

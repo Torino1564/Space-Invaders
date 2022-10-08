@@ -8,6 +8,7 @@ typedef struct ALLEGRO_BITMAP ALLEGRO_BITMAP;
 struct Entity_t
 {
 	Vec2 Pos;
+	Vec2 Vel;
 
 	ALLEGRO_BITMAP * Texture;
 
@@ -18,3 +19,5 @@ struct Entity_t
 typedef struct Entity_t Entity;
 
 void DrawEntity(Entity* Entity);
+
+void UpdateEntity(Entity* Entity);

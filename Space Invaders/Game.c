@@ -59,6 +59,8 @@ int GameInit()
 	Spaceship.Texture = al_load_bitmap("Resources/Ship.png");
 	Spaceship.Pos = NewVec2( 300 , 300 );
 	al_convert_mask_to_alpha(Spaceship.Texture, al_map_rgb(255, 0, 255));
+	Spaceship.Vel = NewVec2(0, 0);
+
 	return;
 }
 
@@ -89,12 +91,57 @@ void GameLogic()
 
 		switch (TempEvent.type)
 		{
-		case ALLEGRO_KEYBOARD_EVENT:
+		case ALLEGRO_EVENT_KEY_DOWN:
+			switch (TempEvent.keyboard.keycode)
+			{
+				case ALLEGRO_KEY_A:
+					Spaceship.Vel.x -= 1;
+					break;
+				case ALLEGRO_KEY_D:
+					Spaceship.Vel.x += 1;
+					break;
+				case ALLEGRO_KEY_W:
+					Spaceship.Vel.y -= 1;
+					break;
+				case ALLEGRO_KEY_S:
+					Spaceship.Vel.y += 1;
+					break;
+				case ALLEGRO_KEY_F4:
+					if (al_key_down(&KeyboardCurrentState, ALLEGRO_KEY_ALT))
+						running = 0;
+					break;
+				default:
+					break;
+
+			}
+			break;
+		case ALLEGRO_EVENT_KEY_UP:
+			switch (TempEvent.keyboard.keycode)
+			{
+			case ALLEGRO_KEY_A:
+				Spaceship.Vel.x += 1;
+				break;
+			case ALLEGRO_KEY_D:
+				Spaceship.Vel.x -= 1;
+				break;
+			case ALLEGRO_KEY_W:
+				Spaceship.Vel.y += 1;
+				break;
+			case ALLEGRO_KEY_S:
+				Spaceship.Vel.y -= 1;
+				break;
+			default:
+				break;
+
+			}
+			break;
+
 
 		}
 		
 	}
 
+	UpdateEntity(&Spaceship);
 
 	return;
 }
@@ -103,7 +150,9 @@ void GameRender()
 {
 	al_clear_to_color(al_map_rgb(0, 0,20));
 
-	DrawEntity(&Spaceship);
+	//DrawEntity(&Spaceship);
+
+	al_draw_scaled_bitmap(Spaceship.Texture, 0, 0, 325, 213, Spaceship.Pos.x, Spaceship.Pos.y, 100, 75, NULL);
 
 	al_flip_display();
 	return;
@@ -111,7 +160,7 @@ void GameRender()
 
 void Prechecks()
 {
-	
+	al_get_keyboard_state(&KeyboardCurrentState);
 
 	return;
 }
