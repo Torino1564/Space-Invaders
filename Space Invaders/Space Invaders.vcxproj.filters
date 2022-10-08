@@ -18,8 +18,39 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Game.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Vec2.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Vec2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Alien.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\MissingTexture.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\Ship.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

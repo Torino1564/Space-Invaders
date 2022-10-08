@@ -70,6 +70,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Allegro_AddonImage>true</Allegro_AddonImage>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -127,10 +130,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Entity.c" />
+    <ClCompile Include="Game.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="Vec2.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="Vec2.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\Alien.png" />
+    <Image Include="Resources\MissingTexture.png" />
+    <Image Include="Resources\Ship.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
