@@ -2,8 +2,8 @@
 
 struct Vec2_t
 {
-	unsigned int x;
-	unsigned int y;
+	int x;
+	int y;
 };
 
 typedef struct Vec2_t Vec2;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Vec2.h"
+#include "Vec2_F.h"
 #include <allegro5/allegro.h>
 #include <allegro5/allegro5.h>
 
@@ -7,8 +8,8 @@ typedef struct ALLEGRO_BITMAP ALLEGRO_BITMAP;
 
 struct Entity_t
 {
-	Vec2 Pos;
-	Vec2 Vel;
+	Vec2F Pos;
+	Vec2F Vel;
 
 	ALLEGRO_BITMAP * Texture;
 
@@ -20,4 +21,9 @@ typedef struct Entity_t Entity;
 
 void DrawEntity(Entity* Entity);
 
-void UpdateEntity(Entity* Entity);
+void UpdateEntity(Entity* Entity , double dt );
+void ClipToScreen(Entity* Entity, Vec2 Screen);
+Entity* CreateNewEntity(Vec2F pos, Vec2F vel, char* texture , int width , int height);
+void DestroyEntity(Entity* Entity);
+
+int AreColiding(Entity* e1, Entity* e2);

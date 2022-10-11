@@ -107,6 +107,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,6 +135,7 @@
     <ClCompile Include="Game.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Vec2.c" />
+    <ClCompile Include="Vec2_F.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -141,10 +143,12 @@
   <ItemGroup>
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Projectile.h" />
     <ClInclude Include="Vec2.h" />
+    <ClInclude Include="Vec2_F.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\Alien.png" />
+    <Image Include="Resources\alien1.png" />
     <Image Include="Resources\MissingTexture.png" />
     <Image Include="Resources\Ship.png" />
   </ItemGroup>

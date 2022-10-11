@@ -27,6 +27,9 @@
     <ClCompile Include="Entity.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Vec2_F.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -41,15 +44,21 @@
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Vec2_F.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Projectile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resources\Alien.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="Resources\MissingTexture.png">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Resources\Ship.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\alien1.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
