@@ -44,34 +44,36 @@ void ClipToScreen(Entity* Entity, Vec2 Screen)
 	}
 }
 
-Entity* CreateNewEntity(Vec2F pos, Vec2F vel, char* texture, int height, int width)
+Entity* CreateNewEntity(Vec2F pos, Vec2F vel, const char* texture, int height, int width)
 {
-	Entity * Entity = malloc(sizeof(Entity));
-	if (Entity == NULL)
+	Entity * ent = malloc(sizeof(Entity));
+	if (ent == NULL)
 	{
 		return NULL;
 	}
-	Entity->Pos = pos;
-	Entity->Vel = vel;
-	Entity->Texture = al_load_bitmap(texture);
-	Entity->width = width;
-	Entity->height = height;
+	ent->Pos = pos;
+	ent->Vel = vel;
+	ent->width = width;
+	ent->height = height;
 
-	al_convert_mask_to_alpha(Entity->Texture, al_map_rgb(255, 0, 255));
-
-	if (Entity->Texture == NULL)
+	ent->Texture = al_load_bitmap(texture);
+	if (ent->Texture == NULL)
 	{
 		return NULL;
 	}
-	else
-	{
-		return Entity;
-	}
+
+	al_convert_mask_to_alpha(ent->Texture, al_map_rgb(255, 0, 255));
+
+
+	return ent;
+	
 }
 
 void DestroyEntity(Entity* Entity)
 {
+	if (Entity->Texture != NULL)
 	al_destroy_bitmap(Entity->Texture);
+	if (Entity != NULL)
 	free(Entity);
 
 	return;
@@ -79,13 +81,6 @@ void DestroyEntity(Entity* Entity)
 
 int AreColiding(Entity* e1, Entity* e2)
 {
-	int Colision = 0;
-	if (((e1->Pos.x > e2->Pos.x) && (e1->Pos.x < (e2->Pos.x + e2->width)))
-		&& ((e1->Pos.y > e2->Pos.y) && (e1->Pos.y < (e2->Pos.y + e2->height))))
-	{
-		Colision = 1;
-	}
-	
-
-	return Colision;
+	return (((e1->Pos.x > e2->Pos.x) && (e1->Pos.x < (e2->Pos.x + e2->width)))
+		&& ((e1->Pos.y > e2->Pos.y) && (e1->Pos.y < (e2->Pos.y + e2->height))));
 }

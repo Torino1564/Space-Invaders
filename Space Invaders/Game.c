@@ -9,8 +9,7 @@ void Game()
 		GameLoop();
 	}
 
-	if (!running)
-		GameDestroy();
+	GameDestroy();
 
 	return;
 }
@@ -59,36 +58,36 @@ int GameInit()
 	al_register_event_source(InputEventQueue, KeyboardEventSource);
 	al_register_event_source(InputEventQueue, MouseEventSource);
 
-	Spaceship.Texture = al_load_bitmap("Resources/Ship.png");
-	Spaceship.Pos = NewVec2F( 600 , 600 );
-	al_convert_mask_to_alpha(Spaceship.Texture, al_map_rgb(255, 0, 255));
-	Spaceship.Vel = NewVec2F(0, 0);
-	Spaceship.width = 50;
-	Spaceship.height = 40;
+	Spaceship = CreateNewEntity(NewVec2F(600, 600), NewVec2F(0, 0), "Resources/Ship.png", 40, 50);
 
-	/*Alien = CreateNewEntity(NewVec2F(100, 50), NewVec2F(0, 0), "Resources/alien1.png", 50, 50);
+	Alien = CreateNewEntity(NewVec2F(100, 50), NewVec2F(0, 0), "Resources/alien1.png", 50, 50);
 	if (Alien == NULL)
 	{
 		printf("There has been an error creating the Alien entity");
 		error = -1;
 	}
-	*/
+	
 
-	Alien.height = 50;
-	Alien.width = 50;
-	Alien.Pos = NewVec2F(100, 50);
-	Alien.Vel = NewVec2F(0, 0);
-	Alien.Texture = al_load_bitmap("Resources/alien1.png");
-	al_convert_mask_to_alpha(Alien.Texture, al_map_rgb(255, 0, 255));
+	Test = CreateNewEntity(NewVec2F(200, 50), NewVec2F(0, 0), "Resources/MissingTexture.png", 50, 50);
+	projectile = NULL;
+	
 
+	Bullets[0] = malloc(sizeof(Entity) * 10);
+	if (Bullets[0] != NULL)
+	{
+		for (int i = 0; i < 10; i++)
+		{
+			Bullets[i] = NULL;
+		}
+	}
 	return error;
 }
 
 void GameDestroy()
 {
-
-	al_destroy_bitmap(Spaceship.Texture);
-
+	DestroyEntity(Spaceship);
+	DestroyEntity(Alien);
+	DestroyEntity(Test);
 	al_destroy_display(DISPLAY);
 	al_destroy_user_event_source(KeyboardEventSource);
 	al_destroy_user_event_source(MouseEventSource);
@@ -119,21 +118,37 @@ void GameLogic()
 			switch (TempEvent.keyboard.keycode)
 			{
 				case ALLEGRO_KEY_A:
-					Spaceship.Vel.x -= SHIP_SPEED;
+					Spaceship->Vel.x -= SHIP_SPEED;
 					break;
 				case ALLEGRO_KEY_D:
-					Spaceship.Vel.x += SHIP_SPEED;
+					Spaceship->Vel.x += SHIP_SPEED;
 					break;
-				case ALLEGRO_KEY_W:
-					Spaceship.Vel.y -= SHIP_SPEED;
+				/*case ALLEGRO_KEY_W:
+					spaceship->vel.y -= ship_speed;
 					break;
 				case ALLEGRO_KEY_S:
-					Spaceship.Vel.y += SHIP_SPEED;
-					break;
+					spaceship->vel.y += ship_speed;
+					break;*/
 				case ALLEGRO_KEY_F4:
 					if (al_key_down(&KeyboardCurrentState, ALLEGRO_KEY_ALT))
 						running = 0;
 					break;
+				case ALLEGRO_KEY_SPACE:
+					for (int i = 0; i < 10; i++)
+					{
+						if (i == 9)
+						{
+							Bullets[i] = CreateNewEntity(NewVec2F(Spaceship->Pos.x + Spaceship->width / 2 - 10 / 2, Spaceship->Pos.y), NewVec2F(0, -1000), "Resources/Bullet.png", 10, 10);
+							break;
+						}
+
+						if (Bullets[i] == NULL)
+						{
+							Bullets[i] = CreateNewEntity(NewVec2F(Spaceship->Pos.x + Spaceship->width / 2 - 10 / 2, Spaceship->Pos.y), NewVec2F(0, -1000), "Resources/Bullet.png", 10, 10);
+							break;
+						}
+					}
+						break;
 				default:
 					break;
 
@@ -143,17 +158,17 @@ void GameLogic()
 			switch (TempEvent.keyboard.keycode)
 			{
 			case ALLEGRO_KEY_A:
-				Spaceship.Vel.x += SHIP_SPEED;
+				Spaceship->Vel.x += SHIP_SPEED;
 				break;
 			case ALLEGRO_KEY_D:
-				Spaceship.Vel.x -= SHIP_SPEED;
+				Spaceship->Vel.x -= SHIP_SPEED;
 				break;
-			case ALLEGRO_KEY_W:
-				Spaceship.Vel.y += SHIP_SPEED;
+			/*case ALLEGRO_KEY_W:
+				Spaceship->Vel.y += SHIP_SPEED;
 				break;
 			case ALLEGRO_KEY_S:
-				Spaceship.Vel.y -= SHIP_SPEED;
-				break;
+				Spaceship->Vel.y -= SHIP_SPEED;
+				break;*/
 			default:
 				break;
 
@@ -165,10 +180,14 @@ void GameLogic()
 		
 	}
 
-	UpdateEntity(&Spaceship, DeltaTime);
-	ClipToScreen(&Spaceship, ScreenDimensions);
-	if (AreColiding(&Spaceship, &Alien))
-		running = 0;
+	CullBullets();
+	UpdateBullets();
+
+
+
+	UpdateEntity(Spaceship, DeltaTime);
+	ClipToScreen(Spaceship, ScreenDimensions);
+
 
 	return;
 }
@@ -177,9 +196,17 @@ void GameRender()
 {
 	al_clear_to_color(al_map_rgb(0, 0,20));
 
-	DrawEntity(&Spaceship);
+	DrawEntity(Spaceship);
+	DrawEntity(Test);
+	DrawEntity(Alien);
 
-	DrawEntity(&Alien);
+	for (int i = 0; i < 10; i++)
+	{
+		if (Bullets[i] != NULL)
+		{
+			DrawEntity(Bullets[i]);
+		}
+	}
 
 	al_flip_display();
 	return;
@@ -200,4 +227,30 @@ void Postframe()
 	DeltaTime = ((double)t) / CLOCKS_PER_SEC;
 
 	return;
+}
+
+void CullBullets()
+{
+	for (int i = 0; i < 10; i++)
+	{
+		if (Bullets[i] != NULL)
+		{
+			if (Bullets[i]->Pos.y < 0)
+			{
+				DestroyEntity(Bullets[i]);
+				Bullets[i] = NULL;
+			}
+		}
+	}
+}
+
+void UpdateBullets()
+{
+	for (int i = 0; i < 10; i++)
+	{
+		if (Bullets[i] != NULL)
+		{
+			UpdateEntity(Bullets[i], DeltaTime);
+		}
+	}
 }

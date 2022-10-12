@@ -47,9 +47,6 @@
     <ClInclude Include="Vec2_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Projectile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\MissingTexture.png">
@@ -59,6 +56,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="Resources\alien1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resources\SpaceInvadersLaserDepiction.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

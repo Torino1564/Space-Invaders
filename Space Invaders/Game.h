@@ -22,6 +22,9 @@ void GameDestroy();
 void Preframe();
 void Postframe();
 
+void CullBullets();
+void UpdateBullets();
+
 #define SHIP_SPEED 500
 
 Vec2 ScreenDimensions;
@@ -46,7 +49,7 @@ ALLEGRO_EVENT TempEvent;
 
 ALLEGRO_KEYBOARD_STATE KeyboardCurrentState;
 
-Entity Spaceship;
+Entity * Spaceship;
 
 double DeltaTime;
 
@@ -56,4 +59,10 @@ clock_t t;
 				Aliens
 ================================= */
 
-Entity Alien;
+Entity* Alien;
+
+Entity* Test;
+
+Entity* projectile;
+
+Entity * Bullets[10];

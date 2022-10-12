@@ -143,7 +143,6 @@
   <ItemGroup>
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="Projectile.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vec2_F.h" />
   </ItemGroup>
@@ -151,6 +150,7 @@
     <Image Include="Resources\alien1.png" />
     <Image Include="Resources\MissingTexture.png" />
     <Image Include="Resources\Ship.png" />
+    <Image Include="Resources\SpaceInvadersLaserDepiction.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
