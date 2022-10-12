@@ -4,9 +4,12 @@
 void DrawEntity(Entity* Entity)
 {
 	if (Entity->Texture != NULL)
-	al_draw_scaled_bitmap(Entity->Texture, 0,0 ,
-		al_get_bitmap_width(Entity->Texture) , al_get_bitmap_height(Entity->Texture),
-		Entity->Pos.x , Entity->Pos.y ,Entity->width , Entity->height , NULL);
+	{
+		al_draw_scaled_bitmap(Entity->Texture, 0, 0,
+			al_get_bitmap_width(Entity->Texture), al_get_bitmap_height(Entity->Texture),
+			Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
+	}
+
 	return;
 }
 
@@ -68,8 +71,8 @@ Entity* CreateNewEntity(Vec2F pos, Vec2F vel, char* texture, int height, int wid
 
 void DestroyEntity(Entity* Entity)
 {
-	//al_destroy_bitmap(Entity->Texture);
-	//free(Entity);
+	al_destroy_bitmap(Entity->Texture);
+	free(Entity);
 
 	return;
 }
@@ -77,11 +80,8 @@ void DestroyEntity(Entity* Entity)
 int AreColiding(Entity* e1, Entity* e2)
 {
 	int Colision = 0;
-	if ((e1->Pos.x > e2->Pos.x) && (e1->Pos.x < (e2->Pos.x + e2->width)))
-	{
-		Colision = 1;
-	}
-	if ((e1->Pos.y > e2->Pos.y) && (e1->Pos.y < (e2->Pos.y + e2->height)))
+	if (((e1->Pos.x > e2->Pos.x) && (e1->Pos.x < (e2->Pos.x + e2->width)))
+		&& ((e1->Pos.y > e2->Pos.y) && (e1->Pos.y < (e2->Pos.y + e2->height))))
 	{
 		Colision = 1;
 	}

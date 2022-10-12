@@ -56,4 +56,4 @@ clock_t t;
 				Aliens
 ================================= */
 
-Entity * Alien;
+Entity Alien;

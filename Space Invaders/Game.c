@@ -9,7 +9,8 @@ void Game()
 		GameLoop();
 	}
 
-	GameDestroy();
+	if (!running)
+		GameDestroy();
 
 	return;
 }
@@ -65,14 +66,20 @@ int GameInit()
 	Spaceship.width = 50;
 	Spaceship.height = 40;
 
-	Alien = CreateNewEntity(NewVec2F(100, 50), NewVec2F(0, 0), "Resources/alien1.png" , 50, 50);
+	/*Alien = CreateNewEntity(NewVec2F(100, 50), NewVec2F(0, 0), "Resources/alien1.png", 50, 50);
 	if (Alien == NULL)
 	{
 		printf("There has been an error creating the Alien entity");
 		error = -1;
 	}
-	
+	*/
 
+	Alien.height = 50;
+	Alien.width = 50;
+	Alien.Pos = NewVec2F(100, 50);
+	Alien.Vel = NewVec2F(0, 0);
+	Alien.Texture = al_load_bitmap("Resources/alien1.png");
+	al_convert_mask_to_alpha(Alien.Texture, al_map_rgb(255, 0, 255));
 
 	return error;
 }
@@ -80,8 +87,7 @@ int GameInit()
 void GameDestroy()
 {
 
-	//al_destroy_bitmap(Spaceship.Texture);
-	//DestroyEntity(Alien);
+	al_destroy_bitmap(Spaceship.Texture);
 
 	al_destroy_display(DISPLAY);
 	al_destroy_user_event_source(KeyboardEventSource);
@@ -161,7 +167,7 @@ void GameLogic()
 
 	UpdateEntity(&Spaceship, DeltaTime);
 	ClipToScreen(&Spaceship, ScreenDimensions);
-	if (AreColiding(&Spaceship, Alien))
+	if (AreColiding(&Spaceship, &Alien))
 		running = 0;
 
 	return;
@@ -173,7 +179,7 @@ void GameRender()
 
 	DrawEntity(&Spaceship);
 
-	DrawEntity(Alien);
+	DrawEntity(&Alien);
 
 	al_flip_display();
 	return;
