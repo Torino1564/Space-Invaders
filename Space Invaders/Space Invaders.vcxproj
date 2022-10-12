@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AlienMatrix.c" />
     <ClCompile Include="Entity.c" />
     <ClCompile Include="Game.c" />
     <ClCompile Include="main.c" />
@@ -141,6 +142,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AlienMatrix.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Vec2.h" />
@@ -148,9 +150,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\alien1.png" />
+    <Image Include="Resources\bullet.png" />
     <Image Include="Resources\MissingTexture.png" />
     <Image Include="Resources\Ship.png" />
-    <Image Include="Resources\SpaceInvadersLaserDepiction.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

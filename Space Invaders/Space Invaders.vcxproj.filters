@@ -30,6 +30,9 @@
     <ClCompile Include="Vec2_F.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AlienMatrix.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -47,6 +50,9 @@
     <ClInclude Include="Vec2_F.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AlienMatrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\MissingTexture.png">
@@ -58,7 +64,7 @@
     <Image Include="Resources\alien1.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="Resources\SpaceInvadersLaserDepiction.png">
+    <Image Include="Resources\bullet.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -9,3 +9,4 @@ struct Vec2_t
 typedef struct Vec2_t Vec2;
 
 Vec2 NewVec2(int x, int y);
+

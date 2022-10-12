@@ -2,6 +2,9 @@
 
 void Game()
 {
+
+	/* Aca iria el menu*/
+
 	int error = GameInit();
 
 	while (running && !error)
@@ -58,7 +61,44 @@ int GameInit()
 	al_register_event_source(InputEventQueue, KeyboardEventSource);
 	al_register_event_source(InputEventQueue, MouseEventSource);
 
+	Vec2 GridDimensions = NewVec2(768, 240);
+	int AlienPaddingX = (GridDimensions.x - 50 * 11) / 10;
+	int AlienPaddingY = (GridDimensions.y - 50 * 4) / 3;
+	XAliens = 11;
+	YAliens = 4;
+	int AlienWidth = 50;
+	int AlienHeight = 50;
+
+
+	AlienGrid = NewMatrix( NewVec2F(ScreenDimensions.x/2 - GridDimensions.x/2, 50), GridDimensions.x, GridDimensions.y, AlienWidth, AlienHeight);
+	if (AlienGrid == NULL)
+	{
+		printf("There has been an error creating the Alien Matrix");
+		error = -2;
+	}
+	else
+	{
+		for (int i = 0; i < YAliens; i++)
+		{
+			for (int j = 0; j < XAliens; j++)
+			{
+				 AlienGrid->matrix[i][j] = CreateNewEntity(
+					NewVec2F(AlienGrid->Pos.x + (50 + AlienPaddingX) * j, AlienGrid->Pos.y + (50 + AlienPaddingY) * i),
+					NewVec2F(0, 0), "Resources/alien1.png", 50, 50);
+
+			}
+
+		}
+		
+	}
+	
+
 	Spaceship = CreateNewEntity(NewVec2F(600, 600), NewVec2F(0, 0), "Resources/Ship.png", 40, 50);
+	if (Spaceship == NULL)
+	{
+		printf("There has been an error creating the player spaceship");
+		error = -1;
+	}
 
 	Alien = CreateNewEntity(NewVec2F(100, 50), NewVec2F(0, 0), "Resources/alien1.png", 50, 50);
 	if (Alien == NULL)
@@ -66,10 +106,6 @@ int GameInit()
 		printf("There has been an error creating the Alien entity");
 		error = -1;
 	}
-	
-
-	Test = CreateNewEntity(NewVec2F(200, 50), NewVec2F(0, 0), "Resources/MissingTexture.png", 50, 50);
-	projectile = NULL;
 	
 
 	Bullets[0] = malloc(sizeof(Entity) * 10);
@@ -80,14 +116,16 @@ int GameInit()
 			Bullets[i] = NULL;
 		}
 	}
+
+
 	return error;
 }
 
 void GameDestroy()
 {
+	DestroyMatrix(AlienGrid);
 	DestroyEntity(Spaceship);
 	DestroyEntity(Alien);
-	DestroyEntity(Test);
 	al_destroy_display(DISPLAY);
 	al_destroy_user_event_source(KeyboardEventSource);
 	al_destroy_user_event_source(MouseEventSource);
@@ -138,13 +176,13 @@ void GameLogic()
 					{
 						if (i == 9)
 						{
-							Bullets[i] = CreateNewEntity(NewVec2F(Spaceship->Pos.x + Spaceship->width / 2 - 10 / 2, Spaceship->Pos.y), NewVec2F(0, -1000), "Resources/Bullet.png", 10, 10);
+							Bullets[i] = CreateNewEntity(NewVec2F(Spaceship->Pos.x + Spaceship->width / 2 - 10 / 2, Spaceship->Pos.y), NewVec2F(0, -600), "Resources/Bullet.png", 10, 10);
 							break;
 						}
 
 						if (Bullets[i] == NULL)
 						{
-							Bullets[i] = CreateNewEntity(NewVec2F(Spaceship->Pos.x + Spaceship->width / 2 - 10 / 2, Spaceship->Pos.y), NewVec2F(0, -1000), "Resources/Bullet.png", 10, 10);
+							Bullets[i] = CreateNewEntity(NewVec2F(Spaceship->Pos.x + Spaceship->width / 2 - 10 / 2, Spaceship->Pos.y), NewVec2F(0, -600), "Resources/Bullet.png", 10, 10);
 							break;
 						}
 					}
@@ -183,8 +221,6 @@ void GameLogic()
 	CullBullets();
 	UpdateBullets();
 
-
-
 	UpdateEntity(Spaceship, DeltaTime);
 	ClipToScreen(Spaceship, ScreenDimensions);
 
@@ -194,11 +230,20 @@ void GameLogic()
 
 void GameRender()
 {
-	al_clear_to_color(al_map_rgb(0, 0,20));
+	al_clear_to_color(al_map_rgb(0, 0,10));
 
 	DrawEntity(Spaceship);
-	DrawEntity(Test);
-	DrawEntity(Alien);
+
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 11; j++)
+		{
+			if ((* (AlienGrid->matrix) + i + j*XAliens) != NULL)
+			{
+				DrawEntity(AlienGrid->matrix[i][j]);
+			}
+		}
+	}
 
 	for (int i = 0; i < 10; i++)
 	{

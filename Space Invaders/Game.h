@@ -7,6 +7,7 @@
 #include "Entity.h"
 #include "Vec2.h"
 #include <time.h>
+#include "AlienMatrix.h"
 
 void Game();
 /* ===================================
@@ -61,8 +62,9 @@ clock_t t;
 
 Entity* Alien;
 
-Entity* Test;
-
-Entity* projectile;
-
 Entity * Bullets[10];
+
+AlienMatrix * AlienGrid;
+
+int XAliens;
+int YAliens;
