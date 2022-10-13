@@ -30,8 +30,12 @@ int GameInit()
 
 	
 	menu0 = al_load_bitmap("Metal_Slug_X-title.png");
+	menu1 = al_create_bitmap(100, 100);
 	
-
+	if (menu1 != NULL)
+	{
+		al_draw_bitmap(menu1, 100, 100, NULL);
+	}
 	ScreenDimensions = NewVec2(1366, 768);
 
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
