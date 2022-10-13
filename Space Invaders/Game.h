@@ -10,6 +10,7 @@
 #include <time.h>
 #include "AlienMatrix.h"
 
+int Menu();
 void Game();
 /* ===================================
 	

@@ -2,12 +2,12 @@
 
 void Game()
 {
-
+	int error = Menu();
 	/* Aca iria el menu*/
 
-	int error = GameInit();
+	int errorI = GameInit();
 
-	while (running && !error)
+	while (running && !error && !errorI)
 	{
 		GameLoop();
 	}
@@ -17,17 +17,17 @@ void Game()
 	return;
 }
 
-int GameInit()
+int Menu()
 {
 	int error = 0;
 
 	al_init();
-	
+
 	al_init_image_addon();
 
 	al_install_keyboard();
 	al_install_mouse();
-	
+
 	ScreenDimensions = NewVec2(1161, 870);
 
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
@@ -60,11 +60,20 @@ int GameInit()
 
 	al_register_event_source(InputEventQueue, KeyboardEventSource);
 	al_register_event_source(InputEventQueue, MouseEventSource);
-	
+
 	menu0 = al_load_bitmap("Metal_Slug_X-title.png");
-	al_draw_bitmap(menu0, ScreenDimensions.x/2, ScreenDimensions.y/2, 0);
-		
-	
+	al_draw_bitmap(menu0, 0, 0, NULL);
+
+	bool ready =0;
+	while (!ready)
+	{
+
+	}
+}
+
+int GameInit()
+{
+	int error = 0;
 
 	Vec2 GridDimensions = NewVec2(768, 240);
 	int AlienPaddingX = (GridDimensions.x - 50 * 11) / 10;
@@ -107,7 +116,7 @@ int GameInit()
 	
 	background1 = al_load_bitmap("nivel3.png");
 
-	Spaceship = CreateNewEntity(NewVec2F(600, 500), NewVec2F(0, 0), "Resources/Ship.png", 40, 50);
+	Spaceship = CreateNewEntity(NewVec2F(600, 820), NewVec2F(0, 0), "Resources/Ship.png", 40, 50);
 	if (Spaceship == NULL)
 	{
 		printf("There has been an error creating the player spaceship");
