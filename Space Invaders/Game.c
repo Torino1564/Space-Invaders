@@ -60,7 +60,7 @@ int Menu()
 	al_register_event_source(InputEventQueue, KeyboardEventSource);
 	al_register_event_source(InputEventQueue, MouseEventSource);
 
-	menu0 = al_load_bitmap("Metal_Slug_X-title.png");
+	menu0 = al_load_bitmap("Menu0.png");
 
 	bool ready = 0;
 	float width = al_get_bitmap_width(menu0);
