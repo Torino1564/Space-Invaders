@@ -30,7 +30,7 @@ int GameInit()
 
 	
 	
-	ScreenDimensions = NewVec2(1366, 768);
+	ScreenDimensions = NewVec2(1161, 870);
 
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
 	if (DISPLAY == NULL)
@@ -64,10 +64,10 @@ int GameInit()
 	al_register_event_source(InputEventQueue, MouseEventSource);
 	
 	menu0 = al_load_bitmap("Metal_Slug_X-title.png");
-
-
-	al_draw_bitmap(menu0, 100, 100, 0);
+	al_draw_bitmap(menu0, ScreenDimensions.x/2, ScreenDimensions.y/2, 0);
 		
+	
+
 	Vec2 GridDimensions = NewVec2(768, 240);
 	int AlienPaddingX = (GridDimensions.x - 50 * 11) / 10;
 	int AlienPaddingY = (GridDimensions.y - 50 * 4) / 3;
@@ -100,7 +100,7 @@ int GameInit()
 	}
 	
 
-	Spaceship = CreateNewEntity(NewVec2F(600, 600), NewVec2F(0, 0), "Resources/Ship.png", 40, 50);
+	Spaceship = CreateNewEntity(NewVec2F(600, 820), NewVec2F(0, 0), "Resources/Ship.png", 40, 50);
 	if (Spaceship == NULL)
 	{
 		printf("There has been an error creating the player spaceship");
@@ -238,7 +238,8 @@ void GameLogic()
 
 void GameRender()
 {
-	al_clear_to_color(al_map_rgb(0, 0,10));
+	background1 = al_load_bitmap("nivel3.png");
+	al_draw_bitmap(background1, (ScreenDimensions.x - al_get_bitmap_width(background1))/2, (ScreenDimensions.y - al_get_bitmap_height(background1))/2, 0);
 
 	DrawEntity(Spaceship);
 
