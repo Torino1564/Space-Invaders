@@ -5,7 +5,6 @@ void Game()
 
 	/* Aca iria el menu*/
 
-
 	int error = GameInit();
 
 	while (running && !error)
@@ -20,6 +19,8 @@ void Game()
 
 int GameInit()
 {
+	int error = 0;
+
 	al_init();
 	
 	al_init_image_addon();
@@ -27,11 +28,9 @@ int GameInit()
 	al_install_keyboard();
 	al_install_mouse();
 
-	ALLEGRO_BITMAP* something = al_create_bitmap(100, 100);
- 	al_draw_bitmap(something, 100, 100, 0);
-
-
-	int error = 0;
+	
+	menu0 = al_load_bitmap("Metal_Slug_X-title.png");
+	
 
 	ScreenDimensions = NewVec2(1366, 768);
 
