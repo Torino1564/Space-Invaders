@@ -3,7 +3,6 @@
 void Game()
 {
 	int error = Menu();
-	/* Aca iria el menu*/
 
 	int errorI = GameInit();
 
@@ -62,13 +61,19 @@ int Menu()
 	al_register_event_source(InputEventQueue, MouseEventSource);
 
 	menu0 = al_load_bitmap("Metal_Slug_X-title.png");
-	al_draw_bitmap(menu0, 0, 0, NULL);
 
-	bool ready =0;
+	bool ready = 0;
+	float width = al_get_bitmap_width(menu0);
+	float height = al_get_bitmap_height(menu0);
+
+
 	while (!ready)
 	{
+		al_draw_scaled_rotated_bitmap(menu0, width, height, ScreenDimensions.x, ScreenDimensions.y, ScreenDimensions.x/width, ScreenDimensions.y/height, 0, NULL);
+		al_flip_display();
 
 	}
+
 }
 
 int GameInit()
