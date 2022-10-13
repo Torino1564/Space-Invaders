@@ -5,6 +5,7 @@ void Game()
 
 	/* Aca iria el menu*/
 
+
 	int error = GameInit();
 
 	while (running && !error)
@@ -25,6 +26,10 @@ int GameInit()
 
 	al_install_keyboard();
 	al_install_mouse();
+
+	menu0 = al_load_bitmap("Metal_Slug_X-title.png");
+ 	al_draw_bitmap(menu0, al_get_bitmap_width(menu0), al_get_bitmap_height(menu0), 0);
+
 
 	int error = 0;
 
@@ -126,6 +131,7 @@ void GameDestroy()
 	DestroyMatrix(AlienGrid);
 	DestroyEntity(Spaceship);
 	DestroyEntity(Alien);
+	al_destroy_bitmap(menu0);
 	al_destroy_display(DISPLAY);
 	al_destroy_user_event_source(KeyboardEventSource);
 	al_destroy_user_event_source(MouseEventSource);
