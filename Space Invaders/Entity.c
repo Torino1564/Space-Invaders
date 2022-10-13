@@ -3,13 +3,15 @@
 
 void DrawEntity(Entity* Entity)
 {
-	if (Entity->Texture != NULL)
+	if (Entity != NULL)
 	{
-		al_draw_scaled_bitmap(Entity->Texture, 0, 0,
-			al_get_bitmap_width(Entity->Texture), al_get_bitmap_height(Entity->Texture),
-			Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
+		if (Entity->Texture != NULL)
+		{
+			al_draw_scaled_bitmap(Entity->Texture, 0, 0,
+				al_get_bitmap_width(Entity->Texture), al_get_bitmap_height(Entity->Texture),
+				Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
+		}
 	}
-
 	return;
 }
 
@@ -69,6 +71,34 @@ Entity* CreateNewEntity(Vec2F pos, Vec2F vel, const char* texture, int height, i
 	
 }
 
+Entity* CreateNewEntityLoadedTexture(Vec2F pos, Vec2F vel, ALLEGRO_BITMAP* texture, int width, int height)
+{
+	Entity* ent = malloc(sizeof(Entity));
+	if (ent == NULL)
+	{
+		return NULL;
+	}
+	ent->Pos = pos;
+	ent->Vel = vel;
+	ent->width = width;
+	ent->height = height;
+
+	if (texture != NULL)
+	{
+		ent->Texture = texture;
+	}
+	else
+	{
+		return NULL;
+	}
+
+	al_convert_mask_to_alpha(ent->Texture, al_map_rgb(255, 0, 255));
+
+
+	return ent;
+
+}
+
 void DestroyEntity(Entity* Entity)
 {
 	if (Entity->Texture != NULL)
@@ -79,8 +109,29 @@ void DestroyEntity(Entity* Entity)
 	return;
 }
 
-int AreColiding(Entity* e1, Entity* e2)
+void DestroyEntityLoadedTexture(Entity* Entity)
 {
-	return (((e1->Pos.x > e2->Pos.x) && (e1->Pos.x < (e2->Pos.x + e2->width)))
-		&& ((e1->Pos.y > e2->Pos.y) && (e1->Pos.y < (e2->Pos.y + e2->height))));
+	if (Entity != NULL)
+	{
+		free(Entity);
+	}
+	return;
+}
+
+int AreColiding(Entity* e0, Entity* e1)
+{
+	if (e1 != NULL && e0 != NULL)
+	{
+		float right0 = e0->Pos.x + e0->width;
+		float bottom0 = e0->Pos.y + e0->height;
+		float right1 = e1->Pos.x + e1->width;
+		float bottom1 = e1->Pos.y + e1->height;
+
+		return
+			right0 >= e1->Pos.x &&
+			e0->Pos.x <= right1 &&
+			bottom0 >= e1->Pos.y &&
+			e0->Pos.y <= bottom1;
+	}
+	else return 0;
 }

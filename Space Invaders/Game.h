@@ -62,6 +62,8 @@ double DeltaTime;
 
 clock_t t;
 
+double FramesPerSecond;
+
 /* ==============================
 				Aliens
 ================================= */
@@ -69,8 +71,10 @@ clock_t t;
 Entity* Alien;
 
 Entity * Bullets[10];
+ALLEGRO_BITMAP* BulletTexture;
 
 AlienMatrix * AlienGrid;
+ALLEGRO_BITMAP* AlienTexture;
 
 int XAliens;
 int YAliens;

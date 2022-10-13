@@ -24,5 +24,8 @@ void DrawEntity(Entity* Entity);
 void UpdateEntity(Entity* Entity , double dt );
 void ClipToScreen(Entity* Entity, Vec2 Screen);
 Entity* CreateNewEntity(Vec2F pos, Vec2F vel, const char * texture , int width , int height);
+Entity* CreateNewEntityLoadedTexture(Vec2F pos, Vec2F vel, ALLEGRO_BITMAP* texture, int width, int height);
+
 void DestroyEntity(Entity* Entity);
+void DestroyEntityLoadedTexture(Entity* Entity);
 int AreColiding(Entity* e1, Entity* e2);

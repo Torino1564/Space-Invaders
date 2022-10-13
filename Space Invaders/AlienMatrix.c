@@ -12,6 +12,10 @@ AlienMatrix* NewMatrix( Vec2F pos_p, int width_p, int height_p, int Awidth_p, in
 		TempMatrix->AlienHeight = Aheight_p;
 		TempMatrix->AlienWidth = Awidth_p;
 
+		TempMatrix->AlienPaddingX = (TempMatrix->width - TempMatrix->AlienWidth * 11) / 10;
+		TempMatrix->AlienPaddingY = (TempMatrix->height - TempMatrix->AlienHeight * 4) / 3;
+
+
 	}
 
 	return TempMatrix;
@@ -20,4 +24,65 @@ AlienMatrix* NewMatrix( Vec2F pos_p, int width_p, int height_p, int Awidth_p, in
 void DestroyMatrix(AlienMatrix* matrix)
 {
 	free(matrix);
+}
+
+void DrawGrid(AlienMatrix* Matrix)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 11; j++)
+		{
+			if (Matrix->matrix[i][j] != NULL)
+			{
+				DrawEntity(Matrix->matrix[i][j]);
+			}
+		}
+	}
+}
+
+void SpawnMatrix(AlienMatrix* Matrix , ALLEGRO_BITMAP * texture)
+{
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 11; j++)
+		{
+			if (Matrix->matrix[i][j] == NULL)
+			{
+				Matrix->matrix[i][j] = CreateNewEntityLoadedTexture(
+					NewVec2F(Matrix->Pos.x + (50 + Matrix->AlienPaddingX) * j, Matrix->Pos.y + (50 + Matrix->AlienPaddingY) * i),
+					NewVec2F(0, 0), texture, 50, 50);
+			}
+			DrawEntity(Matrix->matrix[i][j]);
+			al_flip_display();
+			al_rest(0.02);
+		}
+	}
+
+	Matrix->AlienCount = 4 * 11;
+}
+
+void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix)
+{
+	for (int b = 0; b < 10; b++)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 11; j++)
+			{
+				if (Bullet[b] != NULL && Matrix->matrix[i][j] != NULL)
+				{
+					if (AreColiding(Matrix->matrix[i][j] , Bullet[b]))
+					{
+						DestroyEntityLoadedTexture(Bullet[b]);
+						Bullet[b] = NULL;
+
+						DestroyEntityLoadedTexture(Matrix->matrix[i][j]);
+						Matrix->matrix[i][j] = NULL;
+
+						Matrix->AlienCount -= 1;
+					}
+				}
+			}
+		}
+	}
 }
