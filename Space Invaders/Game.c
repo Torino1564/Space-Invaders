@@ -27,8 +27,8 @@ int GameInit()
 	al_install_keyboard();
 	al_install_mouse();
 
-	menu0 = al_load_bitmap("Metal_Slug_X-title.png");
- 	al_draw_bitmap(menu0, al_get_bitmap_width(menu0), al_get_bitmap_height(menu0), 0);
+	ALLEGRO_BITMAP* something = al_create_bitmap(100, 100);
+ 	al_draw_bitmap(something, 100, 100, 0);
 
 
 	int error = 0;
