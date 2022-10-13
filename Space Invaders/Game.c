@@ -29,13 +29,7 @@ int GameInit()
 	al_install_mouse();
 
 	
-	menu0 = al_load_bitmap("Metal_Slug_X-title.png");
-	menu1 = al_create_bitmap(100, 100);
 	
-	if (menu1 != NULL)
-	{
-		al_draw_bitmap(menu1, 100, 100, NULL);
-	}
 	ScreenDimensions = NewVec2(1366, 768);
 
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
@@ -68,7 +62,12 @@ int GameInit()
 
 	al_register_event_source(InputEventQueue, KeyboardEventSource);
 	al_register_event_source(InputEventQueue, MouseEventSource);
+	
+	menu0 = al_load_bitmap("Metal_Slug_X-title.png");
 
+
+	al_draw_bitmap(menu0, 100, 100, 0);
+		
 	Vec2 GridDimensions = NewVec2(768, 240);
 	int AlienPaddingX = (GridDimensions.x - 50 * 11) / 10;
 	int AlienPaddingY = (GridDimensions.y - 50 * 4) / 3;
