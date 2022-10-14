@@ -6,7 +6,7 @@ void Game()
 
 	int errorI = GameInit();
 
-	while (running && !error && !errorI)
+	while (running)
 	{
 		GameLoop();
 	}
@@ -67,12 +67,12 @@ int Menu()
 	float height = al_get_bitmap_height(menu0);
 
 
-	while (!ready)
+	/*while (!ready)
 	{
 		al_draw_scaled_rotated_bitmap(menu0, width, height, ScreenDimensions.x, ScreenDimensions.y, ScreenDimensions.x/width, ScreenDimensions.y/height, 0, NULL);
 		al_flip_display();
 
-	}
+	}*/
 
 }
 
@@ -267,6 +267,14 @@ void GameRender()
 
 	if (AlienGrid->AlienCount == 0)
 	{
+		for (int i = 0; i < 10; i++) //Limpia las balas que quedan volando cuando se quedan sin aliens
+		{
+			if (Bullets[i] != NULL)
+			{
+				DestroyEntityLoadedTexture(Bullets[i]);
+				Bullets[i] = NULL;
+			}
+		}
 		SpawnMatrix(AlienGrid, AlienTexture);
 		t = clock();
 	}
