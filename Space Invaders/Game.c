@@ -2,11 +2,13 @@
 
 void Game()
 {
+	SystemInit();
+
 	int error = Menu();
 
 	int errorI = GameInit();
 
-	while (running)
+	while (running )
 	{
 		GameLoop();
 	}
@@ -16,7 +18,7 @@ void Game()
 	return;
 }
 
-int Menu()
+int SystemInit()
 {
 	int error = 0;
 
@@ -27,7 +29,7 @@ int Menu()
 	al_install_keyboard();
 	al_install_mouse();
 
-	ScreenDimensions = NewVec2(1161, 870);
+	ScreenDimensions = NewVec2(1366, 768);
 
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
 	if (DISPLAY == NULL)
@@ -60,11 +62,21 @@ int Menu()
 	al_register_event_source(InputEventQueue, KeyboardEventSource);
 	al_register_event_source(InputEventQueue, MouseEventSource);
 
-	menu0 = al_load_bitmap("Menu0.png");
+	PastFrameTime = 0;
+	DeltaTime = 0;
+}
+
+int Menu()
+{
+	int error = 0;
+
+	menu0 = al_load_bitmap(MENU_BG);
+	if (menu0 == NULL)
+	{
+		return -1;
+	}
 
 	bool ready = 0;
-	float width = al_get_bitmap_width(menu0);
-	float height = al_get_bitmap_height(menu0);
 
 
 	/*while (!ready)
@@ -88,14 +100,14 @@ int GameInit()
 	int AlienWidth = 50;
 	int AlienHeight = 50;
 
-	AlienTexture = al_load_bitmap("Resources/alien1.png");
+	AlienTexture = al_load_bitmap(ALIEN_TEXTURE1);
 	if (AlienTexture == NULL)
 	{
 		printf("There has been an error loading the alien texture");
 		error = -1;
 	}
 
-	AlienGrid = NewMatrix( NewVec2F(ScreenDimensions.x/2 - GridDimensions.x/2, 50), GridDimensions.x, GridDimensions.y, AlienWidth, AlienHeight);
+	AlienGrid = NewMatrix( NewVec2F(ScreenDimensions.x/2 - GridDimensions.x/2, 50), GridDimensions.x, GridDimensions.y, AlienWidth, AlienHeight , 50);
 	if (AlienGrid == NULL)
 	{
 		printf("There has been an error creating the Alien Matrix");
@@ -119,22 +131,19 @@ int GameInit()
 		AlienGrid->AlienCount = 0; //Esta linea esta para que la funcion pase por AlienSpawn por primera vez
 	}
 	
-	background1 = al_load_bitmap("nivel3.png");
+	background1 = al_load_bitmap(LVL1_BG);
+	if (background1 == NULL)
+	{
+		printf("There has ben an error loading the level 1 background bitmap");
+		return -1;
+	}
 
-	Spaceship = CreateNewEntity(NewVec2F(600, 820), NewVec2F(0, 0), "Resources/Ship.png", 40, 50);
+	Spaceship = CreateNewEntity(NewVec2F(ScreenDimensions.x/2 - 50/2, ScreenDimensions.y - 80 ), NewVec2F(0, 0), SHIP_TEXTURE, 40, 50);
 	if (Spaceship == NULL)
 	{
 		printf("There has been an error creating the player spaceship");
 		error = -1;
 	}
-
-	Alien = CreateNewEntity(NewVec2F(100, 50), NewVec2F(0, 0), "Resources/alien1.png", 50, 50);
-	if (Alien == NULL)
-	{
-		printf("There has been an error creating the Alien entity");
-		error = -1;
-	}
-	
 
 	Bullets[0] = malloc(sizeof(Entity) * 10);
 	if (Bullets[0] != NULL)
@@ -144,7 +153,7 @@ int GameInit()
 			Bullets[i] = NULL;
 		}
 	}
-	BulletTexture = al_load_bitmap("Resources/Bullet.png");
+	BulletTexture = al_load_bitmap(BULLET_TEXTURE1);
 
 	return error;
 }
@@ -247,6 +256,8 @@ void GameLogic()
 		
 	}
 
+	UpdateMatrix(AlienGrid, PastFrameTime , ScreenDimensions);
+
 	CullBullets();
 	UpdateBullets();
 
@@ -261,7 +272,7 @@ void GameLogic()
 
 void GameRender()
 {
-	al_draw_bitmap(background1, 0,0, NULL);
+	al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), 0, 0, ScreenDimensions.x, ScreenDimensions.y, NULL);
 
 	DrawEntity(Spaceship);
 
@@ -305,8 +316,8 @@ void Preframe()
 void Postframe()
 {
 	t = clock() - t;
+	PastFrameTime = DeltaTime;
 	DeltaTime = (double)(t) / (CLOCKS_PER_SEC);
-	FramesPerSecond = 1 / DeltaTime;
 
 	return;
 }

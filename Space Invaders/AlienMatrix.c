@@ -1,7 +1,7 @@
 #pragma once
 #include "AlienMatrix.h"
 
-AlienMatrix* NewMatrix( Vec2F pos_p, int width_p, int height_p, int Awidth_p, int Aheight_p)
+AlienMatrix* NewMatrix( Vec2F pos_p, int width_p, int height_p, int Awidth_p, int Aheight_p , int speed)
 {
 	AlienMatrix* TempMatrix = malloc(sizeof(AlienMatrix));
 	if (TempMatrix != NULL)
@@ -15,6 +15,7 @@ AlienMatrix* NewMatrix( Vec2F pos_p, int width_p, int height_p, int Awidth_p, in
 		TempMatrix->AlienPaddingX = (TempMatrix->width - TempMatrix->AlienWidth * 11) / 10;
 		TempMatrix->AlienPaddingY = (TempMatrix->height - TempMatrix->AlienHeight * 4) / 3;
 
+		TempMatrix->HorizontalSpeed = speed;
 
 	}
 
@@ -85,4 +86,32 @@ void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix)
 			}
 		}
 	}
+}
+
+void UpdateMatrix(AlienMatrix* Matrix, double dt , Vec2 ScreenDimensions)
+{
+	static double timeBuffer;
+	timeBuffer = timeBuffer + dt;
+
+	if (timeBuffer >= 1)
+	{
+		timeBuffer = 0;
+		Matrix->Pos.x += Matrix->HorizontalSpeed;
+		
+		if ((Matrix->Pos.x + Matrix->width >= ScreenDimensions.x) || (Matrix->Pos.x - 2 * Matrix->AlienWidth < 0 ))
+		{
+			Matrix->HorizontalSpeed *= -1;
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 11; j++)
+			{
+				if (Matrix->matrix[i][j] != NULL)
+				Matrix->matrix[i][j]->Pos.x += Matrix->HorizontalSpeed;
+			}
+		}
+	}
+
+	return;
 }

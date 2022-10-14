@@ -17,33 +17,39 @@ void DrawEntity(Entity* Entity)
 
 void UpdateEntity(Entity* Entity , double dt)
 {
+	if (Entity != NULL)
+	{
+		Entity->Pos.x += Entity->Vel.x * dt;
+		Entity->Pos.y += Entity->Vel.y * dt;
+	}
 
-	Entity->Pos.x += Entity->Vel.x * dt;
-	Entity->Pos.y += Entity->Vel.y * dt;
 
 	return;
 }
 
 void ClipToScreen(Entity* Entity, Vec2 Screen)
 {
+	if (Entity != NULL)
+	{
+		if (Entity->Pos.x < 0)
+		{
+			Entity->Pos.x = 0;
+		}
+		else if (Entity->Pos.x + Entity->width > Screen.x)
+		{
+			Entity->Pos.x = Screen.x - Entity->width;
+		}
 
-	if (Entity->Pos.x < 0)
-	{
-		Entity->Pos.x = 0;
+		if (Entity->Pos.y < 0)
+		{
+			Entity->Pos.y = 0;
+		}
+		else if (Entity->Pos.y + Entity->height > Screen.y)
+		{
+			Entity->Pos.y = Screen.y - Entity->height;
+		}
 	}
-	else if (Entity->Pos.x + Entity->width > Screen.x)
-	{
-		Entity->Pos.x = Screen.x - Entity->width;
-	}
-
-	if (Entity->Pos.y < 0)
-	{
-		Entity->Pos.y = 0;
-	}
-	else if (Entity->Pos.y + Entity->height > Screen.y)
-	{
-		Entity->Pos.y = Screen.y - Entity->height;
-	}
+	
 }
 
 Entity* CreateNewEntity(Vec2F pos, Vec2F vel, const char* texture, int height, int width)
@@ -101,9 +107,9 @@ Entity* CreateNewEntityLoadedTexture(Vec2F pos, Vec2F vel, ALLEGRO_BITMAP* textu
 
 void DestroyEntity(Entity* Entity)
 {
+	if (Entity != NULL)
 	if (Entity->Texture != NULL)
 	al_destroy_bitmap(Entity->Texture);
-	if (Entity != NULL)
 	free(Entity);
 
 	return;

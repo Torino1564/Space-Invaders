@@ -9,14 +9,30 @@
 #include "Vec2.h"
 #include <time.h>
 #include "AlienMatrix.h"
+/* ===================================
 
-int Menu();
-void Game();
+			FILE PATHS
+
+====================================== */ 
+//	Assets
+
+#define ALIEN_TEXTURE1 "Resources/Assets/alien1.png"
+#define BULLET_TEXTURE1 "Resources/Assets/bullet.png"
+#define SHIP_TEXTURE	"Resources/Assets/Ship.png"
+
+//	Backgrounds
+
+#define MENU_BG	"Resources/Backgrounds/menulogo.png"
+#define LVL1_BG	"Resources/Backgrounds/bg1.png"
+
 /* ===================================
 	
 		Functions
 
  ==================================== */
+int SystemInit();
+int Menu();
+void Game();
 int GameInit();
 void GameLoop();
 void GameLogic();
@@ -63,7 +79,7 @@ double DeltaTime;
 
 clock_t t;
 
-double FramesPerSecond;
+double PastFrameTime;
 
 /* ==============================
 				Aliens
