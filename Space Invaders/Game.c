@@ -98,9 +98,11 @@ int Menu()
 			switch (MenuEvent.type)
 			{
 			case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-				if (true)
+				if ((MenuEvent.mouse.x < ScreenDimensions.x / 3 - margin) && (MenuEvent.mouse.x > (ScreenDimensions.x / 3 - margin -width)
+					&& (MenuEvent.mouse.y < (ScreenDimensions.y - 50)) && (MenuEvent.mouse.y > (ScreenDimensions.y - 50 - height)))
+					)
 					{
-
+						ready = 1;
 					}
 			}			
 
