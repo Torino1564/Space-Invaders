@@ -70,21 +70,45 @@ int Menu()
 {
 	int error = 0;
 
-	menu0 = al_load_bitmap(MENU_BG);
-	if (menu0 == NULL)
+	menu = al_load_bitmap(MENU_BG);
+	start = al_load_bitmap(START_BG);
+	if (menu == NULL)
 	{
 		return -1;
 	}
 
 	bool ready = 0;
+	float width = al_get_bitmap_width(menu);
+	float height = al_get_bitmap_height(menu);
 
 
-	/*while (!ready)
+	while (!ready)
 	{
-		al_draw_scaled_rotated_bitmap(menu0, width, height, ScreenDimensions.x, ScreenDimensions.y, ScreenDimensions.x/width, ScreenDimensions.y/height, 0, NULL);
+		int margin = 40;
+		al_draw_scaled_rotated_bitmap(menu, width, height, ScreenDimensions.x, ScreenDimensions.y, ScreenDimensions.x/width, ScreenDimensions.y/height, 0, NULL);
+		float width = al_get_bitmap_width(start);
+		float height = al_get_bitmap_height(start);
+		al_draw_scaled_rotated_bitmap(start, width, height, ScreenDimensions.x/3 - margin, ScreenDimensions.y -50, 1, 1, 0, NULL);
+
+
+		if (!al_is_event_queue_empty(InputEventQueue))
+		{
+			al_get_next_event(InputEventQueue, &MenuEvent);
+
+			switch (MenuEvent.type)
+			{
+			case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+				if (true)
+					{
+
+					}
+			}			
+
+		}
+
 		al_flip_display();
 
-	}*/
+	}
 
 }
 
@@ -163,7 +187,7 @@ void GameDestroy()
 	DestroyMatrix(AlienGrid);
 	DestroyEntity(Spaceship);
 	DestroyEntity(Alien);
-	al_destroy_bitmap(menu0);
+	al_destroy_bitmap(menu);
 	al_destroy_display(DISPLAY);
 	al_destroy_user_event_source(KeyboardEventSource);
 	al_destroy_user_event_source(MouseEventSource);

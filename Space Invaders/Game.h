@@ -23,6 +23,7 @@
 //	Backgrounds
 
 #define MENU_BG	"Resources/Backgrounds/menulogo.png"
+#define START_BG	"Resources/Backgrounds/start.png"
 #define LVL1_BG	"Resources/Backgrounds/bg1.png"
 
 /* ===================================
@@ -58,8 +59,9 @@ typedef struct ALLEGRO_TIMER ALLEGRO_TIMER;
 
 ALLEGRO_DISPLAY* DISPLAY;
 
-ALLEGRO_BITMAP* menu0; 
-ALLEGRO_BITMAP* menu1;
+ALLEGRO_BITMAP* menu;
+
+ALLEGRO_BITMAP* start;
 
 ALLEGRO_BITMAP* background1;
 
@@ -70,6 +72,8 @@ ALLEGRO_EVENT_SOURCE* MouseEventSource;
 ALLEGRO_EVENT_QUEUE* InputEventQueue;
 
 ALLEGRO_EVENT TempEvent;
+
+ALLEGRO_EVENT MenuEvent;
 
 ALLEGRO_KEYBOARD_STATE KeyboardCurrentState;
 
