@@ -93,7 +93,7 @@ void UpdateMatrix(AlienMatrix* Matrix, double dt , Vec2 ScreenDimensions)
 	static double timeBuffer;
 	timeBuffer = timeBuffer + dt;
 
-	if (timeBuffer >= 1)
+	if (timeBuffer >=  ( 0.01 + 0.4 * ( Matrix->AlienCount / (double)44 ) ) )
 	{
 		timeBuffer = 0;
 		Matrix->Pos.x += Matrix->HorizontalSpeed;

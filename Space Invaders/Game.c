@@ -71,8 +71,13 @@ int Menu()
 	int error = 0;
 
 	menu = al_load_bitmap(MENU_BG);
-	start = al_load_bitmap(START_BG);
 	if (menu == NULL)
+	{
+		return -1;
+	}
+
+	start = al_load_bitmap(START_BG);
+	if (start == NULL)
 	{
 		return -1;
 	}
@@ -133,7 +138,7 @@ int GameInit()
 		error = -1;
 	}
 
-	AlienGrid = NewMatrix( NewVec2F(ScreenDimensions.x/2 - GridDimensions.x/2, 50), GridDimensions.x, GridDimensions.y, AlienWidth, AlienHeight , 50);
+	AlienGrid = NewMatrix( NewVec2F(ScreenDimensions.x/2 - GridDimensions.x/2, 50), GridDimensions.x, GridDimensions.y, AlienWidth, AlienHeight , 5);
 	if (AlienGrid == NULL)
 	{
 		printf("There has been an error creating the Alien Matrix");

@@ -23,7 +23,7 @@
 //	Backgrounds
 
 #define MENU_BG	"Resources/Backgrounds/menulogo.png"
-#define START_BG	"Resources/Backgrounds/start.png"
+#define START_BG "Resources/Backgrounds/start.png"
 #define LVL1_BG	"Resources/Backgrounds/bg1.png"
 
 /* ===================================
