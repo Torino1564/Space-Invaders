@@ -10,6 +10,7 @@
 #include "Vec2.h"
 #include <time.h>
 #include "AlienMatrix.h"
+
 /* ===================================
 
 			FILE PATHS
@@ -100,11 +101,13 @@ ALLEGRO_BITMAP* BulletTexture;
 AlienMatrix * AlienGrid;
 ALLEGRO_BITMAP* AlienTexture;
 
+AlienMatrix* CollisionGrid;
+
 int XAliens;
 int YAliens;
 
 /* =============================
-			Samples
+			Audio
 =============================== */
 
 #define SAMPLE_COUNT 30
@@ -118,8 +121,12 @@ int YAliens;
 #define ALIEN3SFX	"Resources/Audio/fastinvader3.wav"
 #define ALIEN4SFX	"Resources/Audio/fastinvader4.wav"
 
+#define EXPLOSION1	"Resources/Audio/Explosion1.wav"
+
 #define PLAYERSHOTSFX "Resources/Audio/shoot.wav"
 #define PLAYERDEATHSFX NULL
+
+ALLEGRO_MIXER* Mixer;
 
 ALLEGRO_SAMPLE* BackgroundMusic1;
 ALLEGRO_SAMPLE* BackgroundMusic2;
@@ -129,6 +136,8 @@ ALLEGRO_SAMPLE* Alien1SFX;
 ALLEGRO_SAMPLE* Alien2SFX;
 ALLEGRO_SAMPLE* Alien3SFX;
 ALLEGRO_SAMPLE* Alien4SFX;
+
+ALLEGRO_SAMPLE* Explosion1;
 
 ALLEGRO_SAMPLE* PlayerShotSFX;
 ALLEGRO_SAMPLE* PlayerDeathSFX;
