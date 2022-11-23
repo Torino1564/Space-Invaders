@@ -4,6 +4,7 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_audio.h>
 #include <stdio.h>
 #include "Entity.h"
 #include "Vec2.h"
@@ -56,6 +57,8 @@ typedef struct ALLEGRO_DISPLAY ALLEGRO_DISPLAY;
 typedef struct ALLEGRO_EVENT_SOURCE ALLEGRO_EVENT_SOURCE;
 typedef struct ALLEGRO_EVENT_QUEUE ALLEGRO_EVENT_QUEUE;
 typedef struct ALLEGRO_TIMER ALLEGRO_TIMER;
+typedef struct ALLEGRO_SAMPLE_ID ALLEGRO_SAMPLE_ID;
+typedef struct ALLEGRO_SAMPLE ALLEGRO_SAMPLE;
 
 ALLEGRO_DISPLAY* DISPLAY;
 
@@ -99,3 +102,35 @@ ALLEGRO_BITMAP* AlienTexture;
 
 int XAliens;
 int YAliens;
+
+/* =============================
+			Samples
+=============================== */
+
+#define SAMPLE_COUNT 30
+
+#define BACKGROUNDMUSIC1 "Resources/Audio/spaceinvaders1.mpeg"
+#define BACKGROUNDMUSIC2 NULL
+
+#define ALIENDEATHSFX "Resources/Audio/invaderkilled.wav"
+#define ALIEN1SFX	"Resources/Audio/fastinvader1.wav"
+#define ALIEN2SFX	"Resources/Audio/fastinvader2.wav"
+#define ALIEN3SFX	"Resources/Audio/fastinvader3.wav"
+#define ALIEN4SFX	"Resources/Audio/fastinvader4.wav"
+
+#define PLAYERSHOTSFX "Resources/Audio/shoot.wav"
+#define PLAYERDEATHSFX NULL
+
+ALLEGRO_SAMPLE* BackgroundMusic1;
+ALLEGRO_SAMPLE* BackgroundMusic2;
+
+ALLEGRO_SAMPLE* AlienDeathSFX;
+ALLEGRO_SAMPLE* Alien1SFX;
+ALLEGRO_SAMPLE* Alien2SFX;
+ALLEGRO_SAMPLE* Alien3SFX;
+ALLEGRO_SAMPLE* Alien4SFX;
+
+ALLEGRO_SAMPLE* PlayerShotSFX;
+ALLEGRO_SAMPLE* PlayerDeathSFX;
+
+
