@@ -92,8 +92,6 @@ double PastFrameTime;
 				Aliens
 ================================= */
 
-Entity* Alien;
-
 Entity * Bullets[10];
 ALLEGRO_BITMAP* BulletTexture;
 
@@ -107,30 +105,6 @@ int YAliens;
 			Samples
 =============================== */
 
-#define SAMPLE_COUNT 30
 
-#define BACKGROUNDMUSIC1 "Resources/Audio/spaceinvaders1.mpeg"
-#define BACKGROUNDMUSIC2 NULL
-
-#define ALIENDEATHSFX "Resources/Audio/invaderkilled.wav"
-#define ALIEN1SFX	"Resources/Audio/fastinvader1.wav"
-#define ALIEN2SFX	"Resources/Audio/fastinvader2.wav"
-#define ALIEN3SFX	"Resources/Audio/fastinvader3.wav"
-#define ALIEN4SFX	"Resources/Audio/fastinvader4.wav"
-
-#define PLAYERSHOTSFX "Resources/Audio/shoot.wav"
-#define PLAYERDEATHSFX NULL
-
-ALLEGRO_SAMPLE* BackgroundMusic1;
-ALLEGRO_SAMPLE* BackgroundMusic2;
-
-ALLEGRO_SAMPLE* AlienDeathSFX;
-ALLEGRO_SAMPLE* Alien1SFX;
-ALLEGRO_SAMPLE* Alien2SFX;
-ALLEGRO_SAMPLE* Alien3SFX;
-ALLEGRO_SAMPLE* Alien4SFX;
-
-ALLEGRO_SAMPLE* PlayerShotSFX;
-ALLEGRO_SAMPLE* PlayerDeathSFX;
 
 

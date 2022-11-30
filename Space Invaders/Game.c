@@ -25,8 +25,6 @@ int SystemInit()
 	al_init();
 
 	al_init_image_addon();
-	al_install_audio();
-	al_init_acodec_addon();
 
 	al_install_keyboard();
 	al_install_mouse();
@@ -64,7 +62,6 @@ int SystemInit()
 	al_register_event_source(InputEventQueue, KeyboardEventSource);
 	al_register_event_source(InputEventQueue, MouseEventSource);
 
-	al_reserve_samples(SAMPLE_COUNT);
 
 	PastFrameTime = 0;
 	DeltaTime = 0;
@@ -142,7 +139,7 @@ int GameInit()
 		error = -1;
 	}
 
-	AlienGrid = NewMatrix( NewVec2F(ScreenDimensions.x/2 - GridDimensions.x/2, 50), GridDimensions.x, GridDimensions.y, AlienWidth, AlienHeight , 15 , 8 , 3);
+	AlienGrid = NewMatrix( NewVec2F(ScreenDimensions.x/2 - GridDimensions.x/2, 50), GridDimensions.x, GridDimensions.y, AlienWidth, AlienHeight , 15 , XAliens , YAliens);
 	if (AlienGrid == NULL)
 	{
 		printf("There has been an error creating the Alien Matrix");
@@ -181,7 +178,7 @@ int GameInit()
 	}
 
 	Bullets[0] = malloc(sizeof(Entity) * 10);
-	if (Bullets[0] != NULL)
+	if (Bullets != NULL)
 	{
 		for (int i = 0; i < 10; i++)
 		{
@@ -190,10 +187,6 @@ int GameInit()
 	}
 	BulletTexture = al_load_bitmap(BULLET_TEXTURE1);
 
-	PlayerShotSFX = al_load_sample(PLAYERSHOTSFX);
-
-
-
 	return error;
 }
 
@@ -201,14 +194,12 @@ void GameDestroy()
 {
 	DestroyMatrix(AlienGrid);
 	DestroyEntity(Spaceship);
-	DestroyEntity(Alien);
 	al_destroy_bitmap(menu);
 	al_destroy_display(DISPLAY);
 	al_destroy_user_event_source(KeyboardEventSource);
 	al_destroy_user_event_source(MouseEventSource);
 	al_destroy_event_queue(InputEventQueue);
 
-	al_uninstall_audio();
 	al_uninstall_keyboard();
 	al_uninstall_mouse();
 	al_shutdown_image_addon();
@@ -260,8 +251,6 @@ void GameLogic()
 							break;
 						}
 					}
-
-					al_play_sample(PlayerDeathSFX, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP_ONCE, NULL);
 					break;
 				default:
 					break;
@@ -277,15 +266,8 @@ void GameLogic()
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x -= SHIP_SPEED;
 				break;
-			/*case ALLEGRO_KEY_W:
-				Spaceship->Vel.y += SHIP_SPEED;
-				break;
-			case ALLEGRO_KEY_S:
-				Spaceship->Vel.y -= SHIP_SPEED;
-				break;*/
 			default:
 				break;
-
 			}
 			break;
 
@@ -310,8 +292,9 @@ void GameLogic()
 
 void GameRender()
 {
+	//background
 	al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), 0, 0, ScreenDimensions.x, ScreenDimensions.y, 4, 11 , NULL);
-
+	//player
 	DrawEntity(Spaceship);
 
 	if (AlienGrid->AlienCount == 0)
