@@ -89,6 +89,15 @@ clock_t t;
 double PastFrameTime;
 
 /* ==============================
+				GUI
+================================= */
+
+Vec2 PlaySpaceArea;
+Vec2 PlaySpacePos;
+ALLEGRO_COLOR GUIColor;
+
+
+/* ==============================
 				Aliens
 ================================= */
 
@@ -97,6 +106,10 @@ ALLEGRO_BITMAP* BulletTexture;
 
 AlienMatrix * AlienGrid;
 ALLEGRO_BITMAP* AlienTexture;
+
+Vec2 GridDimensions;
+int AlienWidth;
+int AlienHeight;
 
 int XAliens;
 int YAliens;

@@ -124,13 +124,17 @@ int GameInit()
 {
 	int error = 0;
 
-	Vec2 GridDimensions = NewVec2(768, 240);
+	GridDimensions = NewVec2(600, 220);
 	int AlienPaddingX = (GridDimensions.x - 50 * 11) / 10;
 	int AlienPaddingY = (GridDimensions.y - 50 * 4) / 3;
 	XAliens = 11;
-	YAliens = 4;
-	int AlienWidth = 50;
-	int AlienHeight = 50;
+	YAliens = 5;
+	AlienWidth = 40;
+	AlienHeight = 40;
+
+	PlaySpaceArea = NewVec2(900, 700);
+	PlaySpacePos = NewVec2(ScreenDimensions.x / 2 - PlaySpaceArea.x / 2, 20);
+	GUIColor = al_map_rgb(40, 60, 20);
 
 	AlienTexture = al_load_bitmap(ALIEN_TEXTURE1);
 	if (AlienTexture == NULL)
@@ -139,7 +143,7 @@ int GameInit()
 		error = -1;
 	}
 
-	AlienGrid = NewMatrix( NewVec2F(ScreenDimensions.x/2 - GridDimensions.x/2, 50), GridDimensions.x, GridDimensions.y, AlienWidth, AlienHeight , 15 , XAliens , YAliens);
+	AlienGrid = NewMatrix( NewVec2F(ScreenDimensions.x/2 - GridDimensions.x/2 - AlienWidth, 50), GridDimensions.x, GridDimensions.y, AlienWidth, AlienHeight , 15 );
 	if (AlienGrid == NULL)
 	{
 		printf("There has been an error creating the Alien Matrix");
@@ -152,9 +156,9 @@ int GameInit()
 		{
 			for (int j = 0; j < XAliens; j++)
 			{ 
-				(* (AlienGrid->matrix))[i + j * AlienGrid->XAliens] = CreateNewEntityLoadedTexture(
+				AlienGrid->matrix[i][j] = CreateNewEntityLoadedTexture(
 					NewVec2F(AlienGrid->Pos.x + (50 + AlienGrid->AlienPaddingX) * j, AlienGrid->Pos.y + (50 + AlienGrid->AlienPaddingY) * i),
-					NewVec2F(0, 0), AlienTexture , 50, 50);
+					NewVec2F(0, 0), AlienTexture , 40, 40);
 
 			}
 
@@ -292,8 +296,23 @@ void GameLogic()
 
 void GameRender()
 {
+
 	//background
 	al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), 0, 0, ScreenDimensions.x, ScreenDimensions.y, 4, 11 , NULL);
+	
+	
+	//Render GUI
+	for (int i = 0; i < ScreenDimensions.x; i++)
+	{
+		for (int j = 0; j < ScreenDimensions.y; j++)
+		{
+			if ((i >= PlaySpacePos.x && i <= PlaySpacePos.x + PlaySpaceArea.x) && (j >= PlaySpacePos.y && j <= PlaySpacePos.y + PlaySpaceArea.y))
+			{
+				//al_put_pixel(i, j, GUIColor);
+			}
+
+		}
+	}
 	//player
 	DrawEntity(Spaceship);
 
@@ -320,6 +339,9 @@ void GameRender()
 			DrawEntity(Bullets[i]);
 		}
 	}
+
+	
+	
 
 	al_flip_display();
 	return;

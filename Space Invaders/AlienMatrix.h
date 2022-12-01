@@ -4,7 +4,7 @@
 
 struct AlienMatrix_t
 {
-	Entity * (* matrix)[];
+	Entity * matrix[5][11];
 
 	Vec2F Pos;
 
@@ -28,7 +28,7 @@ struct AlienMatrix_t
 
 typedef struct AlienMatrix_t AlienMatrix;
 
-AlienMatrix* NewMatrix(Vec2F pos_p, int width_p, int height_p, int Awidth_p, int Aheight_p, int speed, int Xaliens, int Yaliens);
+AlienMatrix* NewMatrix(Vec2F pos_p, int width_p, int height_p, int Awidth_p, int Aheight_p, int speed);
 void DestroyMatrix( AlienMatrix * matrix );
 void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix);
 void DrawGrid(AlienMatrix* Matrix);
