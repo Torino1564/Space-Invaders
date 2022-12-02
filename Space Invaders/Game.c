@@ -68,6 +68,10 @@ int SystemInit()
 
 	PastFrameTime = 0;
 	DeltaTime = 0;
+
+	Mixer = al_get_default_mixer();
+
+	al_reserve_samples(SAMPLE_COUNT);
 }
 
 int Menu()
@@ -90,6 +94,13 @@ int Menu()
 	float width = al_get_bitmap_width(menu);
 	float height = al_get_bitmap_height(menu);
 
+	ALLEGRO_SAMPLE* menuMusic = al_load_sample(BACKGROUNDMUSIC1);
+
+	ALLEGRO_SAMPLE_INSTANCE* playMenuMusic = al_create_sample_instance(menuMusic);
+	al_set_sample_instance_playmode(playMenuMusic, ALLEGRO_PLAYMODE_LOOP);
+	al_attach_sample_instance_to_mixer(playMenuMusic, Mixer);
+
+	al_play_sample_instance(playMenuMusic);
 
 	while (!ready)
 	{
@@ -121,6 +132,9 @@ int Menu()
 
 	}
 
+	al_stop_sample_instance(playMenuMusic);
+	al_destroy_sample_instance(playMenuMusic);
+	al_destroy_sample(menuMusic);
 }
 
 int GameInit()
@@ -166,6 +180,15 @@ int GameInit()
 		AlienGrid->AlienCount = 0; //Esta linea esta para que la funcion pase por AlienSpawn por primera vez
 	}
 	
+	CollisionGrid = NewMatrix(NewVec2F(ScreenDimensions.x / 2 - GridDimensions.x / 2, 50), GridDimensions.x, GridDimensions.y, AlienWidth, AlienHeight, 15, 8, 3);
+	for (int i = 0; i < YAliens; i++)
+	{
+		for (int j = 0; j < XAliens; j++)
+		{
+			(*(CollisionGrid->matrix))[i + j * CollisionGrid->XAliens] = (*(AlienGrid->matrix))[i + j * AlienGrid->XAliens];
+		}
+	}
+
 	background1 = al_load_bitmap(LVL1_BG);
 	if (background1 == NULL)
 	{
@@ -190,16 +213,18 @@ int GameInit()
 	}
 	BulletTexture = al_load_bitmap(BULLET_TEXTURE1);
 
+	Explosion1 = al_load_sample(EXPLOSION1);
 	PlayerShotSFX = al_load_sample(PLAYERSHOTSFX);
-
-
 
 	return error;
 }
 
 void GameDestroy()
 {
+	al_destroy_sample(Explosion1);
+
 	DestroyMatrix(AlienGrid);
+	DestroyMatrix(CollisionGrid);
 	DestroyEntity(Spaceship);
 	DestroyEntity(Alien);
 	al_destroy_bitmap(menu);
@@ -259,6 +284,10 @@ void GameLogic()
 							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 20 / 2, Spaceship->Pos.y - 20), NewVec2F(0, -600), BulletTexture, 5, 20);
 							break;
 						}
+
+						ALLEGRO_SAMPLE_INSTANCE* shot = al_create_sample_instance(PlayerShotSFX);
+						al_attach_sample_instance_to_mixer(shot, Mixer);
+						al_play_sample_instance(shot);
 					}
 
 					al_play_sample(PlayerDeathSFX, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP_ONCE, NULL);
@@ -293,6 +322,22 @@ void GameLogic()
 		}
 		
 	}
+	//Death SFX
+	for (int i = 0; i < YAliens; i++)
+	{
+		for (int j = 0; j < XAliens; j++)
+		{
+			if ((*(CollisionGrid->matrix))[i + j * CollisionGrid->XAliens] != NULL && (*(AlienGrid->matrix))[i + j * AlienGrid->XAliens] == NULL)
+			{
+				ALLEGRO_SAMPLE_INSTANCE* Death = al_create_sample_instance(Explosion1);
+				al_attach_sample_instance_to_mixer(Death, Mixer);
+				al_play_sample_instance(Death);
+
+				(*(CollisionGrid->matrix))[i + j * CollisionGrid->XAliens] = (*(AlienGrid->matrix))[i + j * AlienGrid->XAliens];
+			}
+
+		}
+	}
 
 	UpdateMatrix(AlienGrid, PastFrameTime , ScreenDimensions);
 
@@ -325,6 +370,13 @@ void GameRender()
 			}
 		}
 		SpawnMatrix(AlienGrid, AlienTexture);
+		for (int i = 0; i < YAliens; i++)
+		{
+			for (int j = 0; j < XAliens; j++)
+			{
+				(*(CollisionGrid->matrix))[i + j * CollisionGrid->XAliens] = (*(AlienGrid->matrix))[i + j * AlienGrid->XAliens];
+			}
+		}
 		t = clock();
 	}
 
