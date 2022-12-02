@@ -26,6 +26,9 @@ int SystemInit()
 
 	al_init_image_addon();
 
+	al_install_audio();
+	al_init_acodec_addon();
+
 	al_install_keyboard();
 	al_install_mouse();
 
@@ -65,6 +68,12 @@ int SystemInit()
 
 	PastFrameTime = 0;
 	DeltaTime = 0;
+
+
+	Mixer = al_get_default_mixer();
+
+	al_reserve_samples(SAMPLE_COUNT);
+
 }
 
 int Menu()
@@ -203,6 +212,7 @@ void GameDestroy()
 	al_destroy_user_event_source(KeyboardEventSource);
 	al_destroy_user_event_source(MouseEventSource);
 	al_destroy_event_queue(InputEventQueue);
+	al_destroy_sample(BackgroundMusic1);
 
 	al_uninstall_keyboard();
 	al_uninstall_mouse();

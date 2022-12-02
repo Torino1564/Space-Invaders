@@ -4,7 +4,10 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
+
 #include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+
 #include <stdio.h>
 #include "Entity.h"
 #include "Vec2.h"
@@ -115,8 +118,42 @@ int XAliens;
 int YAliens;
 
 /* =============================
-			Samples
+			Audio
 =============================== */
+
+#define SAMPLE_COUNT 30
+
+#define BACKGROUNDMUSIC1 "Resources/Audio/spaceinvaders1.mpeg"
+#define BACKGROUNDMUSIC2 NULL
+
+#define ALIENDEATHSFX "Resources/Audio/invaderkilled.wav"
+#define ALIEN1SFX	"Resources/Audio/fastinvader1.wav"
+#define ALIEN2SFX	"Resources/Audio/fastinvader2.wav"
+#define ALIEN3SFX	"Resources/Audio/fastinvader3.wav"
+#define ALIEN4SFX	"Resources/Audio/fastinvader4.wav"
+
+#define EXPLOSION1	"Resources/Audio/Explosion1.wav"
+
+#define PLAYERSHOTSFX "Resources/Audio/shoot.wav"
+#define PLAYERDEATHSFX NULL
+
+ALLEGRO_MIXER* Mixer;
+
+ALLEGRO_SAMPLE* BackgroundMusic1;
+ALLEGRO_SAMPLE* BackgroundMusic2;
+
+ALLEGRO_SAMPLE* AlienDeathSFX;
+ALLEGRO_SAMPLE* Alien1SFX;
+ALLEGRO_SAMPLE* Alien2SFX;
+ALLEGRO_SAMPLE* Alien3SFX;
+ALLEGRO_SAMPLE* Alien4SFX;
+
+ALLEGRO_SAMPLE* Explosion1;
+
+ALLEGRO_SAMPLE* PlayerShotSFX;
+ALLEGRO_SAMPLE* PlayerDeathSFX;
+
+
 
 
 
