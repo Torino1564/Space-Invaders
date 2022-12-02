@@ -134,6 +134,11 @@ int YAliens;
 
 #define EXPLOSION1	"Resources/Audio/Explosion1.wav"
 
+#define MUSIC_LEVEL1 "Resources/Audio/Level1.mp3" 
+#define MUSIC_LEVEL2 "Resources/Audio/Level2.mp3" 
+#define MUSIC_LEVEL3 "Resources/Audio/Level3.mp3" 
+#define MUSIC_LEVEL4 "Resources/Audio/Level4.mp3" 
+
 #define PLAYERSHOTSFX "Resources/Audio/shoot.wav"
 #define PLAYERDEATHSFX NULL
 
@@ -152,6 +157,12 @@ ALLEGRO_SAMPLE* Explosion1;
 
 ALLEGRO_SAMPLE* PlayerShotSFX;
 ALLEGRO_SAMPLE* PlayerDeathSFX;
+
+
+ALLEGRO_SAMPLE* menuMusic;
+ALLEGRO_SAMPLE* level2Music;
+ALLEGRO_SAMPLE* level4Music;
+
 
 
 

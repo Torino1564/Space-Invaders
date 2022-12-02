@@ -96,6 +96,16 @@ int Menu()
 	float width = al_get_bitmap_width(menu);
 	float height = al_get_bitmap_height(menu);
 
+	menuMusic = al_load_sample(BACKGROUNDMUSIC1);
+
+	al_play_sample(menuMusic, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+
+//	ALLEGRO_SAMPLE_INSTANCE* playMenuMusic = al_create_sample_instance(menuMusic);
+//	al_set_sample_instance_playmode(playMenuMusic, ALLEGRO_PLAYMODE_LOOP);
+//	al_attach_sample_instance_to_mixer(playMenuMusic, Mixer);
+
+//	al_play_sample_instance(playMenuMusic);
+
 
 	while (!ready)
 	{
@@ -126,6 +136,7 @@ int Menu()
 		al_flip_display();
 
 	}
+	al_stop_samples();
 
 }
 
@@ -182,6 +193,12 @@ int GameInit()
 		printf("There has ben an error loading the level 1 background bitmap");
 		return -1;
 	}
+
+	level2Music = al_load_sample(MUSIC_LEVEL2);
+	level4Music = al_load_sample(MUSIC_LEVEL4);
+
+	al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+
 
 	Spaceship = CreateNewEntity(NewVec2F(ScreenDimensions.x/2 - 50/2, ScreenDimensions.y - 80 ), NewVec2F(0, 0), SHIP_TEXTURE, 40, 50);
 	if (Spaceship == NULL)
