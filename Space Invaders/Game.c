@@ -188,16 +188,23 @@ int GameInit()
 	}
 	
 	background1 = al_load_bitmap(LVL1_BG);
-	if (background1 == NULL)
+	background2 = al_load_bitmap(LVL2_BG);
+	background4 = al_load_bitmap(LVL4_BG);
+	if (background2 == NULL)
 	{
-		printf("There has ben an error loading the level 1 background bitmap");
+		printf("There has ben an error loading the level 4 background bitmap");
+		return -1;
+	}
+
+	if (background4 == NULL)
+	{
+		printf("There has ben an error loading the level 4 background bitmap");
 		return -1;
 	}
 
 	level2Music = al_load_sample(MUSIC_LEVEL2);
 	level4Music = al_load_sample(MUSIC_LEVEL4);
 
-	al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 
 
 	Spaceship = CreateNewEntity(NewVec2F(ScreenDimensions.x/2 - 50/2, ScreenDimensions.y - 80 ), NewVec2F(0, 0), SHIP_TEXTURE, 40, 50);
@@ -248,6 +255,7 @@ void GameLoop()
 
 void GameLogic()
 {
+
 	if (!al_is_event_queue_empty(InputEventQueue))
 	{
 		al_get_next_event(InputEventQueue, &TempEvent);
@@ -263,6 +271,10 @@ void GameLogic()
 				case ALLEGRO_KEY_D:
 					Spaceship->Vel.x += SHIP_SPEED;
 					break;
+				case ALLEGRO_KEY_S:
+					Level += 1;
+					break;
+
 				case ALLEGRO_KEY_F4:
 					if (al_key_down(&KeyboardCurrentState, ALLEGRO_KEY_ALT))
 						running = 0;
@@ -317,6 +329,11 @@ void GameLogic()
 	UpdateEntity(Spaceship, DeltaTime);
 	ClipToScreen(Spaceship, ScreenDimensions);
 
+	if (AlienGrid->AlienCount == 0)
+	{
+		Level += 1;
+	}
+
 
 	return;
 }
@@ -324,9 +341,66 @@ void GameLogic()
 void GameRender()
 {
 
-	//background
-	al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), 0, 0, ScreenDimensions.x, ScreenDimensions.y, 4, 11 , NULL);
+	//Background
+	switch (Level)
+	{
+		case 1:
+			al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), 0, 0, ScreenDimensions.x, ScreenDimensions.y, 4, 11, NULL);
+			break;
+		case 2:
+			al_draw_scaled_bitmap(background2, 0, 0, al_get_bitmap_width(background2), al_get_bitmap_height(background2), 0, 0, ScreenDimensions.x, ScreenDimensions.y, 4, 11, NULL);
+			break;
+		case 3:
+			al_draw_scaled_bitmap(background4, 0, 0, al_get_bitmap_width(background4), al_get_bitmap_height(background4), 0, 0, ScreenDimensions.x, ScreenDimensions.y, 4, 11, NULL);
+			break;
+		case 4:
+			al_draw_scaled_bitmap(background4, 0, 0, al_get_bitmap_width(background4), al_get_bitmap_height(background4), 0, 0, ScreenDimensions.x, ScreenDimensions.y, 4, 11, NULL);
+			break;
+	}
 	
+	//Music
+	static int playing = 0;
+	
+	if (playing == 0) //primer nivel
+	{
+		al_stop_samples();
+		al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+		playing = Level;
+	}
+	if (playing == 1)  //espera al segundo nivel
+	{
+		playing = Level;
+	}
+	if (playing == 2) //segundo nivel
+	{
+		al_stop_samples();
+		al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+		playing = Level+1;
+	}
+	if (playing == 3) // espera al tercer nivel
+	{
+		playing = Level+1;
+	}
+	if (playing == 4) // tercer nivel
+	{
+		al_stop_samples();
+		al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+		playing = Level+2;
+	}
+	if (playing == 5) // espera al cuarto nivel
+	{
+		playing = Level+2;
+	}
+	if (playing == 6)
+	{
+		al_stop_samples();
+		al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+		playing = Level+5;
+	}
+	if (playing == 9)
+	{
+		playing = 3*Level-3;
+	}
 	
 	//Render GUI
 	for (int i = 0; i < ScreenDimensions.x; i++)

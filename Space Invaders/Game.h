@@ -28,7 +28,12 @@
 
 #define MENU_BG	"Resources/Backgrounds/menulogo.png"
 #define START_BG "Resources/Backgrounds/start.png"
+
+
 #define LVL1_BG	"Resources/Backgrounds/bg1.png"
+#define LVL2_BG	"Resources/Backgrounds/bg2.png"
+//#define LVL3_BG	"Resources/Backgrounds/bg3.png"
+#define LVL4_BG	"Resources/Backgrounds/bg4.png"
 
 /* ===================================
 	
@@ -70,6 +75,9 @@ ALLEGRO_BITMAP* menu;
 ALLEGRO_BITMAP* start;
 
 ALLEGRO_BITMAP* background1;
+ALLEGRO_BITMAP* background2;
+ALLEGRO_BITMAP* background3;
+ALLEGRO_BITMAP* background4;
 
 ALLEGRO_EVENT_SOURCE* KeyboardEventSource;
 
@@ -163,9 +171,11 @@ ALLEGRO_SAMPLE* menuMusic;
 ALLEGRO_SAMPLE* level2Music;
 ALLEGRO_SAMPLE* level4Music;
 
+/* =============================
+			Variable global
+=============================== */
 
-
-
+int Level;
 
 
 
