@@ -79,6 +79,9 @@ ALLEGRO_BITMAP* menu;
 ALLEGRO_BITMAP* start;
 
 ALLEGRO_BITMAP* background1;
+ALLEGRO_BITMAP* background2;
+ALLEGRO_BITMAP* background3;
+ALLEGRO_BITMAP* background4;
 
 ALLEGRO_EVENT_SOURCE* KeyboardEventSource;
 
@@ -181,6 +184,6 @@ ALLEGRO_SAMPLE* level4Music;
 =============================== */
 
 int Level;
-
+int Once;
 
 
