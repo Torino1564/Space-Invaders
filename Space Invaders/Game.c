@@ -361,15 +361,34 @@ void GameRender()
 	
 	switch (Level % 4)
 	{
-		case 1:
+		case 0:
 			if (Once == 0)
 			{
 				al_stop_samples();
 				al_play_sample(level1Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 				Once = 1;
 			}
-
-
+		case 1:
+			if (Once == 0)
+			{
+				al_stop_samples();
+				al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+				Once = 1;
+			}
+		case 2:
+			if (Once == 0)
+			{
+				al_stop_samples();
+				al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+				Once = 1;
+			}
+		case 3:
+			if (Once == 0)
+			{
+				al_stop_samples();
+				al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+				Once = 1;
+			}
 	}
 
 	//player
