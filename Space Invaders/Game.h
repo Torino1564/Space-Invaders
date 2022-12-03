@@ -17,6 +17,15 @@
 #include "SpriteSheet.h"
 /* ===================================
 
+			PLATFORM
+
+====================================== */
+
+int pc;
+int raspi;
+
+/* ===================================
+
 			FILE PATHS
 
 ====================================== */ 
@@ -25,8 +34,11 @@
 #define ALIEN_TEXTURE1 "Resources/Assets/alien1.png"
 #define BULLET_TEXTURE1 "Resources/Assets/bullet.png"
 #define SHIP_TEXTURE	"Resources/Assets/Ship.png"
+#define GUN_TEXTURE "Resources/Assets/Gun.png"
 
 #define MINIUFO1SP "Resources/Assets/MiniUFO1Sp.png"
+#define SLUG "Resources/Assets/Spaceship_sprite.png"
+
 
 //	Backgrounds
 
@@ -37,6 +49,9 @@
 #define LVL2_BG	"Resources/Backgrounds/bg2.png"
 //#define LVL3_BG	"Resources/Backgrounds/bg3.png"
 #define LVL4_BG	"Resources/Backgrounds/bg4.png"
+
+
+#define PAUSE_BG "Resources/Backgrounds/pause.png"
 
 
 /* ===================================
@@ -54,6 +69,7 @@ void GameRender();
 void GameDestroy();
 void Preframe();
 void Postframe();
+void Pause();
 
 void CullBullets();
 void UpdateBullets();
@@ -82,6 +98,7 @@ ALLEGRO_BITMAP* background1;
 ALLEGRO_BITMAP* background2;
 ALLEGRO_BITMAP* background3;
 ALLEGRO_BITMAP* background4;
+ALLEGRO_BITMAP* backgroundpause;
 
 ALLEGRO_EVENT_SOURCE* KeyboardEventSource;
 
@@ -96,6 +113,10 @@ ALLEGRO_EVENT MenuEvent;
 ALLEGRO_KEYBOARD_STATE KeyboardCurrentState;
 
 Entity * Spaceship;
+
+Entity* Gun;
+
+Entity Marco;
 
 double DeltaTime;
 
@@ -123,6 +144,8 @@ AlienMatrix * AlienGrid;
 ALLEGRO_BITMAP* AlienTexture;
 
 SpriteSheet* MiniUFO;
+SpriteSheet* Slug;
+SpriteSheet* Weapon;
 
 Vec2 GridDimensions;
 int AlienWidth;
@@ -140,7 +163,7 @@ int YAliens;
 #define BACKGROUNDMUSIC1 "Resources/Audio/spaceinvaders1.mpeg"
 #define BACKGROUNDMUSIC2 NULL
 
-#define ALIENDEATHSFX "Resources/Audio/invaderkilled.wav"
+#define ALIENDEATHSFX "Resources/Audio/aliendeathsound.mp3"
 #define ALIEN1SFX	"Resources/Audio/fastinvader1.wav"
 #define ALIEN2SFX	"Resources/Audio/fastinvader2.wav"
 #define ALIEN3SFX	"Resources/Audio/fastinvader3.wav"
@@ -153,7 +176,7 @@ int YAliens;
 #define MUSIC_LEVEL3 "Resources/Audio/Level3.mp3" 
 #define MUSIC_LEVEL4 "Resources/Audio/Level4.mp3" 
 
-#define PLAYERSHOTSFX "Resources/Audio/shoot.wav"
+#define PLAYERSHOTSFX "Resources/Audio/shoot.mp3"
 #define PLAYERDEATHSFX NULL
 
 ALLEGRO_MIXER* Mixer;
@@ -179,11 +202,20 @@ ALLEGRO_SAMPLE* level2Music;
 // ALLEGRO_SAMPLE* level2Music;
 ALLEGRO_SAMPLE* level4Music;
 
+
+ALLEGRO_SAMPLE* Bullet_sound;
+ALLEGRO_SAMPLE* alien_death_sound;
+
+ALLEGRO_SAMPLE_INSTANCE* instance1;
+
 /* =============================
-			Variable global
+			global variables
 =============================== */
 
+int pause;
 int Level;
 int Once;
-
-
+int Moving;
+int shot;
+int aliendeath;
+int playerdeath;

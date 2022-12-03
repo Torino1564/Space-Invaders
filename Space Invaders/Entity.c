@@ -7,25 +7,24 @@ void DrawEntity(Entity* Entity)
 	{
 		if (Entity->animated == true)
 		{
-			if (Entity->spriteS->Texture != NULL)
+			if (Entity->spriteS->Texture != NULL && Entity->spriteS->animationNumber < Entity->spriteS->maxAnimationNumber)
 			{
-				al_draw_scaled_bitmap(Entity->spriteS->Texture, Entity->frameCount * Entity->spriteS->frameWidth, 0, Entity->spriteS->frameWidth, Entity->spriteS->frameHeight,
+				al_draw_scaled_bitmap(Entity->spriteS->Texture, Entity->frameCount * Entity->spriteS->frameWidth, Entity->spriteS->frameHeight * Entity->spriteS->animationNumber, Entity->spriteS->frameWidth, Entity->spriteS->frameHeight,
 					Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
 			}
-			
+
 		}
-		else if(Entity->Texture != NULL)
+		else if (Entity->Texture != NULL)
 		{
 			al_draw_scaled_bitmap(Entity->Texture, 0, 0,
 				al_get_bitmap_width(Entity->Texture), al_get_bitmap_height(Entity->Texture),
 				Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
 		}
 
-		
-
 	}
 	return;
 }
+
 
 void UpdateEntity(Entity* Entity , double dt)
 {
@@ -64,6 +63,21 @@ void ClipToScreen(Entity* Entity, Vec2 Screen)
 		}
 	}
 	
+}
+
+void ClipToEntity(Entity* e1, Entity* e2, int adjust)
+{
+	if (e1 != NULL)
+	{
+		if (e1->Pos.x < e2->Pos.x + adjust)
+		{
+			e1->Pos.x = e2->Pos.x + adjust;
+		}
+		else if (e1->Pos.x > e2->Pos.x + adjust)
+		{
+			e1->Pos.x = e2->Pos.x + adjust;
+		}
+	}
 }
 
 Entity* CreateNewEntity(Vec2F pos, Vec2F vel, const char* texture, int height, int width)
@@ -126,10 +140,13 @@ Entity* CreateNewEntityLoadedTexture(Vec2F pos, Vec2F vel, ALLEGRO_BITMAP* textu
 void DestroyEntity(Entity* Entity)
 {
 	if (Entity != NULL)
-	if (Entity->Texture != NULL)
-	al_destroy_bitmap(Entity->Texture);
-	free(Entity);
-
+	{
+		if (Entity->Texture != NULL)
+		{
+			al_destroy_bitmap(Entity->Texture);
+			free(Entity);
+		}
+	}
 	return;
 }
 

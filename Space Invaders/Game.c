@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Entity.h"
 
 void Game()
 {
@@ -22,6 +23,13 @@ void Game()
 
 int SystemInit()
 {
+#ifdef __linux__
+	pc = false;
+	raspi = true;
+#elif _WIN64
+	pc = true;
+	raspi = false;
+#endif
 	int error = 0;
 
 	al_init();
@@ -151,6 +159,9 @@ int GameInit()
 	AlienWidth = 45;
 	AlienHeight = 45;
 
+	int	SpaceshipWidth = 120;
+	int	SpaceshipHeight = 60;
+
 	PlaySpaceArea = NewVec2( 1000 , ScreenDimensions.y );
 	PlaySpacePos = NewVec2(ScreenDimensions.x/2 - PlaySpaceArea.x/2, 0);
 	GUIColor = al_map_rgb(40, 60, 20);
@@ -169,9 +180,11 @@ int GameInit()
 		error = -2;
 	}
 	
+	// Background Init
 	background1 = al_load_bitmap(LVL1_BG);
 	background2 = al_load_bitmap(LVL2_BG);
 	background4 = al_load_bitmap(LVL4_BG);
+	backgroundpause = al_load_bitmap(PAUSE_BG);
 
 	if (background1 == NULL)
 	{
@@ -189,16 +202,28 @@ int GameInit()
 		return -1;
 	}
 
+	// Music Init
 	level1Music = al_load_sample(MUSIC_LEVEL1);
 	level2Music = al_load_sample(MUSIC_LEVEL2);
 	level4Music = al_load_sample(MUSIC_LEVEL4);
 
-	Spaceship = CreateNewEntity(NewVec2F(ScreenDimensions.x/2 - 50/2, PlaySpacePos.y + PlaySpaceArea.y - 80 ), NewVec2F(0, 0), SHIP_TEXTURE, 40, 50);
+	Bullet_sound = al_load_sample(PLAYERSHOTSFX);
+	alien_death_sound = al_load_sample(ALIENDEATHSFX);
+
+	instance1 = al_create_sample_instance(PLAYERSHOTSFX);
+
+	// Characters Init
+	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)17), 16, 44, 38, 1);
+	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38, 1);
+
+	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x/2 - 50/2, PlaySpacePos.y + PlaySpaceArea.y - 80 ), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
 	if (Spaceship == NULL)
 	{
 		printf("There has been an error creating the player spaceship");
 		error = -1;
 	}
+
+	Gun = CreateNewEntity(NewVec2F(0, PlaySpacePos.y + PlaySpaceArea.y - 130), NewVec2F(0, 0), GUN_TEXTURE, 90, 90);
 
 	Bullets[0] = malloc(sizeof(Entity) * 10);
 	if (Bullets != NULL)
@@ -210,13 +235,20 @@ int GameInit()
 	}
 	BulletTexture = al_load_bitmap(BULLET_TEXTURE1);
 
-	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38);
-
+	
 	return error;
 }
 
 void GameDestroy()
 {
+	for (int i = 0; i < 10; i++)
+	{
+		if (Bullets[i] != NULL)
+		{
+			free(Bullets[i]);
+		}
+	}
+
 	DestroyMatrix(AlienGrid);
 	DestroyEntity(Spaceship);
 	al_destroy_bitmap(menu);
@@ -224,6 +256,13 @@ void GameDestroy()
 	al_destroy_user_event_source(KeyboardEventSource);
 	al_destroy_user_event_source(MouseEventSource);
 	al_destroy_event_queue(InputEventQueue);
+
+	al_destroy_sample(background1);
+	al_destroy_sample(background2);
+	al_destroy_sample(background3);
+	al_destroy_sample(background4);
+
+	al_destroy_sample_instance(instance1);
 
 	al_shutdown_primitives_addon();
 	al_uninstall_keyboard();
@@ -239,6 +278,36 @@ void GameLoop()
 	GameLogic();
 	GameRender();
 	Postframe();
+	Pause();
+
+}
+
+void Pause()
+{
+	if (pause)
+	{
+		al_draw_scaled_bitmap(backgroundpause, 0, 0, al_get_bitmap_width(backgroundpause), al_get_bitmap_height(backgroundpause), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+		al_flip_display();
+	}
+	while (pause)
+	{
+		if (!al_is_event_queue_empty(InputEventQueue))
+		{
+			al_get_next_event(InputEventQueue, &TempEvent);
+
+
+			switch (TempEvent.type)
+			{
+			case ALLEGRO_EVENT_KEY_DOWN:
+				switch (TempEvent.keyboard.keycode)
+				{
+				case ALLEGRO_KEY_ESCAPE:
+					pause = 0;
+				}
+
+			}
+		}
+	}
 }
 
 void GameLogic()
@@ -252,11 +321,16 @@ void GameLogic()
 		case ALLEGRO_EVENT_KEY_DOWN:
 			switch (TempEvent.keyboard.keycode)
 			{
+				case ALLEGRO_KEY_ESCAPE:
+					pause = 1;
+					break;
 				case ALLEGRO_KEY_A:
 					Spaceship->Vel.x -= SHIP_SPEED;
+					Gun->Vel.x -= SHIP_SPEED;
 					break;
 				case ALLEGRO_KEY_D:
 					Spaceship->Vel.x += SHIP_SPEED;
+					Gun->Vel.x += SHIP_SPEED;
 					break;
 				case ALLEGRO_KEY_S:
 					Level += 1;
@@ -267,17 +341,18 @@ void GameLogic()
 						running = 0;
 					break;
 				case ALLEGRO_KEY_SPACE:
+					shot = 1;
 					for (int i = 0; i < 10; i++)
 					{
 						if (i == 9)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 20 / 2, Spaceship->Pos.y - 20), NewVec2F(0, -600), BulletTexture , 5, 20);
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 16 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture , 5, 20);
 							break;
 						}
 
 						if (Bullets[i] == NULL)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 20 / 2, Spaceship->Pos.y - 20), NewVec2F(0, -600), BulletTexture, 5, 20);
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 16 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture, 5, 20);
 							break;
 						}
 					}
@@ -292,9 +367,11 @@ void GameLogic()
 			{
 			case ALLEGRO_KEY_A:
 				Spaceship->Vel.x += SHIP_SPEED;
+				Gun->Vel.x += SHIP_SPEED;
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x -= SHIP_SPEED;
+				Gun->Vel.x -= SHIP_SPEED;
 				break;
 			default:
 				break;
@@ -313,13 +390,19 @@ void GameLogic()
 	CullBullets();
 	UpdateBullets();
 
-	CollideGrid(Bullets, AlienGrid);
+	aliendeath = CollideGrid(Bullets, AlienGrid);
 
 	UpdateEntity(Spaceship, DeltaTime);
+	UpdateEntity(Gun, DeltaTime);
 	ClipToScreen(Spaceship, ScreenDimensions);
+	ClipToEntity(Gun, Spaceship, 10);
+	Animate(Spaceship, DeltaTime);
 
 	if (AlienGrid->AlienCount == 0)
 	{
+		Level += 1;	//Pasa al siguiente nivel
+		Once = 0;	//Resetea para el sonido
+
 		for (int i = 0; i < 10; i++) //Limpia las balas que quedan volando cuando se quedan sin aliens
 		{
 			if (Bullets[i] != NULL)
@@ -332,16 +415,15 @@ void GameLogic()
 		//FillMatrix(AlienGrid, AlienTexture);
 		FillMatrixAnimated(AlienGrid, MiniUFO);
 
+
 	}
-
-
 	return;
 }
 
 void GameRender()
-{	
+{
 	//Background
-	switch (Level%4)
+	switch ((Level - 1) % 4)
 	{
 	case 0:
 		al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
@@ -358,42 +440,56 @@ void GameRender()
 	}
 
 	//Music
-	
-	switch (Level % 4)
+
+	switch ((Level - 1) % 4)
 	{
-		case 0:
-			if (Once == 0)
-			{
-				al_stop_samples();
-				al_play_sample(level1Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-				Once = 1;
-			}
-		case 1:
-			if (Once == 0)
-			{
-				al_stop_samples();
-				al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-				Once = 1;
-			}
-		case 2:
-			if (Once == 0)
-			{
-				al_stop_samples();
-				al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-				Once = 1;
-			}
-		case 3:
-			if (Once == 0)
-			{
-				al_stop_samples();
-				al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-				Once = 1;
-			}
+	case 0:
+		if (Once == 0)
+		{
+			al_stop_samples();
+			al_play_sample(level1Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			Once = 1;
+		}
+	case 1:
+		if (Once == 0)
+		{
+			al_stop_samples();
+			al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			Once = 1;
+		}
+	case 2:
+		if (Once == 0)
+		{
+			al_stop_samples();
+			al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			Once = 1;
+		}
+	case 3:
+		if (Once == 0)
+		{
+			al_stop_samples();
+			al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			Once = 1;
+		}
 	}
 
 	//player
+	DrawEntity(Gun);
 	DrawEntity(Spaceship);
 
+
+	//fight sounds
+	if (shot)
+	{
+		al_play_sample(Bullet_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+		shot = 0;
+	}
+	if (aliendeath)
+	{
+		al_play_sample(alien_death_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+	}
+
+	
 	DrawGrid(AlienGrid);
 
 	for (int i = 0; i < 10; i++)

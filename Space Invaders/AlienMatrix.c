@@ -98,8 +98,9 @@ void FillMatrixAnimated(AlienMatrix* Matrix, SpriteSheet * SpriteSheet_p)
 	Matrix->AlienCount = Matrix->XAliens * Matrix->YAliens;
 }
 
-void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix)
+int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix)
 {
+	int death=0;
 	for (int b = 0; b < 10; b++)
 	{
 		for (int i = 0; i < Matrix->XAliens; i++)
@@ -117,11 +118,13 @@ void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix)
 						(Matrix->matrix)[i][j] = NULL;
 
 						Matrix->AlienCount -= 1;
+						death = 1;
 					}
 				}
 			}
 		}
 	}
+	return death;
 }
 
 void UpdateMatrix(AlienMatrix* Matrix, double dt , Vec2 PlayAreaPos , Vec2 PlayAreaDim)
