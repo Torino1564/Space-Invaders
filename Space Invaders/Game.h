@@ -4,7 +4,10 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
+
 #include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
+
 #include <stdio.h>
 #include "Entity.h"
 #include "Vec2.h"
@@ -25,7 +28,12 @@
 
 #define MENU_BG	"Resources/Backgrounds/menulogo.png"
 #define START_BG "Resources/Backgrounds/start.png"
+
+
 #define LVL1_BG	"Resources/Backgrounds/bg1.png"
+#define LVL2_BG	"Resources/Backgrounds/bg2.png"
+//#define LVL3_BG	"Resources/Backgrounds/bg3.png"
+#define LVL4_BG	"Resources/Backgrounds/bg4.png"
 
 /* ===================================
 	
@@ -67,6 +75,9 @@ ALLEGRO_BITMAP* menu;
 ALLEGRO_BITMAP* start;
 
 ALLEGRO_BITMAP* background1;
+ALLEGRO_BITMAP* background2;
+ALLEGRO_BITMAP* background3;
+ALLEGRO_BITMAP* background4;
 
 ALLEGRO_EVENT_SOURCE* KeyboardEventSource;
 
@@ -115,9 +126,58 @@ int XAliens;
 int YAliens;
 
 /* =============================
-			Samples
+			Audio
 =============================== */
 
+#define SAMPLE_COUNT 30
+
+#define BACKGROUNDMUSIC1 "Resources/Audio/spaceinvaders1.mpeg"
+#define BACKGROUNDMUSIC2 NULL
+
+#define ALIENDEATHSFX "Resources/Audio/invaderkilled.wav"
+#define ALIEN1SFX	"Resources/Audio/fastinvader1.wav"
+#define ALIEN2SFX	"Resources/Audio/fastinvader2.wav"
+#define ALIEN3SFX	"Resources/Audio/fastinvader3.wav"
+#define ALIEN4SFX	"Resources/Audio/fastinvader4.wav"
+
+#define EXPLOSION1	"Resources/Audio/Explosion1.wav"
+
+#define MUSIC_LEVEL1 "Resources/Audio/Level1.mp3" 
+#define MUSIC_LEVEL2 "Resources/Audio/Level2.mp3" 
+#define MUSIC_LEVEL3 "Resources/Audio/Level3.mp3" 
+#define MUSIC_LEVEL4 "Resources/Audio/Level4.mp3" 
+
+#define PLAYERSHOTSFX "Resources/Audio/shoot.wav"
+#define PLAYERDEATHSFX NULL
+
+ALLEGRO_MIXER* Mixer;
+
+ALLEGRO_SAMPLE* BackgroundMusic1;
+ALLEGRO_SAMPLE* BackgroundMusic2;
+
+ALLEGRO_SAMPLE* AlienDeathSFX;
+ALLEGRO_SAMPLE* Alien1SFX;
+ALLEGRO_SAMPLE* Alien2SFX;
+ALLEGRO_SAMPLE* Alien3SFX;
+ALLEGRO_SAMPLE* Alien4SFX;
+
+ALLEGRO_SAMPLE* Explosion1;
+
+ALLEGRO_SAMPLE* PlayerShotSFX;
+ALLEGRO_SAMPLE* PlayerDeathSFX;
+
+
+ALLEGRO_SAMPLE* menuMusic;
+ALLEGRO_SAMPLE* level1Music;
+ALLEGRO_SAMPLE* level2Music;
+// ALLEGRO_SAMPLE* level2Music;
+ALLEGRO_SAMPLE* level4Music;
+
+/* =============================
+			Variable global
+=============================== */
+
+int Level;
 
 
 
