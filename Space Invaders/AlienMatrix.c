@@ -1,32 +1,22 @@
 #pragma once
 #include "AlienMatrix.h"
+#include "Game.h"
 
-AlienMatrix* NewMatrix( int AlienPaddingX, int AlienPaddingY , int Awidth_p , int Aheight_p, int XAliens_p, int YAliens_p, int speed)
+AlienMatrix* NewMatrix( Vec2F pos_p, int width_p, int height_p, int Awidth_p, int Aheight_p , int speed)
 {
 	AlienMatrix* TempMatrix = malloc(sizeof(AlienMatrix));
 	if (TempMatrix != NULL)
 	{
+		TempMatrix->Pos = pos_p;
+		TempMatrix->width = width_p;
+		TempMatrix->height = height_p;
 		TempMatrix->AlienHeight = Aheight_p;
 		TempMatrix->AlienWidth = Awidth_p;
-		TempMatrix->XAliens = XAliens_p;
-		TempMatrix->YAliens = YAliens_p;
-		TempMatrix->AlienCount = 0;
 
-		TempMatrix->AlienPaddingX = AlienPaddingX;
-		TempMatrix->AlienPaddingY = AlienPaddingY;
-
-		TempMatrix->width = Awidth_p * XAliens_p + (XAliens_p - 1) * AlienPaddingX;
-		TempMatrix->height = Aheight_p * YAliens_p + (YAliens_p - 1) * AlienPaddingY;
+		TempMatrix->AlienPaddingX = (TempMatrix->width - TempMatrix->AlienWidth * 11) / (10) ;
+		TempMatrix->AlienPaddingY = (TempMatrix->height - TempMatrix->AlienHeight * 5) / (4);
 
 		TempMatrix->HorizontalSpeed = speed;
-
-		for (int i = 0; i < TempMatrix->XAliens; i++)
-		{
-			for (int j = 0; j < TempMatrix->YAliens; j++)
-			{
-				TempMatrix->matrix[i][j] = NULL;
-			}
-		}
 
 	}
 
@@ -35,24 +25,14 @@ AlienMatrix* NewMatrix( int AlienPaddingX, int AlienPaddingY , int Awidth_p , in
 
 void DestroyMatrix(AlienMatrix* matrix)
 {
-	for (int i = 0; i < matrix->XAliens; i++)
-	{
-		for (int j = 0; j < matrix->YAliens; j++)
-		{
-			if (matrix->matrix[i][j] != NULL)
-			{
-				DestroyEntityLoadedTexture(matrix->matrix[i][j]);
-			}
-		}
-	}
 	free(matrix);
 }
 
 void DrawGrid(AlienMatrix* Matrix)
 {
-	for (int i = 0; i < Matrix->XAliens; i++)
+	for (int i = 0; i < 5; i++)
 	{
-		for (int j = 0; j < Matrix->YAliens; j++)
+		for (int j = 0; j < 11; j++)
 		{
 			if ((Matrix->matrix)[i][j] != NULL)
 			{
@@ -62,31 +42,35 @@ void DrawGrid(AlienMatrix* Matrix)
 	}
 }
 
-void FillMatrix(AlienMatrix* Matrix , ALLEGRO_BITMAP * entityTexture)
+void SpawnMatrix(AlienMatrix* Matrix , ALLEGRO_BITMAP * texture)
 {
-	for (int i = 0; i < Matrix->XAliens; i++)
+	Matrix->Pos = NewVec2F(ScreenDimensions.x / 2 - GridDimensions.x / 2 - AlienWidth, 50);
+	for (int i = 0; i < 5; i++)
 	{
-		for (int j = 0; j < Matrix->YAliens; j++)
+		for (int j = 0; j < 11; j++)
 		{
 			if ((Matrix->matrix)[i][j] == NULL)
 			{
 				(Matrix->matrix)[i][j] = CreateNewEntityLoadedTexture(
-					NewVec2F(Matrix->Pos.x + (Matrix->AlienWidth + Matrix->AlienPaddingX) * i, Matrix->Pos.y + (Matrix->AlienHeight + Matrix->AlienPaddingY) * j),
-					NewVec2F(0, 0), entityTexture, Matrix->AlienWidth, Matrix->AlienHeight);
+					NewVec2F(Matrix->Pos.x + (50 + Matrix->AlienPaddingX) * j, Matrix->Pos.y + (50 + Matrix->AlienPaddingY) * i),
+					NewVec2F(0, 0), texture, 40, 40);
 			}
+			DrawEntity((Matrix->matrix)[i][j]);
+			al_flip_display();
+			al_rest(0.02);
 		}
 	}
 
-	Matrix->AlienCount = Matrix->XAliens * Matrix->YAliens;
+	Matrix->AlienCount = 11 * 5;
 }
 
 void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix)
 {
 	for (int b = 0; b < 10; b++)
 	{
-		for (int i = 0; i < Matrix->XAliens; i++)
+		for (int i = 0; i < 5; i++)
 		{
-			for (int j = 0; j < Matrix->YAliens; j++)
+			for (int j = 0; j < 11; j++)
 			{
 				if (Bullet[b] != NULL && (Matrix->matrix)[i][j] != NULL)
 				{
@@ -106,149 +90,49 @@ void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix)
 	}
 }
 
-void UpdateMatrix(AlienMatrix* Matrix, double dt , Vec2 PlayAreaPos , Vec2 PlayAreaDim)
+void UpdateMatrix(AlienMatrix* Matrix, double dt , Vec2 ScreenDimensions)
 {
 	static double timeBuffer;
 	timeBuffer = timeBuffer + dt;
-	static int bounce;
 
-	if (bounce)
-	{
-		for (int i = 0; i < Matrix->XAliens; i++)
-		{
-			for (int j = 0; j < Matrix->YAliens; j++)
-			{
-				if ((Matrix->matrix)[i][j] != NULL)
-				{
-					(Matrix->matrix)[i][j]->Pos.y += 3;
-				}
-			}
-		}
-		Matrix->HorizontalSpeed *= -1;
-		Matrix->Pos.y += 3;
-	}
+	int bounce = false;
 
-	bounce = false;
-
-	if (timeBuffer >=  ( 0.05 + 1.25 * ( Matrix->AlienCount / (double) ( Matrix->XAliens * Matrix->YAliens ) ) ))
+	if (timeBuffer >=  ( 0.05 + 0.95 * ( Matrix->AlienCount / (double) ( 11 * 5 ) ) ))
 	{
 		timeBuffer = 0;
 		Matrix->Pos.x += Matrix->HorizontalSpeed;
 		
-		for (int i = 0; i < Matrix->XAliens; i++)
+		for (int i = 0; i < 5; i++)
 		{
-			for (int j = 0; j < Matrix->YAliens; j++)
+			for (int j = 0; j < 11; j++)
 			{
 				if ((Matrix->matrix)[i][j] != NULL)
 				{
 					(Matrix->matrix)[i][j]->Pos.x += Matrix->HorizontalSpeed;
-
-					if ((Matrix->matrix)[i][j]->Pos.x - (Matrix->AlienWidth/2) <= PlayAreaPos.x ||
-						((Matrix->matrix)[i][j]->Pos.x + ( 1.5 * Matrix->AlienWidth) >= PlayAreaPos.x + PlayAreaDim.x))
+					if ((Matrix->matrix)[i][j]->Pos.x - (Matrix->AlienWidth/2) <= 0 || ((Matrix->matrix)[i][j]->Pos.x + ( (3/2) * Matrix->AlienWidth) >= ScreenDimensions.x))
 					{
 						bounce = true;
-						
+						for (int i = 0; i < 5; i++)
+						{
+							for (int j = 0; j < 11; j++)
+							{
+								if ((Matrix->matrix)[i][j] != NULL)
+								{
+									(Matrix->matrix)[i][j]->Pos.y += 3;
+								}
+							}
+						}
 					}
 				}
 					
 			}
 		}
+		if (bounce)
+		{
+			Matrix->HorizontalSpeed *= -1;
+			Matrix->Pos.y += 50;
+		}
 	}
 
 	return;
-}
-
-void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim)
-{
-	static double UpdateTimeBuffer;
-	static double MicroTimeBuffer;
-
-	static int updating;
-	static int bounce;
-
-	static int Xcoord;
-	static int Ycoord;
-
-	MicroTimeBuffer += dt;
-
-	if (Xcoord >= Matrix->XAliens)
-	{
-		Xcoord = 0;
-		Ycoord++;
-	}
-	if (Ycoord >= Matrix->YAliens)
-	{
-		Ycoord = 0;
-		updating = false;
-	}
-
-	if (!updating)
-	{
-		UpdateTimeBuffer += dt;
-	}
-
-	if (UpdateTimeBuffer >= (0.05 + 1.25 * (Matrix->AlienCount / (double)(Matrix->XAliens * Matrix->YAliens))))
-	{
-		UpdateTimeBuffer = 0;
-		updating = true;
-	}
-
-	if (updating)
-	{
-		if (MicroTimeBuffer >= 0.005)
-		{
-			MicroTimeBuffer = 0;
-
-			int searching = true;
-			int found = false;
-
-			while (searching)
-			{
-				if (Matrix->matrix[Xcoord][Ycoord] == NULL)
-				{
-					Xcoord++;
-					if (Xcoord >= Matrix->XAliens)
-					{
-						Xcoord = 0;
-						Ycoord++;
-						if (Ycoord >= Matrix->YAliens)
-						{
-							Ycoord = 0;
-							searching = false;
-							updating = false;
-						}
-					}
-				}
-				else
-				{
-					searching = false;
-					found = true;
-				}
-			}
-			if ( Matrix->matrix[Xcoord][Ycoord] != NULL && found)
-			{
-				Matrix->matrix[Xcoord][Ycoord]->Pos.x += Matrix->HorizontalSpeed;
-				if ((Matrix->matrix)[Xcoord][Ycoord]->Pos.x - (Matrix->AlienWidth / 2) <= PlayAreaPos.x ||
-					((Matrix->matrix)[Xcoord][Ycoord]->Pos.x + (1.5 * Matrix->AlienWidth) >= PlayAreaPos.x + PlayAreaDim.x))
-				{
-					bounce = true;
-
-				}
-				Xcoord++;
-			}
-			
-		}
-	}
-	
-	if (bounce && !updating)
-	{
-		Matrix->HorizontalSpeed *= -1;
-		bounce = false;
-	}
-
-}
-
-Vec2F GetCentredPosition(AlienMatrix* Matrix, Vec2 ScreenDimension)
-{
-	return NewVec2F( ScreenDimension.x/2 - Matrix->width/2 , 50 );
 }

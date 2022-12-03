@@ -124,15 +124,16 @@ int GameInit()
 {
 	int error = 0;
 
-	int AlienPaddingX = 30;
-	int AlienPaddingY = 10;
+	GridDimensions = NewVec2(600, 220);
+	int AlienPaddingX = (GridDimensions.x - 50 * 11) / 10;
+	int AlienPaddingY = (GridDimensions.y - 50 * 4) / 3;
 	XAliens = 11;
 	YAliens = 5;
 	AlienWidth = 40;
 	AlienHeight = 40;
 
-	PlaySpaceArea = ScreenDimensions;
-	PlaySpacePos = NewVec2(0, 0);
+	PlaySpaceArea = NewVec2(900, 700);
+	PlaySpacePos = NewVec2(ScreenDimensions.x / 2 - PlaySpaceArea.x / 2, 20);
 	GUIColor = al_map_rgb(40, 60, 20);
 
 	AlienTexture = al_load_bitmap(ALIEN_TEXTURE1);
@@ -142,11 +143,28 @@ int GameInit()
 		error = -1;
 	}
 
-	AlienGrid = NewMatrix( AlienPaddingX, AlienPaddingY, AlienWidth, AlienHeight , XAliens, YAliens, 15 );
+	AlienGrid = NewMatrix( NewVec2F(ScreenDimensions.x/2 - GridDimensions.x/2 - AlienWidth, 50), GridDimensions.x, GridDimensions.y, AlienWidth, AlienHeight , 15 );
 	if (AlienGrid == NULL)
 	{
 		printf("There has been an error creating the Alien Matrix");
 		error = -2;
+	}
+	else if (AlienTexture != NULL)
+	{
+
+		for (int i = 0; i < YAliens; i++)
+		{
+			for (int j = 0; j < XAliens; j++)
+			{ 
+				AlienGrid->matrix[i][j] = CreateNewEntityLoadedTexture(
+					NewVec2F(AlienGrid->Pos.x + (50 + AlienGrid->AlienPaddingX) * j, AlienGrid->Pos.y + (50 + AlienGrid->AlienPaddingY) * i),
+					NewVec2F(0, 0), AlienTexture , 40, 40);
+
+			}
+
+		}
+		
+		AlienGrid->AlienCount = 0; //Esta linea esta para que la funcion pase por AlienSpawn por primera vez
 	}
 	
 	background1 = al_load_bitmap(LVL1_BG);
@@ -262,8 +280,7 @@ void GameLogic()
 		
 	}
 
-	UpdateMatrixDynamic(AlienGrid, PastFrameTime , PlaySpacePos , PlaySpaceArea);
-	//UpdateMatrix(AlienGrid, PastFrameTime , PlaySpacePos , PlaySpaceArea);
+	UpdateMatrix(AlienGrid, PastFrameTime , ScreenDimensions);
 
 	CullBullets();
 	UpdateBullets();
@@ -272,20 +289,6 @@ void GameLogic()
 
 	UpdateEntity(Spaceship, DeltaTime);
 	ClipToScreen(Spaceship, ScreenDimensions);
-
-	if (AlienGrid->AlienCount == 0)
-	{
-		for (int i = 0; i < 10; i++) //Limpia las balas que quedan volando cuando se quedan sin aliens
-		{
-			if (Bullets[i] != NULL)
-			{
-				DestroyEntityLoadedTexture(Bullets[i]);
-				Bullets[i] = NULL;
-			}
-		}
-		AlienGrid->Pos = GetCentredPosition(AlienGrid, ScreenDimensions);
-		FillMatrix(AlienGrid, AlienTexture);
-	}
 
 
 	return;
@@ -313,6 +316,20 @@ void GameRender()
 	//player
 	DrawEntity(Spaceship);
 
+	if (AlienGrid->AlienCount == 0)
+	{
+		for (int i = 0; i < 10; i++) //Limpia las balas que quedan volando cuando se quedan sin aliens
+		{
+			if (Bullets[i] != NULL)
+			{
+				DestroyEntityLoadedTexture(Bullets[i]);
+				Bullets[i] = NULL;
+			}
+		}
+		SpawnMatrix(AlienGrid, AlienTexture);
+		t = clock();
+	}
+
 	DrawGrid(AlienGrid);
 
 	for (int i = 0; i < 10; i++)
@@ -322,6 +339,9 @@ void GameRender()
 			DrawEntity(Bullets[i]);
 		}
 	}
+
+	
+	
 
 	al_flip_display();
 	return;

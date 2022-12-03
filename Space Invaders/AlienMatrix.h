@@ -4,7 +4,7 @@
 
 struct AlienMatrix_t
 {
-	Entity * matrix[20][10];
+	Entity * matrix[5][11];
 
 	Vec2F Pos;
 
@@ -28,11 +28,9 @@ struct AlienMatrix_t
 
 typedef struct AlienMatrix_t AlienMatrix;
 
-AlienMatrix* NewMatrix(int AlienPaddingX, int AlienPaddingY, int Awidth_p, int Aheight_p, int XAliens_p, int YAliens_p, int speed);
+AlienMatrix* NewMatrix(Vec2F pos_p, int width_p, int height_p, int Awidth_p, int Aheight_p, int speed);
 void DestroyMatrix( AlienMatrix * matrix );
 void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix);
 void DrawGrid(AlienMatrix* Matrix);
-void FillMatrix(AlienMatrix* Matrix , ALLEGRO_BITMAP * texture);
-void UpdateMatrix(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim);
-void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim);
-Vec2F GetCentredPosition(AlienMatrix* Matrix, Vec2 ScreenDimension);
+void SpawnMatrix(AlienMatrix* Matrix , ALLEGRO_BITMAP * texture);
+void UpdateMatrix(AlienMatrix* Matrix, double dt , Vec2 ScreenDimensions);
