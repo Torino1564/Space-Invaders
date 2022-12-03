@@ -202,6 +202,7 @@ int GameInit()
 		return -1;
 	}
 
+	level1Music = al_load_sample(MUSIC_LEVEL1);
 	level2Music = al_load_sample(MUSIC_LEVEL2);
 	level4Music = al_load_sample(MUSIC_LEVEL4);
 
@@ -364,7 +365,7 @@ void GameRender()
 	if (playing == 0) //primer nivel
 	{
 		al_stop_samples();
-		al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+		al_play_sample(level1Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 		playing = Level;
 	}
 	if (playing == 1)  //espera al segundo nivel

@@ -168,7 +168,9 @@ ALLEGRO_SAMPLE* PlayerDeathSFX;
 
 
 ALLEGRO_SAMPLE* menuMusic;
+ALLEGRO_SAMPLE* level1Music;
 ALLEGRO_SAMPLE* level2Music;
+// ALLEGRO_SAMPLE* level2Music;
 ALLEGRO_SAMPLE* level4Music;
 
 /* =============================
