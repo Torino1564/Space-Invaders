@@ -320,6 +320,9 @@ void GameLogic()
 
 	if (AlienGrid->AlienCount == 0)
 	{
+		Level += 1;	//Pasa al siguiente nivel
+		Once = 0;	//Resetea para el sonido
+
 		for (int i = 0; i < 10; i++) //Limpia las balas que quedan volando cuando se quedan sin aliens
 		{
 			if (Bullets[i] != NULL)
@@ -332,16 +335,15 @@ void GameLogic()
 		//FillMatrix(AlienGrid, AlienTexture);
 		FillMatrixAnimated(AlienGrid, MiniUFO);
 
+
 	}
-
-
 	return;
 }
 
 void GameRender()
 {	
 	//Background
-	switch (Level%4)
+	switch ((Level-1)%4)
 	{
 	case 0:
 		al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
@@ -359,7 +361,7 @@ void GameRender()
 
 	//Music
 	
-	switch (Level % 4)
+	switch ((Level - 1) % 4)
 	{
 		case 0:
 			if (Once == 0)
