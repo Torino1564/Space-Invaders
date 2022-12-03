@@ -1,6 +1,7 @@
 #pragma once
 #include "Entity.h"
 #include "Vec2_F.h"
+#include "SpriteSheet.h"
 
 struct AlienMatrix_t
 {
@@ -33,6 +34,8 @@ void DestroyMatrix( AlienMatrix * matrix );
 void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix);
 void DrawGrid(AlienMatrix* Matrix);
 void FillMatrix(AlienMatrix* Matrix , ALLEGRO_BITMAP * texture);
+void FillMatrixAnimated(AlienMatrix* Matrix, SpriteSheet* SpriteSheet_p);
 void UpdateMatrix(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim);
 void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim);
 Vec2F GetCentredPosition(AlienMatrix* Matrix, Vec2 ScreenDimension);
+void AnimateMatrix(AlienMatrix* Matrix, float dt);

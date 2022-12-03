@@ -5,11 +5,13 @@
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_primitives.h>
 #include <stdio.h>
 #include "Entity.h"
 #include "Vec2.h"
 #include <time.h>
 #include "AlienMatrix.h"
+#include "SpriteSheet.h"
 /* ===================================
 
 			FILE PATHS
@@ -20,6 +22,8 @@
 #define ALIEN_TEXTURE1 "Resources/Assets/alien1.png"
 #define BULLET_TEXTURE1 "Resources/Assets/bullet.png"
 #define SHIP_TEXTURE	"Resources/Assets/Ship.png"
+
+#define MINIUFO1SP "Resources/Assets/MiniUFO1Sp.png"
 
 //	Backgrounds
 
@@ -106,6 +110,8 @@ ALLEGRO_BITMAP* BulletTexture;
 
 AlienMatrix * AlienGrid;
 ALLEGRO_BITMAP* AlienTexture;
+
+SpriteSheet* MiniUFO;
 
 Vec2 GridDimensions;
 int AlienWidth;

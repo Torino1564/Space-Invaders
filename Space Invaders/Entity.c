@@ -5,12 +5,24 @@ void DrawEntity(Entity* Entity)
 {
 	if (Entity != NULL)
 	{
-		if (Entity->Texture != NULL)
+		if (Entity->animated == true)
+		{
+			if (Entity->spriteS->Texture != NULL)
+			{
+				al_draw_scaled_bitmap(Entity->spriteS->Texture, Entity->frameCount * Entity->spriteS->frameWidth, 0, Entity->spriteS->frameWidth, Entity->spriteS->frameHeight,
+					Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
+			}
+			
+		}
+		else if(Entity->Texture != NULL)
 		{
 			al_draw_scaled_bitmap(Entity->Texture, 0, 0,
 				al_get_bitmap_width(Entity->Texture), al_get_bitmap_height(Entity->Texture),
 				Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
 		}
+
+		
+
 	}
 	return;
 }
@@ -21,8 +33,10 @@ void UpdateEntity(Entity* Entity , double dt)
 	{
 		Entity->Pos.x += Entity->Vel.x * dt;
 		Entity->Pos.y += Entity->Vel.y * dt;
+
 	}
 
+	
 
 	return;
 }
@@ -64,6 +78,8 @@ Entity* CreateNewEntity(Vec2F pos, Vec2F vel, const char* texture, int height, i
 	ent->width = width;
 	ent->height = height;
 
+	ent->animated = false;
+
 	ent->Texture = al_load_bitmap(texture);
 	if (ent->Texture == NULL)
 	{
@@ -88,6 +104,8 @@ Entity* CreateNewEntityLoadedTexture(Vec2F pos, Vec2F vel, ALLEGRO_BITMAP* textu
 	ent->Vel = vel;
 	ent->width = width;
 	ent->height = height;
+
+	ent->animated = false;
 
 	if (texture != NULL)
 	{
@@ -140,4 +158,50 @@ int AreColiding(Entity* e0, Entity* e1)
 			e0->Pos.y <= bottom1;
 	}
 	else return 0;
+}
+
+Entity* CreateNewAnimatedEntityLoadedTexture(Vec2F pos, Vec2F vel, SpriteSheet* SpriteSheet_p, int width_p, int height_p)
+{
+	Entity* ent = malloc(sizeof(Entity));
+	if (ent == NULL)
+	{
+		return ent;
+	}
+	ent->Pos = pos;
+	ent->Vel = vel;
+
+	if (SpriteSheet_p == NULL)
+	{
+		return NULL;
+	}
+
+	ent->spriteS = SpriteSheet_p;
+	if (ent->spriteS->Texture != NULL)
+	{
+		al_convert_mask_to_alpha(ent->spriteS->Texture, al_map_rgb(255, 0, 255));
+	}
+
+	ent->animated = true;
+	ent->frameCount = 0;
+
+	ent->deltaFrame = 0;
+
+	ent->width = width_p;
+	ent->height = height_p;
+
+	return ent;
+}
+
+void Animate(Entity* ent, float dt)
+{
+	ent->deltaFrame += dt;
+	if (ent->deltaFrame >= ent->spriteS->maxDeltaFrame)
+	{
+		ent->deltaFrame = 0;
+		ent->frameCount++;
+		if (ent->frameCount >= ent->spriteS->maxFrameCount)
+		{
+			ent->frameCount = 0;
+		}
+	}
 }

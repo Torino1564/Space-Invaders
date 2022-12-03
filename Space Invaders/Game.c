@@ -29,6 +29,8 @@ int SystemInit()
 	al_install_keyboard();
 	al_install_mouse();
 
+	al_init_primitives_addon();
+
 	ScreenDimensions = NewVec2(1366, 768);
 
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
@@ -124,15 +126,15 @@ int GameInit()
 {
 	int error = 0;
 
-	int AlienPaddingX = 30;
+	int AlienPaddingX = 20;
 	int AlienPaddingY = 10;
 	XAliens = 11;
 	YAliens = 5;
-	AlienWidth = 40;
-	AlienHeight = 40;
+	AlienWidth = 45;
+	AlienHeight = 45;
 
-	PlaySpaceArea = ScreenDimensions;
-	PlaySpacePos = NewVec2(0, 0);
+	PlaySpaceArea = NewVec2( 1000 , ScreenDimensions.y );
+	PlaySpacePos = NewVec2(ScreenDimensions.x/2 - PlaySpaceArea.x/2, 0);
 	GUIColor = al_map_rgb(40, 60, 20);
 
 	AlienTexture = al_load_bitmap(ALIEN_TEXTURE1);
@@ -156,7 +158,7 @@ int GameInit()
 		return -1;
 	}
 
-	Spaceship = CreateNewEntity(NewVec2F(ScreenDimensions.x/2 - 50/2, ScreenDimensions.y - 80 ), NewVec2F(0, 0), SHIP_TEXTURE, 40, 50);
+	Spaceship = CreateNewEntity(NewVec2F(ScreenDimensions.x/2 - 50/2, PlaySpacePos.y + PlaySpaceArea.y - 80 ), NewVec2F(0, 0), SHIP_TEXTURE, 40, 50);
 	if (Spaceship == NULL)
 	{
 		printf("There has been an error creating the player spaceship");
@@ -173,6 +175,8 @@ int GameInit()
 	}
 	BulletTexture = al_load_bitmap(BULLET_TEXTURE1);
 
+	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38);
+
 	return error;
 }
 
@@ -186,6 +190,7 @@ void GameDestroy()
 	al_destroy_user_event_source(MouseEventSource);
 	al_destroy_event_queue(InputEventQueue);
 
+	al_shutdown_primitives_addon();
 	al_uninstall_keyboard();
 	al_uninstall_mouse();
 	al_shutdown_image_addon();
@@ -264,6 +269,7 @@ void GameLogic()
 
 	UpdateMatrixDynamic(AlienGrid, PastFrameTime , PlaySpacePos , PlaySpaceArea);
 	//UpdateMatrix(AlienGrid, PastFrameTime , PlaySpacePos , PlaySpaceArea);
+	AnimateMatrix(AlienGrid, DeltaTime);
 
 	CullBullets();
 	UpdateBullets();
@@ -284,7 +290,9 @@ void GameLogic()
 			}
 		}
 		AlienGrid->Pos = GetCentredPosition(AlienGrid, ScreenDimensions);
-		FillMatrix(AlienGrid, AlienTexture);
+		//FillMatrix(AlienGrid, AlienTexture);
+		FillMatrixAnimated(AlienGrid, MiniUFO);
+
 	}
 
 
@@ -295,21 +303,9 @@ void GameRender()
 {
 
 	//background
-	al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), 0, 0, ScreenDimensions.x, ScreenDimensions.y, 4, 11 , NULL);
+	al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
 	
-	
-	//Render GUI
-	for (int i = 0; i < ScreenDimensions.x; i++)
-	{
-		for (int j = 0; j < ScreenDimensions.y; j++)
-		{
-			if ((i >= PlaySpacePos.x && i <= PlaySpacePos.x + PlaySpaceArea.x) && (j >= PlaySpacePos.y && j <= PlaySpacePos.y + PlaySpaceArea.y))
-			{
-				//al_put_pixel(i, j, GUIColor);
-			}
 
-		}
-	}
 	//player
 	DrawEntity(Spaceship);
 
@@ -322,6 +318,18 @@ void GameRender()
 			DrawEntity(Bullets[i]);
 		}
 	}
+
+	//Render GUI
+	//Game Render Rectangle
+	al_draw_rectangle(PlaySpacePos.x, PlaySpacePos.y, PlaySpacePos.x + PlaySpaceArea.x, PlaySpacePos.y + PlaySpaceArea.y, GUIColor, 0);
+	//Top	
+	al_draw_filled_rectangle(0, 0, ScreenDimensions.x, PlaySpacePos.y, GUIColor);
+	//Left
+	al_draw_filled_rectangle(0, PlaySpacePos.y, PlaySpacePos.x, PlaySpacePos.y + PlaySpaceArea.y, GUIColor);
+	//Right
+	al_draw_filled_rectangle(PlaySpacePos.x + PlaySpaceArea.x, PlaySpacePos.y, ScreenDimensions.x, PlaySpacePos.y + PlaySpaceArea.y, GUIColor);
+	//Bottom
+	al_draw_filled_rectangle(0, PlaySpacePos.y + PlaySpaceArea.y, ScreenDimensions.x, ScreenDimensions.y, GUIColor);
 
 	al_flip_display();
 	return;

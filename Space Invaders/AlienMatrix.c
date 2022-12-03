@@ -80,6 +80,24 @@ void FillMatrix(AlienMatrix* Matrix , ALLEGRO_BITMAP * entityTexture)
 	Matrix->AlienCount = Matrix->XAliens * Matrix->YAliens;
 }
 
+void FillMatrixAnimated(AlienMatrix* Matrix, SpriteSheet * SpriteSheet_p)
+{
+	for (int i = 0; i < Matrix->XAliens; i++)
+	{
+		for (int j = 0; j < Matrix->YAliens; j++)
+		{
+			if ((Matrix->matrix)[i][j] == NULL)
+			{
+				(Matrix->matrix)[i][j] = CreateNewAnimatedEntityLoadedTexture(
+					NewVec2F(Matrix->Pos.x + (Matrix->AlienWidth + Matrix->AlienPaddingX) * i, Matrix->Pos.y + (Matrix->AlienHeight + Matrix->AlienPaddingY) * j),
+					NewVec2F(0, 0), SpriteSheet_p, Matrix->AlienWidth, Matrix->AlienHeight);
+			}
+		}
+	}
+
+	Matrix->AlienCount = Matrix->XAliens * Matrix->YAliens;
+}
+
 void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix)
 {
 	for (int b = 0; b < 10; b++)
@@ -244,6 +262,19 @@ void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 
 	{
 		Matrix->HorizontalSpeed *= -1;
 		bounce = false;
+
+		Matrix->Pos.y += 3;
+		for (int i = 0; i < Matrix->XAliens; i++)
+		{
+			for (int j = 0; j < Matrix->YAliens; j++)
+			{
+				if (Matrix->matrix[i][j] != NULL)
+				{
+					Matrix->matrix[i][j]->Pos.y += 3;
+				}
+			}
+		}
+
 	}
 
 }
@@ -251,4 +282,27 @@ void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 
 Vec2F GetCentredPosition(AlienMatrix* Matrix, Vec2 ScreenDimension)
 {
 	return NewVec2F( ScreenDimension.x/2 - Matrix->width/2 , 50 );
+}
+
+void AnimateMatrix( AlienMatrix* Matrix , float dt )
+{
+	for (int i = 0; i < Matrix->XAliens; i++)
+	{
+		for (int j = 0; j < Matrix->YAliens; j++)
+		{
+			if (Matrix->matrix[i][j] != NULL)
+			{
+				Matrix->matrix[i][j]->deltaFrame += dt;
+				if (Matrix->matrix[i][j]->deltaFrame + dt >= Matrix->matrix[i][j]->spriteS->maxDeltaFrame)
+				{
+					Matrix->matrix[i][j]->deltaFrame = 0;
+					Matrix->matrix[i][j]->frameCount++;
+					if (Matrix->matrix[i][j]->frameCount >= Matrix->matrix[i][j]->spriteS->maxFrameCount)
+					{
+						Matrix->matrix[i][j]->frameCount = 0;
+					}
+				}
+			}
+		}
+	}
 }
