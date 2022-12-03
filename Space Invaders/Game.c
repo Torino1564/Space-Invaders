@@ -151,6 +151,9 @@ int GameInit()
 	AlienWidth = 45;
 	AlienHeight = 45;
 
+	int	SpaceshipWidth = 120;
+	int	SpaceshipHeight = 60;
+
 	PlaySpaceArea = NewVec2( 1000 , ScreenDimensions.y );
 	PlaySpacePos = NewVec2(ScreenDimensions.x/2 - PlaySpaceArea.x/2, 0);
 	GUIColor = al_map_rgb(40, 60, 20);
@@ -169,6 +172,7 @@ int GameInit()
 		error = -2;
 	}
 	
+	// Background Init
 	background1 = al_load_bitmap(LVL1_BG);
 	background2 = al_load_bitmap(LVL2_BG);
 	background4 = al_load_bitmap(LVL4_BG);
@@ -189,11 +193,16 @@ int GameInit()
 		return -1;
 	}
 
+	// Music Init
 	level1Music = al_load_sample(MUSIC_LEVEL1);
 	level2Music = al_load_sample(MUSIC_LEVEL2);
 	level4Music = al_load_sample(MUSIC_LEVEL4);
 
-	Spaceship = CreateNewEntity(NewVec2F(ScreenDimensions.x/2 - 50/2, PlaySpacePos.y + PlaySpaceArea.y - 80 ), NewVec2F(0, 0), SHIP_TEXTURE, 40, 50);
+	// Characters Init
+	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)17), 16, 44, 38);
+	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38);
+
+	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x/2 - 50/2, PlaySpacePos.y + PlaySpaceArea.y - 80 ), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
 	if (Spaceship == NULL)
 	{
 		printf("There has been an error creating the player spaceship");
@@ -210,8 +219,7 @@ int GameInit()
 	}
 	BulletTexture = al_load_bitmap(BULLET_TEXTURE1);
 
-	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38);
-
+	
 	return error;
 }
 
@@ -317,6 +325,7 @@ void GameLogic()
 
 	UpdateEntity(Spaceship, DeltaTime);
 	ClipToScreen(Spaceship, ScreenDimensions);
+	Animate(Spaceship, DeltaTime);
 
 	if (AlienGrid->AlienCount == 0)
 	{

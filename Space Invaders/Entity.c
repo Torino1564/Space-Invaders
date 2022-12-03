@@ -126,10 +126,13 @@ Entity* CreateNewEntityLoadedTexture(Vec2F pos, Vec2F vel, ALLEGRO_BITMAP* textu
 void DestroyEntity(Entity* Entity)
 {
 	if (Entity != NULL)
-	if (Entity->Texture != NULL)
-	al_destroy_bitmap(Entity->Texture);
-	free(Entity);
-
+	{
+		if (Entity->Texture != NULL)
+		{
+			al_destroy_bitmap(Entity->Texture);
+			free(Entity);
+		}
+	}
 	return;
 }
 

@@ -27,6 +27,7 @@
 #define SHIP_TEXTURE	"Resources/Assets/Ship.png"
 
 #define MINIUFO1SP "Resources/Assets/MiniUFO1Sp.png"
+#define SLUG "Resources/Assets/Spaceship_sprite.png"
 
 //	Backgrounds
 
@@ -123,6 +124,7 @@ AlienMatrix * AlienGrid;
 ALLEGRO_BITMAP* AlienTexture;
 
 SpriteSheet* MiniUFO;
+SpriteSheet* Slug;
 
 Vec2 GridDimensions;
 int AlienWidth;
