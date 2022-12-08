@@ -29,6 +29,8 @@ void DrawEntity(Entity* Entity);
 
 void UpdateEntity(Entity* Entity , double dt );
 void ClipToScreen(Entity* Entity, Vec2 Screen);
+void ClipToEntity(Entity* e1, Entity* e2, int adjust);
+
 Entity* CreateNewEntity(Vec2F pos, Vec2F vel, const char * texture , int width , int height);
 Entity* CreateNewEntityLoadedTexture(Vec2F pos, Vec2F vel, ALLEGRO_BITMAP* texture, int width, int height);
 Entity* CreateNewAnimatedEntityLoadedTexture(Vec2F pos, Vec2F vel, SpriteSheet * SpriteSheet_p, int width_p, int height_p);

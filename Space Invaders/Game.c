@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "Entity.h"
 
 void Game()
 {
@@ -209,6 +210,8 @@ int GameInit()
 		error = -1;
 	}
 
+	Gun = CreateNewEntity(NewVec2F(0, PlaySpacePos.y + PlaySpaceArea.y - 130), NewVec2F(0, 0), GUN_TEXTURE, 90, 90);
+
 	Bullets[0] = malloc(sizeof(Entity) * 10);
 	if (Bullets != NULL)
 	{
@@ -262,9 +265,11 @@ void GameLogic()
 			{
 				case ALLEGRO_KEY_A:
 					Spaceship->Vel.x -= SHIP_SPEED;
+					Gun->Vel.x -= SHIP_SPEED;
 					break;
 				case ALLEGRO_KEY_D:
 					Spaceship->Vel.x += SHIP_SPEED;
+					Gun->Vel.x += SHIP_SPEED;
 					break;
 				case ALLEGRO_KEY_S:
 					Level += 1;
@@ -279,13 +284,13 @@ void GameLogic()
 					{
 						if (i == 9)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 20 / 2, Spaceship->Pos.y - 20), NewVec2F(0, -600), BulletTexture , 5, 20);
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 16 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture , 5, 20);
 							break;
 						}
 
 						if (Bullets[i] == NULL)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 20 / 2, Spaceship->Pos.y - 20), NewVec2F(0, -600), BulletTexture, 5, 20);
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 16 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture, 5, 20);
 							break;
 						}
 					}
@@ -300,9 +305,11 @@ void GameLogic()
 			{
 			case ALLEGRO_KEY_A:
 				Spaceship->Vel.x += SHIP_SPEED;
+				Gun->Vel.x += SHIP_SPEED;
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x -= SHIP_SPEED;
+				Gun->Vel.x -= SHIP_SPEED;
 				break;
 			default:
 				break;
@@ -324,7 +331,9 @@ void GameLogic()
 	CollideGrid(Bullets, AlienGrid);
 
 	UpdateEntity(Spaceship, DeltaTime);
+	UpdateEntity(Gun, DeltaTime);
 	ClipToScreen(Spaceship, ScreenDimensions);
+	ClipToEntity(Gun, Spaceship, 10);
 	Animate(Spaceship, DeltaTime);
 
 	if (AlienGrid->AlienCount == 0)
@@ -403,7 +412,9 @@ void GameRender()
 	}
 
 	//player
+	DrawEntity(Gun);
 	DrawEntity(Spaceship);
+
 
 	DrawGrid(AlienGrid);
 

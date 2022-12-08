@@ -25,9 +25,11 @@
 #define ALIEN_TEXTURE1 "Resources/Assets/alien1.png"
 #define BULLET_TEXTURE1 "Resources/Assets/bullet.png"
 #define SHIP_TEXTURE	"Resources/Assets/Ship.png"
+#define GUN_TEXTURE "Resources/Assets/Gun.png"
 
 #define MINIUFO1SP "Resources/Assets/MiniUFO1Sp.png"
 #define SLUG "Resources/Assets/Spaceship_sprite.png"
+
 
 //	Backgrounds
 
@@ -98,6 +100,10 @@ ALLEGRO_KEYBOARD_STATE KeyboardCurrentState;
 
 Entity * Spaceship;
 
+Entity* Gun;
+
+Entity Marco;
+
 double DeltaTime;
 
 clock_t t;
@@ -125,6 +131,7 @@ ALLEGRO_BITMAP* AlienTexture;
 
 SpriteSheet* MiniUFO;
 SpriteSheet* Slug;
+SpriteSheet* Weapon;
 
 Vec2 GridDimensions;
 int AlienWidth;
