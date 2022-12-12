@@ -22,6 +22,14 @@ void Game()
 
 int SystemInit()
 {
+#ifdef __linux__
+	pc = false;
+	raspi = true;
+#elif _WIN64
+	pc = true;
+	raspi = false;
+#endif
+
 	int error = 0;
 
 	al_init();
@@ -36,7 +44,7 @@ int SystemInit()
 
 	al_init_primitives_addon();
 
-	ScreenDimensions = NewVec2(1366, 768);
+	ScreenDimensions = NewVec2(1920, 1080);
 
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
 	if (DISPLAY == NULL)
@@ -93,6 +101,7 @@ int Menu()
 	{
 		return -1;
 	}
+
 
 	bool ready = 0;
 	float width = al_get_bitmap_width(menu);
@@ -173,6 +182,7 @@ int GameInit()
 	background2 = al_load_bitmap(LVL2_BG);
 	background4 = al_load_bitmap(LVL4_BG);
 
+
 	if (background1 == NULL)
 	{
 		printf("There has ben an error loading the level 1 background bitmap");
@@ -210,7 +220,7 @@ int GameInit()
 	}
 	BulletTexture = al_load_bitmap(BULLET_TEXTURE1);
 
-	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38);
+	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38 , 1);
 
 	return error;
 }
