@@ -34,9 +34,6 @@ void UpdateEntity(Entity* Entity , double dt)
 		Entity->Pos.y += Entity->Vel.y * dt;
 
 	}
-
-	
-
 	return;
 }
 
@@ -44,13 +41,13 @@ void ClipToScreen(Entity* Entity, Vec2 Screen)
 {
 	if (Entity != NULL)
 	{
-		if (Entity->Pos.x < 0)
+		if (Entity->Pos.x < 2*Entity->width)
 		{
-			Entity->Pos.x = 0;
+			Entity->Pos.x = 2*Entity->width;
 		}
-		else if (Entity->Pos.x + Entity->width > Screen.x)
+		else if (Entity->Pos.x + Entity->width > (Screen.x - 2*Entity->width))
 		{
-			Entity->Pos.x = Screen.x - Entity->width;
+			Entity->Pos.x = Screen.x - 3*Entity->width;
 		}
 
 		if (Entity->Pos.y < 0)

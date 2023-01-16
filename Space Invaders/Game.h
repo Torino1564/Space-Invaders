@@ -47,7 +47,7 @@ int raspi;
 
 #define LVL1_BG	"Resources/Backgrounds/bg1.png"
 #define LVL2_BG	"Resources/Backgrounds/bg2.png"
-//#define LVL3_BG	"Resources/Backgrounds/bg3.png"
+#define LVL3_BG	"Resources/Backgrounds/bg3.png"
 #define LVL4_BG	"Resources/Backgrounds/bg4.png"
 
 
@@ -199,7 +199,7 @@ ALLEGRO_SAMPLE* PlayerDeathSFX;
 ALLEGRO_SAMPLE* menuMusic;
 ALLEGRO_SAMPLE* level1Music;
 ALLEGRO_SAMPLE* level2Music;
-// ALLEGRO_SAMPLE* level2Music;
+ALLEGRO_SAMPLE* level3Music;
 ALLEGRO_SAMPLE* level4Music;
 
 

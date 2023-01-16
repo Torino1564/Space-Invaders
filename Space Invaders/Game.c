@@ -183,6 +183,7 @@ int GameInit()
 	// Background Init
 	background1 = al_load_bitmap(LVL1_BG);
 	background2 = al_load_bitmap(LVL2_BG);
+	background3 = al_load_bitmap(LVL3_BG);
 	background4 = al_load_bitmap(LVL4_BG);
 	backgroundpause = al_load_bitmap(PAUSE_BG);
 
@@ -205,6 +206,7 @@ int GameInit()
 	// Music Init
 	level1Music = al_load_sample(MUSIC_LEVEL1);
 	level2Music = al_load_sample(MUSIC_LEVEL2);
+	level3Music = al_load_sample(MUSIC_LEVEL3);
 	level4Music = al_load_sample(MUSIC_LEVEL4);
 
 	Bullet_sound = al_load_sample(PLAYERSHOTSFX);
@@ -213,6 +215,7 @@ int GameInit()
 	instance1 = al_create_sample_instance(PLAYERSHOTSFX);
 
 	// Characters Init
+
 	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)17), 16, 44, 38, 1);
 	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38, 1);
 
@@ -346,13 +349,13 @@ void GameLogic()
 					{
 						if (i == 9)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 16 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture , 5, 20);
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 16 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture , al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
 
 						if (Bullets[i] == NULL)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 16 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture, 5, 20);
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 16 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
 					}
@@ -432,7 +435,7 @@ void GameRender()
 		al_draw_scaled_bitmap(background2, 0, 0, al_get_bitmap_width(background2), al_get_bitmap_height(background2), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
 		break;
 	case 2:
-		al_draw_scaled_bitmap(background4, 0, 0, al_get_bitmap_width(background4), al_get_bitmap_height(background4), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+		al_draw_scaled_bitmap(background3, 0, 0, al_get_bitmap_width(background3), al_get_bitmap_height(background3), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
 		break;
 	case 3:
 		al_draw_scaled_bitmap(background4, 0, 0, al_get_bitmap_width(background4), al_get_bitmap_height(background4), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
@@ -461,7 +464,7 @@ void GameRender()
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level3Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	case 3:
