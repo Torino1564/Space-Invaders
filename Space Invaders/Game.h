@@ -57,6 +57,7 @@ void GameRender();
 void GameDestroy();
 void Preframe();
 void Postframe();
+void Pause();
 
 void CullBullets();
 void UpdateBullets();
@@ -149,7 +150,7 @@ int YAliens;
 #define BACKGROUNDMUSIC1 "Resources/Audio/spaceinvaders1.mpeg"
 #define BACKGROUNDMUSIC2 NULL
 
-#define ALIENDEATHSFX "Resources/Audio/invaderkilled.wav"
+#define ALIENDEATHSFX "Resources/Audio/aliendeathsound.mp3"
 #define ALIEN1SFX	"Resources/Audio/fastinvader1.wav"
 #define ALIEN2SFX	"Resources/Audio/fastinvader2.wav"
 #define ALIEN3SFX	"Resources/Audio/fastinvader3.wav"
@@ -162,7 +163,7 @@ int YAliens;
 #define MUSIC_LEVEL3 "Resources/Audio/Level3.mp3" 
 #define MUSIC_LEVEL4 "Resources/Audio/Level4.mp3" 
 
-#define PLAYERSHOTSFX "Resources/Audio/shoot.wav"
+#define PLAYERSHOTSFX "Resources/Audio/shoot.mp3"
 #define PLAYERDEATHSFX NULL
 
 ALLEGRO_MIXER* Mixer;
@@ -188,11 +189,20 @@ ALLEGRO_SAMPLE* level2Music;
 // ALLEGRO_SAMPLE* level2Music;
 ALLEGRO_SAMPLE* level4Music;
 
+
+ALLEGRO_SAMPLE* Bullet_sound;
+ALLEGRO_SAMPLE* alien_death_sound;
+
+ALLEGRO_SAMPLE_INSTANCE* instance1;
+
 /* =============================
-			Variable global
+			global variables
 =============================== */
 
+int pause;
 int Level;
 int Once;
-
-
+int Moving;
+int shot;
+int aliendeath;
+int playerdeath;

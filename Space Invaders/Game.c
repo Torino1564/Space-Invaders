@@ -199,6 +199,11 @@ int GameInit()
 	level2Music = al_load_sample(MUSIC_LEVEL2);
 	level4Music = al_load_sample(MUSIC_LEVEL4);
 
+	Bullet_sound = al_load_sample(PLAYERSHOTSFX);
+	alien_death_sound = al_load_sample(ALIENDEATHSFX);
+
+	instance1 = al_create_sample_instance(PLAYERSHOTSFX);
+
 	// Characters Init
 	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)17), 16, 44, 38);
 	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38);
@@ -228,6 +233,14 @@ int GameInit()
 
 void GameDestroy()
 {
+	for (int i = 0; i < 10; i++)
+	{
+		if (Bullets[i] != NULL)
+		{
+			free(Bullets[i]);
+		}
+	}
+
 	DestroyMatrix(AlienGrid);
 	DestroyEntity(Spaceship);
 	al_destroy_bitmap(menu);
@@ -235,6 +248,13 @@ void GameDestroy()
 	al_destroy_user_event_source(KeyboardEventSource);
 	al_destroy_user_event_source(MouseEventSource);
 	al_destroy_event_queue(InputEventQueue);
+
+	al_destroy_sample(background1);
+	al_destroy_sample(background2);
+	al_destroy_sample(background3);
+	al_destroy_sample(background4);
+
+	al_destroy_sample_instance(instance1);
 
 	al_shutdown_primitives_addon();
 	al_uninstall_keyboard();
@@ -250,6 +270,29 @@ void GameLoop()
 	GameLogic();
 	GameRender();
 	Postframe();
+	Pause();
+}
+
+void Pause()
+{
+	while (pause)
+	{
+		if (!al_is_event_queue_empty(InputEventQueue))
+		{
+			al_get_next_event(InputEventQueue, &TempEvent);
+
+			switch (TempEvent.type)
+			{
+			case ALLEGRO_EVENT_KEY_DOWN:
+				switch (TempEvent.keyboard.keycode)
+				{
+				case ALLEGRO_KEY_ESCAPE:
+					pause = 0;
+				}
+
+			}
+		}
+	}
 }
 
 void GameLogic()
@@ -263,6 +306,8 @@ void GameLogic()
 		case ALLEGRO_EVENT_KEY_DOWN:
 			switch (TempEvent.keyboard.keycode)
 			{
+				case ALLEGRO_KEY_ESCAPE:
+					pause = 1;
 				case ALLEGRO_KEY_A:
 					Spaceship->Vel.x -= SHIP_SPEED;
 					Gun->Vel.x -= SHIP_SPEED;
@@ -280,6 +325,7 @@ void GameLogic()
 						running = 0;
 					break;
 				case ALLEGRO_KEY_SPACE:
+					shot = 1;
 					for (int i = 0; i < 10; i++)
 					{
 						if (i == 9)
@@ -328,7 +374,7 @@ void GameLogic()
 	CullBullets();
 	UpdateBullets();
 
-	CollideGrid(Bullets, AlienGrid);
+	aliendeath = CollideGrid(Bullets, AlienGrid);
 
 	UpdateEntity(Spaceship, DeltaTime);
 	UpdateEntity(Gun, DeltaTime);
@@ -359,9 +405,9 @@ void GameLogic()
 }
 
 void GameRender()
-{	
+{
 	//Background
-	switch ((Level-1)%4)
+	switch ((Level - 1) % 4)
 	{
 	case 0:
 		al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
@@ -378,37 +424,37 @@ void GameRender()
 	}
 
 	//Music
-	
+
 	switch ((Level - 1) % 4)
 	{
-		case 0:
-			if (Once == 0)
-			{
-				al_stop_samples();
-				al_play_sample(level1Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-				Once = 1;
-			}
-		case 1:
-			if (Once == 0)
-			{
-				al_stop_samples();
-				al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-				Once = 1;
-			}
-		case 2:
-			if (Once == 0)
-			{
-				al_stop_samples();
-				al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-				Once = 1;
-			}
-		case 3:
-			if (Once == 0)
-			{
-				al_stop_samples();
-				al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
-				Once = 1;
-			}
+	case 0:
+		if (Once == 0)
+		{
+			al_stop_samples();
+			al_play_sample(level1Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			Once = 1;
+		}
+	case 1:
+		if (Once == 0)
+		{
+			al_stop_samples();
+			al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			Once = 1;
+		}
+	case 2:
+		if (Once == 0)
+		{
+			al_stop_samples();
+			al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			Once = 1;
+		}
+	case 3:
+		if (Once == 0)
+		{
+			al_stop_samples();
+			al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			Once = 1;
+		}
 	}
 
 	//player
@@ -416,6 +462,18 @@ void GameRender()
 	DrawEntity(Spaceship);
 
 
+	//fight sounds
+	if (shot)
+	{
+		al_play_sample(Bullet_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+		shot = 0;
+	}
+	if (aliendeath)
+	{
+		al_play_sample(alien_death_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+	}
+
+	
 	DrawGrid(AlienGrid);
 
 	for (int i = 0; i < 10; i++)

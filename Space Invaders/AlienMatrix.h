@@ -31,7 +31,7 @@ typedef struct AlienMatrix_t AlienMatrix;
 
 AlienMatrix* NewMatrix(int AlienPaddingX, int AlienPaddingY, int Awidth_p, int Aheight_p, int XAliens_p, int YAliens_p, int speed);
 void DestroyMatrix( AlienMatrix * matrix );
-void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix);
+int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix);
 void DrawGrid(AlienMatrix* Matrix);
 void FillMatrix(AlienMatrix* Matrix , ALLEGRO_BITMAP * texture);
 void FillMatrixAnimated(AlienMatrix* Matrix, SpriteSheet* SpriteSheet_p);
