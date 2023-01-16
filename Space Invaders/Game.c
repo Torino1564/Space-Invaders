@@ -23,6 +23,13 @@ void Game()
 
 int SystemInit()
 {
+#ifdef __linux__
+	pc = false;
+	raspi = true;
+#elif _WIN64
+	pc = true;
+	raspi = false;
+#endif
 	int error = 0;
 
 	al_init();
@@ -177,6 +184,7 @@ int GameInit()
 	background1 = al_load_bitmap(LVL1_BG);
 	background2 = al_load_bitmap(LVL2_BG);
 	background4 = al_load_bitmap(LVL4_BG);
+	backgroundpause = al_load_bitmap(PAUSE_BG);
 
 	if (background1 == NULL)
 	{
@@ -205,8 +213,8 @@ int GameInit()
 	instance1 = al_create_sample_instance(PLAYERSHOTSFX);
 
 	// Characters Init
-	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)17), 16, 44, 38);
-	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38);
+	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)17), 16, 44, 38, 1);
+	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38, 1);
 
 	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x/2 - 50/2, PlaySpacePos.y + PlaySpaceArea.y - 80 ), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
 	if (Spaceship == NULL)
@@ -275,11 +283,17 @@ void GameLoop()
 
 void Pause()
 {
+	if (pause)
+	{
+		al_draw_scaled_bitmap(backgroundpause, 0, 0, al_get_bitmap_width(backgroundpause), al_get_bitmap_height(backgroundpause), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+		al_flip_display();
+	}
 	while (pause)
 	{
 		if (!al_is_event_queue_empty(InputEventQueue))
 		{
 			al_get_next_event(InputEventQueue, &TempEvent);
+
 
 			switch (TempEvent.type)
 			{
@@ -308,6 +322,7 @@ void GameLogic()
 			{
 				case ALLEGRO_KEY_ESCAPE:
 					pause = 1;
+					break;
 				case ALLEGRO_KEY_A:
 					Spaceship->Vel.x -= SHIP_SPEED;
 					Gun->Vel.x -= SHIP_SPEED;

@@ -17,6 +17,15 @@
 #include "SpriteSheet.h"
 /* ===================================
 
+			PLATFORM
+
+====================================== */
+
+int pc;
+int raspi;
+
+/* ===================================
+
 			FILE PATHS
 
 ====================================== */ 
@@ -40,6 +49,9 @@
 #define LVL2_BG	"Resources/Backgrounds/bg2.png"
 //#define LVL3_BG	"Resources/Backgrounds/bg3.png"
 #define LVL4_BG	"Resources/Backgrounds/bg4.png"
+
+
+#define PAUSE_BG "Resources/Backgrounds/pause.png"
 
 
 /* ===================================
@@ -86,6 +98,7 @@ ALLEGRO_BITMAP* background1;
 ALLEGRO_BITMAP* background2;
 ALLEGRO_BITMAP* background3;
 ALLEGRO_BITMAP* background4;
+ALLEGRO_BITMAP* backgroundpause;
 
 ALLEGRO_EVENT_SOURCE* KeyboardEventSource;
 
