@@ -33,6 +33,7 @@ int raspi;
 
 #define ALIEN_TEXTURE1 "Resources/Assets/alien1.png"
 #define BULLET_TEXTURE1 "Resources/Assets/bullet.png"
+#define DEATH_TEXTURE "Resources/Assets/death.png"
 #define SHIP_TEXTURE	"Resources/Assets/Ship.png"
 #define GUN_TEXTURE "Resources/Assets/Gun.png"
 
@@ -138,7 +139,10 @@ ALLEGRO_COLOR GUIColor;
 ================================= */
 
 Entity * Bullets[10];
+Entity* Deaths[20];
 ALLEGRO_BITMAP* BulletTexture;
+ALLEGRO_BITMAP* DeathTexture;
+
 
 AlienMatrix * AlienGrid;
 ALLEGRO_BITMAP* AlienTexture;

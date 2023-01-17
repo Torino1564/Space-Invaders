@@ -237,6 +237,7 @@ int GameInit()
 		}
 	}
 	BulletTexture = al_load_bitmap(BULLET_TEXTURE1);
+	DeathTexture = al_load_bitmap(DEATH_TEXTURE);
 
 	
 	return error;
@@ -393,7 +394,6 @@ void GameLogic()
 	CullBullets();
 	UpdateBullets();
 
-	aliendeath = CollideGrid(Bullets, AlienGrid);
 
 	UpdateEntity(Spaceship, DeltaTime);
 	UpdateEntity(Gun, DeltaTime);
@@ -480,6 +480,34 @@ void GameRender()
 	DrawEntity(Gun);
 	DrawEntity(Spaceship);
 
+	//Enemies
+
+	aliendeath = CollideGrid(Bullets, AlienGrid, Deaths, DeathTexture);
+	DrawGrid(AlienGrid);
+
+	for (int h = 0; h < 20; h++)
+	{
+		if (Deaths[h] != NULL)
+		{
+			DrawEntity(Deaths[h]);
+			if (Deaths[h] != NULL)
+			{
+
+//				Deaths[h]->frameCount++
+
+//				if (Deaths[h]->deltaFrame >= Deaths[h]->spriteS->maxDeltaFrame)
+//				{
+//					DestroyEntityLoadedTexture(Deaths[h]);
+//					Deaths[h] = NULL;
+//
+//				}
+//				DestroyEntity(Deaths[h]);
+
+			}
+			
+		}
+	}
+
 
 	//fight sounds
 	if (shot)
@@ -493,13 +521,13 @@ void GameRender()
 	}
 
 	
-	DrawGrid(AlienGrid);
 
 	for (int i = 0; i < 10; i++)
 	{
 		if (Bullets[i] != NULL)
 		{
 			DrawEntity(Bullets[i]);
+
 		}
 	}
 
