@@ -350,13 +350,13 @@ void GameLogic()
 					{
 						if (i == 9)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 16 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture , al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture , al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
 
 						if (Bullets[i] == NULL)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 16 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
 					}
