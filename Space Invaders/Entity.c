@@ -156,6 +156,19 @@ void DestroyEntityLoadedTexture(Entity* Entity)
 	return;
 }
 
+void DestroyAnimatedEntity(Entity* Entity)
+{
+	if (Entity != NULL)
+	{
+		if (Entity->spriteS != NULL)
+		{
+			DeleteSpriteSheet(Entity->spriteS);
+			free(Entity);
+		}
+	}
+	return;
+}
+
 int AreColiding(Entity* e0, Entity* e1)
 {
 	if (e1 != NULL && e0 != NULL)

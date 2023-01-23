@@ -20,3 +20,13 @@ SpriteSheet * NewSpriteSheet(char* texture, float maxDeltaFrame_p, int maxFrameC
 
 	return TempSpriteSheet;
 }
+
+void DeleteSpriteSheet(SpriteSheet* Ssheet)
+{
+	if (Ssheet != NULL)
+	{
+		free(Ssheet);
+	}
+
+	return;
+}

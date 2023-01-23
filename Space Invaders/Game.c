@@ -257,7 +257,8 @@ void GameDestroy()
 	}
 
 	DestroyMatrix(AlienGrid);
-	DestroyEntity(Spaceship);
+	DestroyAnimatedEntity(Spaceship);
+
 	al_destroy_bitmap(menu);
 	al_destroy_display(DISPLAY);
 	al_destroy_user_event_source(KeyboardEventSource);

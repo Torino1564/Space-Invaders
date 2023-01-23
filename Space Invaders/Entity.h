@@ -37,5 +37,7 @@ Entity* CreateNewAnimatedEntityLoadedTexture(Vec2F pos, Vec2F vel, SpriteSheet *
 
 void DestroyEntity(Entity* Entity);
 void DestroyEntityLoadedTexture(Entity* Entity);
+void DestroyAnimatedEntity(Entity* Entity);
+
 int AreColiding(Entity* e1, Entity* e2);
 void Animate(Entity* ent, float dt);

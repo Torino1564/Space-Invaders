@@ -19,3 +19,4 @@ struct SpriteSheet_t
 typedef struct SpriteSheet_t SpriteSheet;
 
 SpriteSheet * NewSpriteSheet(char* texture, float maxDeltaFrame_p, int maxFrameCount_p, int frameWidth_p, int frameHeight_p , int maxAnimationNumber_p);
+void DeleteSpriteSheet(SpriteSheet* Ssheet);
