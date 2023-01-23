@@ -263,14 +263,14 @@ void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 
 		Matrix->HorizontalSpeed *= -1;
 		bounce = false;
 
-		Matrix->Pos.y += 3;
+		Matrix->Pos.y += 6;
 		for (int i = 0; i < Matrix->XAliens; i++)
 		{
 			for (int j = 0; j < Matrix->YAliens; j++)
 			{
 				if (Matrix->matrix[i][j] != NULL)
 				{
-					Matrix->matrix[i][j]->Pos.y += 3;
+					Matrix->matrix[i][j]->Pos.y += 6;
 				}
 			}
 		}
