@@ -12,20 +12,19 @@ void DrawEntity(Entity* Entity)
 				al_draw_scaled_bitmap(Entity->spriteS->Texture, Entity->frameCount * Entity->spriteS->frameWidth, Entity->spriteS->frameHeight * Entity->spriteS->animationNumber, Entity->spriteS->frameWidth, Entity->spriteS->frameHeight,
 					Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
 			}
-			
+
 		}
-		else if(Entity->Texture != NULL)
+		else if (Entity->Texture != NULL)
 		{
 			al_draw_scaled_bitmap(Entity->Texture, 0, 0,
 				al_get_bitmap_width(Entity->Texture), al_get_bitmap_height(Entity->Texture),
 				Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
 		}
 
-		
-
 	}
 	return;
 }
+
 
 void UpdateEntity(Entity* Entity , double dt)
 {
@@ -35,9 +34,6 @@ void UpdateEntity(Entity* Entity , double dt)
 		Entity->Pos.y += Entity->Vel.y * dt;
 
 	}
-
-	
-
 	return;
 }
 
@@ -45,13 +41,13 @@ void ClipToScreen(Entity* Entity, Vec2 Screen)
 {
 	if (Entity != NULL)
 	{
-		if (Entity->Pos.x < 0)
+		if (Entity->Pos.x < 2*Entity->width)
 		{
-			Entity->Pos.x = 0;
+			Entity->Pos.x = 2*Entity->width;
 		}
-		else if (Entity->Pos.x + Entity->width > Screen.x)
+		else if (Entity->Pos.x + Entity->width > (Screen.x - 2*Entity->width))
 		{
-			Entity->Pos.x = Screen.x - Entity->width;
+			Entity->Pos.x = Screen.x - 3*Entity->width;
 		}
 
 		if (Entity->Pos.y < 0)
@@ -64,6 +60,21 @@ void ClipToScreen(Entity* Entity, Vec2 Screen)
 		}
 	}
 	
+}
+
+void ClipToEntity(Entity* e1, Entity* e2, int adjust)
+{
+	if (e1 != NULL)
+	{
+		if (e1->Pos.x < e2->Pos.x + adjust)
+		{
+			e1->Pos.x = e2->Pos.x + adjust;
+		}
+		else if (e1->Pos.x > e2->Pos.x + adjust)
+		{
+			e1->Pos.x = e2->Pos.x + adjust;
+		}
+	}
 }
 
 Entity* CreateNewEntity(Vec2F pos, Vec2F vel, const char* texture, int height, int width)
@@ -126,10 +137,13 @@ Entity* CreateNewEntityLoadedTexture(Vec2F pos, Vec2F vel, ALLEGRO_BITMAP* textu
 void DestroyEntity(Entity* Entity)
 {
 	if (Entity != NULL)
-	if (Entity->Texture != NULL)
-	al_destroy_bitmap(Entity->Texture);
-	free(Entity);
-
+	{
+		if (Entity->Texture != NULL)
+		{
+			al_destroy_bitmap(Entity->Texture);
+			free(Entity);
+		}
+	}
 	return;
 }
 

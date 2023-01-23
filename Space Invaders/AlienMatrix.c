@@ -98,8 +98,10 @@ void FillMatrixAnimated(AlienMatrix* Matrix, SpriteSheet * SpriteSheet_p)
 	Matrix->AlienCount = Matrix->XAliens * Matrix->YAliens;
 }
 
-void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix)
+int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix, Entity* Deaths[], ALLEGRO_BITMAP* DeathTexture)
 {
+	int death=0;
+	int n=0;
 	for (int b = 0; b < 10; b++)
 	{
 		for (int i = 0; i < Matrix->XAliens; i++)
@@ -113,15 +115,26 @@ void CollideGrid(Entity* Bullet[], AlienMatrix* Matrix)
 						DestroyEntityLoadedTexture(Bullet[b]);
 						Bullet[b] = NULL;
 
+						Deaths[n] = CreateNewEntityLoadedTexture((Matrix->matrix)[i][j]->Pos, NewVec2F(0, 0), DeathTexture, 45, 51);
+
 						DestroyEntityLoadedTexture((Matrix->matrix)[i][j]);
 						(Matrix->matrix)[i][j] = NULL;
+						
+						n+=1;
 
 						Matrix->AlienCount -= 1;
+						death = 1;
 					}
 				}
 			}
 		}
 	}
+	return death;
+}
+
+void DeathAnimation(int i, int j)
+{
+	return;
 }
 
 void UpdateMatrix(AlienMatrix* Matrix, double dt , Vec2 PlayAreaPos , Vec2 PlayAreaDim)
