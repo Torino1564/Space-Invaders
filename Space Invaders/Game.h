@@ -2,8 +2,9 @@
 #include <allegro5/allegro.h>
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_native_dialog.h>
-#include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_primitives.h>
@@ -43,7 +44,7 @@ int raspi;
 #define SHIELD "Resources/Assets/ShieldTexture2.png"
 #define ALIENBULLETS "Resources/Assets/AlienBullet.png"
 
-
+#define FONT "Resources/Assets/PublicPixel-z84yD.ttf"
 
 //	Backgrounds
 
@@ -139,6 +140,7 @@ double PastFrameTime;
 Vec2 PlaySpaceArea;
 Vec2 PlaySpacePos;
 ALLEGRO_COLOR GUIColor;
+ALLEGRO_FONT* font;
 
 
 /* ==============================
@@ -230,6 +232,11 @@ ALLEGRO_SAMPLE* alien_death_sound;
 ALLEGRO_SAMPLE_INSTANCE* instance1;
 
 /* =============================
+			Arrays
+=============================== */
+
+
+/* =============================
 			global variables
 =============================== */
 
@@ -240,3 +247,4 @@ int Moving;
 int shot;
 int aliendeath;
 int playerdeath;
+int score;
