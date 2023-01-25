@@ -44,6 +44,9 @@ int SystemInit()
 
 	al_init_primitives_addon();
 
+	al_init_font_addon();
+	al_init_ttf_addon();
+
 	ScreenDimensions = NewVec2(1920, 1080);
 
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
@@ -167,7 +170,7 @@ int GameInit()
 	int SpaceshipYcoord = 950;
 	int GunYcoord = 880;
 
-	PlaySpaceArea = NewVec2( 1000 , ScreenDimensions.y );
+	PlaySpaceArea = NewVec2( 1000 , ScreenDimensions.y);
 	PlaySpacePos = NewVec2(ScreenDimensions.x/2 - PlaySpaceArea.x/2, 0);
 	GUIColor = al_map_rgb(40, 60, 20);
 
@@ -266,6 +269,10 @@ int GameInit()
 		}
 	}
 
+	//Score system init
+
+	font = al_load_ttf_font(FONT, 36, NULL);
+
 	return error;
 }
 
@@ -290,10 +297,11 @@ void GameDestroy()
 
 	al_destroy_bitmap(background1);
 	al_destroy_bitmap(background2);
-	//al_destroy_bitmap(background3);
+	al_destroy_bitmap(background3);
 	al_destroy_bitmap(background4);
 
 	al_destroy_sample_instance(instance1);
+	al_destroy_font(font);
 
 	al_shutdown_primitives_addon();
 	al_uninstall_keyboard();
@@ -346,6 +354,8 @@ void GameLogic()
 	if (!al_is_event_queue_empty(InputEventQueue))
 	{
 		al_get_next_event(InputEventQueue, &TempEvent);
+
+		lives = 3;
 
 		switch (TempEvent.type)
 		{
@@ -521,6 +531,7 @@ void GameRender()
 	//Enemies
 
 	aliendeath = CollideGrid(Bullets, AlienGrid, Deaths, DeathTexture);
+	score += aliendeath;
 	DrawGrid(AlienGrid);
 
 	for (int h = 0; h < 20; h++)
@@ -595,6 +606,21 @@ void GameRender()
 
 		}
 	}
+	//Score
+
+const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\0", "8\0", "9\0"};
+
+	al_draw_text(font, al_map_rgb(254, 254, 254), 230, 60, ALLEGRO_ALIGN_CENTRE, "PLAYER SCORE");
+	al_draw_text(font, al_map_rgb(254, 254, 254), 1580, 60, ALLEGRO_ALIGN_CENTRE, "LIVES");
+
+			// Dato importante: El espacio entre cada letra es 40 pixeles
+	al_draw_text(font, al_map_rgb(254, 254, 254), 370, 115, ALLEGRO_ALIGN_RIGHT, "0");
+	al_draw_text(font, al_map_rgb(254, 254, 254), 330, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score%10)]);
+	al_draw_text(font, al_map_rgb(254, 254, 254), 290, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/10)%10]);
+	al_draw_text(font, al_map_rgb(254, 254, 254), 250, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/100)%10]);
+	al_draw_text(font, al_map_rgb(254, 254, 254), 210, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/1000) % 10]);
+	al_draw_text(font, al_map_rgb(254, 254, 254), 170, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/10000) % 10]);
+	al_draw_text(font, al_map_rgb(254, 254, 254), 130, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/100000) % 10]);
 
 	al_flip_display();
 	return;
