@@ -13,6 +13,9 @@
 #include <time.h>
 #include "AlienMatrix.h"
 #include "SpriteSheet.h"
+#include "Shield.h"
+#include "Math.h"
+
 /* ===================================
 
 			PLATFORM
@@ -37,6 +40,9 @@ int raspi;
 
 #define MINIUFO1SP "Resources/Assets/MiniUFO1Sp.png"
 #define SLUG "Resources/Assets/Spaceship_sprite.png"
+#define SHIELD "Resources/Assets/ShieldTexture2.png"
+#define ALIENBULLETS "Resources/Assets/AlienBullet.png"
+
 
 
 //	Backgrounds
@@ -69,9 +75,12 @@ void GameDestroy();
 void Preframe();
 void Postframe();
 void Pause();
+void ComputeAlienShot();
 
 void CullBullets();
 void UpdateBullets();
+void AnimateBullets();
+
 
 #define SHIP_SPEED 500
 
@@ -133,14 +142,23 @@ ALLEGRO_COLOR GUIColor;
 
 
 /* ==============================
-				Aliens
+			Game Elements
 ================================= */
 
+#define BASE_ALIEN_SHOT_SPEED 2.5
+
 Entity * Bullets[10];
+Entity* AlienBullets[15];
 Entity* Deaths[20];
+
 ALLEGRO_BITMAP* BulletTexture;
 ALLEGRO_BITMAP* DeathTexture;
 
+int numberOfShields;
+shield* shieldArray[10];
+shield* shield1;
+Vec2F shieldSize;
+float shieldPadding;
 
 AlienMatrix * AlienGrid;
 ALLEGRO_BITMAP* AlienTexture;
@@ -148,6 +166,7 @@ ALLEGRO_BITMAP* AlienTexture;
 SpriteSheet* MiniUFO;
 SpriteSheet* Slug;
 SpriteSheet* Weapon;
+SpriteSheet* AlienBullet;
 
 Vec2 GridDimensions;
 int AlienWidth;

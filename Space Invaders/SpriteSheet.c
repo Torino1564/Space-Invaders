@@ -10,6 +10,10 @@ SpriteSheet * NewSpriteSheet(char* texture, float maxDeltaFrame_p, int maxFrameC
 	}
 
 	TempSpriteSheet->Texture = al_load_bitmap(texture);
+	if (TempSpriteSheet->Texture != NULL)
+	{
+		al_convert_mask_to_alpha(TempSpriteSheet->Texture, al_map_rgb(255, 0, 255));
+	}
 	
 	TempSpriteSheet->maxDeltaFrame = maxDeltaFrame_p;
 	TempSpriteSheet->maxFrameCount = maxFrameCount_p;

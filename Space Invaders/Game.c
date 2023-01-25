@@ -239,9 +239,28 @@ int GameInit()
 		}
 	}
 	BulletTexture = al_load_bitmap(BULLET_TEXTURE1);
+
+	AlienBullets[0] = calloc(15, sizeof(Entity));
+	AlienBullet = NewSpriteSheet(ALIENBULLETS, 0.3, 3, 5, 32, 1);
+
 	DeathTexture = al_load_bitmap(DEATH_TEXTURE);
 
 	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38 , 1);
+
+	numberOfShields = 5;
+	shieldSize = NewVec2F(150, 70);
+	shieldPadding = (PlaySpaceArea.x - shieldSize.x * numberOfShields ) / (numberOfShields + 1);
+	float shieldYpos = Spaceship->Pos.y - PlaySpaceArea.y * 0.15;
+
+	shieldArray[0] = calloc(numberOfShields, sizeof(shield));
+	if (shieldArray != NULL)
+	{
+		for (int i = 0; i < numberOfShields; i++)
+		{
+			shieldArray[i] = CreateNewShield(NewVec2F(PlaySpacePos.x + shieldPadding + ( i * (shieldSize.x + shieldPadding)), shieldYpos), NewVec2F(0, 0), NewVec2F(150, 70), 10, SHIELD);
+			FillShieldParticles(shieldArray[i]);
+		}
+	}
 
 	return error;
 }
@@ -265,10 +284,10 @@ void GameDestroy()
 	al_destroy_user_event_source(MouseEventSource);
 	al_destroy_event_queue(InputEventQueue);
 
-	al_destroy_sample(background1);
-	al_destroy_sample(background2);
-	al_destroy_sample(background3);
-	al_destroy_sample(background4);
+	al_destroy_bitmap(background1);
+	al_destroy_bitmap(background2);
+	//al_destroy_bitmap(background3);
+	al_destroy_bitmap(background4);
 
 	al_destroy_sample_instance(instance1);
 
@@ -398,12 +417,15 @@ void GameLogic()
 	CullBullets();
 	UpdateBullets();
 
+	ComputeAlienShot();
 
 	UpdateEntity(Spaceship, DeltaTime);
 	UpdateEntity(Gun, DeltaTime);
 	ClipToScreen(Spaceship, ScreenDimensions);
 	ClipToEntity(Gun, Spaceship, 10);
 	Animate(Spaceship, DeltaTime);
+	AnimateBullets();
+	
 
 	if (AlienGrid->AlienCount == 0)
 	{
@@ -416,6 +438,14 @@ void GameLogic()
 			{
 				DestroyEntityLoadedTexture(Bullets[i]);
 				Bullets[i] = NULL;
+			}
+		}
+		for (int i = 0; i < 15; i++)
+		{
+			if (AlienBullets[i] != NULL)
+			{
+				DestroyAnimatedEntitySharedSprite(AlienBullets[i]);
+				AlienBullets[i] = NULL;
 			}
 		}
 		AlienGrid->Pos = GetCentredPosition(AlienGrid, ScreenDimensions);
@@ -524,14 +554,20 @@ void GameRender()
 		al_play_sample(alien_death_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 	}
 
-	
 
 	for (int i = 0; i < 10; i++)
 	{
 		if (Bullets[i] != NULL)
 		{
 			DrawEntity(Bullets[i]);
+		}
+	}
 
+	for (int i = 0; i < 15; i++)
+	{
+		if (AlienBullets[i] != NULL)
+		{
+			DrawEntity(AlienBullets[i]);
 		}
 	}
 
@@ -546,6 +582,15 @@ void GameRender()
 	al_draw_filled_rectangle(PlaySpacePos.x + PlaySpaceArea.x, PlaySpacePos.y, ScreenDimensions.x, PlaySpacePos.y + PlaySpaceArea.y, GUIColor);
 	//Bottom
 	al_draw_filled_rectangle(0, PlaySpacePos.y + PlaySpaceArea.y, ScreenDimensions.x, ScreenDimensions.y, GUIColor);
+
+	for (int i = 0; i < numberOfShields; i++)
+	{
+		if (shieldArray[i] != NULL)
+		{
+			DrawShieldPartitions(shieldArray[i]);
+
+		}
+	}
 
 	al_flip_display();
 	return;
@@ -582,6 +627,18 @@ void CullBullets()
 			}
 		}
 	}
+
+	for (int i = 0; i < 15; i++)
+	{
+		if (AlienBullets[i] != NULL)
+		{
+			if (AlienBullets[i]->Pos.y > ScreenDimensions.y)
+			{
+				DestroyAnimatedEntitySharedSprite(AlienBullets[i]);
+				AlienBullets[i] = NULL;
+			}
+		}
+	}
 }
 
 void UpdateBullets()
@@ -591,6 +648,76 @@ void UpdateBullets()
 		if (Bullets[i] != NULL)
 		{
 			UpdateEntity(Bullets[i], DeltaTime);
+		}
+	}
+
+	for (int i = 0; i < 15; i++)
+	{
+		if (AlienBullets[i] != NULL)
+		{
+			UpdateEntity(AlienBullets[i], DeltaTime);
+		}
+	}
+}
+
+void ComputeAlienShot()
+{
+	static float timeBuffer;
+
+	timeBuffer += DeltaTime;
+
+	if (timeBuffer >= BASE_ALIEN_SHOT_SPEED)
+	{
+		timeBuffer = 0;
+
+		float minimumDistanceToPlayer = 9999;
+		float TempDistanceToPlayer;
+		int closestAlienColumnToPlayer = (int)( AlienGrid->XAliens / 2);
+		int lastAlienRow = 0;
+
+		for (int i = 0; i < AlienGrid->XAliens; i++)
+		{
+			for (int j = (AlienGrid->YAliens - 1) ; j >= 0; j--)
+			{
+				if (AlienGrid->matrix[i][j] != NULL)
+				{
+					TempDistanceToPlayer = AbsoluteValue(AlienGrid->matrix[i][j]->Pos.x + (AlienGrid->matrix[i][j]->width / 2) - (Spaceship->Pos.x + (Spaceship->width / 2)));
+
+					if (TempDistanceToPlayer < minimumDistanceToPlayer)
+					{
+						minimumDistanceToPlayer = TempDistanceToPlayer;
+						closestAlienColumnToPlayer = i;
+						lastAlienRow = j;
+					}
+					j = -1;
+				}
+			}
+		}
+
+		for (int i = 0; i < 15; i++)
+		{
+			if (AlienBullets[i] == NULL)
+			{
+				if (AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow] != NULL)
+				{
+					AlienBullets[i] = CreateNewAnimatedEntityLoadedTexture(NewVec2F(AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.x + AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->width/2 , AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.y + AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->height)
+						, NewVec2F(0, 400), AlienBullet, 5, 32);
+					break;
+				}
+				
+			}
+		}
+	}
+
+}
+
+void AnimateBullets()
+{
+	for (int i = 1; i < 15; i++)
+	{
+		if (AlienBullets[i] != NULL)
+		{
+			Animate(AlienBullets[i], DeltaTime);
 		}
 	}
 }

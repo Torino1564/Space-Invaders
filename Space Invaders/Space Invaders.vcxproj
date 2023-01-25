@@ -145,6 +145,8 @@
     <ClCompile Include="Entity.c" />
     <ClCompile Include="Game.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="Math.c" />
+    <ClCompile Include="Shield.c" />
     <ClCompile Include="SpriteSheet.c" />
     <ClCompile Include="Vec2.c" />
     <ClCompile Include="Vec2_F.c" />
@@ -157,6 +159,8 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Math.h" />
+    <ClInclude Include="Shield.h" />
     <ClInclude Include="SpriteSheet.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vec2_F.h" />

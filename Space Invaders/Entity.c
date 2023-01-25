@@ -25,7 +25,6 @@ void DrawEntity(Entity* Entity)
 	return;
 }
 
-
 void UpdateEntity(Entity* Entity , double dt)
 {
 	if (Entity != NULL)
@@ -163,6 +162,18 @@ void DestroyAnimatedEntity(Entity* Entity)
 		if (Entity->spriteS != NULL)
 		{
 			DeleteSpriteSheet(Entity->spriteS);
+			free(Entity);
+		}
+	}
+	return;
+}
+
+void DestroyAnimatedEntitySharedSprite(Entity* Entity)
+{
+	if (Entity != NULL)
+	{
+		if (Entity->spriteS != NULL)
+		{
 			free(Entity);
 		}
 	}
