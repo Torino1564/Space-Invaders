@@ -160,8 +160,12 @@ int GameInit()
 	AlienWidth = 45;
 	AlienHeight = 45;
 
-	int	SpaceshipWidth = 120;
-	int	SpaceshipHeight = 60;
+	int	SpaceshipWidth = 180;
+	int	SpaceshipHeight = 100;
+	int GunWidth = 120;
+	int GunHeight = 120;
+	int SpaceshipYcoord = 950;
+	int GunYcoord = 880;
 
 	PlaySpaceArea = NewVec2( 1000 , ScreenDimensions.y );
 	PlaySpacePos = NewVec2(ScreenDimensions.x/2 - PlaySpaceArea.x/2, 0);
@@ -221,14 +225,14 @@ int GameInit()
 	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)17), 16, 44, 38, 1);
 	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38, 1);
 
-	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x/2 - 50/2, PlaySpacePos.y + PlaySpaceArea.y - 80 ), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
+	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x/2 - 50/2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
 	if (Spaceship == NULL)
 	{
 		printf("There has been an error creating the player spaceship");
 		error = -1;
 	}
 
-	Gun = CreateNewEntity(NewVec2F(0, PlaySpacePos.y + PlaySpaceArea.y - 130), NewVec2F(0, 0), GUN_TEXTURE, 90, 90);
+	Gun = CreateNewEntity(NewVec2F(0, GunYcoord), NewVec2F(0, 0), GUN_TEXTURE, GunWidth, GunHeight);
 
 	Bullets[0] = malloc(sizeof(Entity) * 10);
 	if (Bullets != NULL)
@@ -422,7 +426,7 @@ void GameLogic()
 	UpdateEntity(Spaceship, DeltaTime);
 	UpdateEntity(Gun, DeltaTime);
 	ClipToScreen(Spaceship, ScreenDimensions);
-	ClipToEntity(Gun, Spaceship, 10);
+	ClipToEntity(Gun, Spaceship, 20);
 	Animate(Spaceship, DeltaTime);
 	AnimateBullets();
 	
