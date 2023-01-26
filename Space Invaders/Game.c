@@ -354,6 +354,8 @@ void GameLogic()
 	{
 		al_get_next_event(InputEventQueue, &TempEvent);
 
+		lives = 3;
+
 		switch (TempEvent.type)
 		{
 		case ALLEGRO_EVENT_KEY_DOWN:
@@ -605,6 +607,20 @@ void GameRender()
 		}
 	}
 	//Score
+
+const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\0", "8\0", "9\0"};
+
+	al_draw_text(font, al_map_rgb(254, 254, 254), 230, 60, ALLEGRO_ALIGN_CENTRE, "PLAYER SCORE");
+	al_draw_text(font, al_map_rgb(254, 254, 254), 1580, 60, ALLEGRO_ALIGN_CENTRE, "LIVES");
+
+			// Dato importante: El espacio entre cada letra es 40 pixeles
+	al_draw_text(font, al_map_rgb(254, 254, 254), 370, 115, ALLEGRO_ALIGN_RIGHT, "0");
+	al_draw_text(font, al_map_rgb(254, 254, 254), 330, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score%10)]);
+	al_draw_text(font, al_map_rgb(254, 254, 254), 290, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/10)%10]);
+	al_draw_text(font, al_map_rgb(254, 254, 254), 250, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/100)%10]);
+	al_draw_text(font, al_map_rgb(254, 254, 254), 210, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/1000) % 10]);
+	al_draw_text(font, al_map_rgb(254, 254, 254), 170, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/10000) % 10]);
+	al_draw_text(font, al_map_rgb(254, 254, 254), 130, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/100000) % 10]);
 
 const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\0", "8\0", "9\0"};
 

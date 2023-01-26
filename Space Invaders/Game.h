@@ -248,5 +248,5 @@ int Once;
 int Moving;
 int shot;
 int aliendeath;
-int playerdeath;
+int lives;
 int score;
