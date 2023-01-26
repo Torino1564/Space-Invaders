@@ -194,7 +194,6 @@ int GameInit()
 	background4 = al_load_bitmap(LVL4_BG);
 	backgroundpause = al_load_bitmap(PAUSE_BG);
 
-
 	if (background1 == NULL)
 	{
 		printf("There has ben an error loading the level 1 background bitmap");
@@ -252,6 +251,11 @@ int GameInit()
 	DeathTexture = al_load_bitmap(DEATH_TEXTURE);
 
 	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38 , 1);
+
+	//Miscellaneous assets
+
+	heart = al_load_bitmap(HEART);
+	deadheart = al_load_bitmap(DHEART);
 
 	numberOfShields = 5;
 	shieldSize = NewVec2F(150, 70);
@@ -606,12 +610,43 @@ void GameRender()
 
 		}
 	}
-	//Score
 
+
+	//Score
 
 const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\0", "8\0", "9\0"};
 
 	al_draw_text(font, al_map_rgb(254, 254, 254), 230, 60, ALLEGRO_ALIGN_CENTRE, "PLAYER SCORE");
+	al_draw_text(font, al_map_rgb(254, 254, 254), 1580, 60, ALLEGRO_ALIGN_CENTRE, "LIVES");
+	//corazoncito 
+	
+	if (lives > 0)
+	{
+		al_draw_scaled_bitmap(heart, 0, 0, al_get_bitmap_width(heart), al_get_bitmap_height(heart), 1690, 57, 55, 55, NULL);
+	}
+	else
+	{
+		al_draw_scaled_bitmap(deadheart, 0, 0, al_get_bitmap_width(deadheart), al_get_bitmap_height(deadheart), 1690, 57, 55, 55, NULL);
+	}
+	if (lives > 1)
+	{
+		al_draw_scaled_bitmap(heart, 0, 0, al_get_bitmap_width(heart), al_get_bitmap_height(heart), 1760, 57, 55, 55, NULL);
+	}
+	else
+	{
+		al_draw_scaled_bitmap(deadheart, 0, 0, al_get_bitmap_width(deadheart), al_get_bitmap_height(deadheart), 1760, 57, 55, 55, NULL);
+	}
+	if (lives > 2)
+	{
+		al_draw_scaled_bitmap(heart, 0, 0, al_get_bitmap_width(heart), al_get_bitmap_height(heart), 1830, 57, 55, 55, NULL);
+	}
+	else
+	{
+		al_draw_scaled_bitmap(deadheart, 0, 0, al_get_bitmap_width(deadheart), al_get_bitmap_height(deadheart), 1830, 57, 55, 55, NULL);
+	}
+
+
+
 
 			// Dato importante: El espacio entre cada letra es 40 pixeles
 	al_draw_text(font, al_map_rgb(254, 254, 254), 370, 115, ALLEGRO_ALIGN_RIGHT, "0");

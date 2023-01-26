@@ -45,6 +45,8 @@ int raspi;
 #define ALIENBULLETS "Resources/Assets/AlienBullet.png"
 
 #define FONT "Resources/Assets/PublicPixel-z84yD.ttf"
+#define HEART "Resources/Assets/heart.png"
+#define DHEART "Resources/Assets/deadheart.png"
 
 //	Backgrounds
 
@@ -110,6 +112,9 @@ ALLEGRO_BITMAP* background2;
 ALLEGRO_BITMAP* background3;
 ALLEGRO_BITMAP* background4;
 ALLEGRO_BITMAP* backgroundpause;
+
+ALLEGRO_BITMAP* heart;
+ALLEGRO_BITMAP* deadheart;
 
 ALLEGRO_EVENT_SOURCE* KeyboardEventSource;
 
