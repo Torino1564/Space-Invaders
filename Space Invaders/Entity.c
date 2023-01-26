@@ -97,6 +97,7 @@ Entity* CreateNewEntity(Vec2F pos, Vec2F vel, const char* texture, int height, i
 	}
 
 	al_convert_mask_to_alpha(ent->Texture, al_map_rgb(255, 0, 255));
+	ent->data = 0;
 
 
 	return ent;
@@ -128,6 +129,7 @@ Entity* CreateNewEntityLoadedTexture(Vec2F pos, Vec2F vel, ALLEGRO_BITMAP* textu
 
 	al_convert_mask_to_alpha(ent->Texture, al_map_rgb(255, 0, 255));
 
+	ent->data = 0;
 
 	return ent;
 
@@ -226,6 +228,8 @@ Entity* CreateNewAnimatedEntityLoadedTexture(Vec2F pos, Vec2F vel, SpriteSheet* 
 
 	ent->width = width_p;
 	ent->height = height_p;
+
+	ent->data = 0;
 
 	return ent;
 }

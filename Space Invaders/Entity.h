@@ -22,6 +22,8 @@ struct Entity_t
 	unsigned int frameCount;
 	float deltaFrame;
 
+	char data;
+
 };
 typedef struct Entity_t Entity;
 

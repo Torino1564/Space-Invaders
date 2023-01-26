@@ -21,10 +21,15 @@ struct shield_t
 	Vec2F particleSize;
 	Vec2F Factors;
 
+	float OXdelta;
+
 	ALLEGRO_BITMAP* Texture;
 	SpriteSheet* Sprite;
 
 	uint8_t animated;
+
+	char destroyed;
+	int originalSize;
 
 	uint8_t * Particles[XDivisions][YDivisions];
 };

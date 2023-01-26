@@ -14,9 +14,12 @@ shield* CreateNewShield(Vec2F pos, Vec2F vel, Vec2F Dimensions, uint16_t Xdivisi
 	TempShield->vel = vel;
 	TempShield->dimensions = Dimensions;
 
-	TempShield->Xdivisions = Xdivisions;
+	TempShield->Xdivisions = XDivisions;
+	TempShield->Ydivisions = YDivisions;
 
 	TempShield->animated = false;
+
+	TempShield->destroyed = false;
 
 	TempShield->Texture = al_load_bitmap(Texture);
 
@@ -33,6 +36,7 @@ shield* CreateNewShield(Vec2F pos, Vec2F vel, Vec2F Dimensions, uint16_t Xdivisi
 
 void DrawShield(shield* shield)
 {
+	if (shield->destroyed == false)
 	al_draw_scaled_bitmap(shield->Texture, 0, 0, al_get_bitmap_width(shield->Texture), al_get_bitmap_height(shield->Texture), shield->pos.x, shield->pos.y
 		, shield->dimensions.x, shield->dimensions.y, NULL);
 	return;
@@ -44,6 +48,7 @@ void FillShieldParticles(shield* shield)
 	float Oheight = al_get_bitmap_height(shield->Texture);
 
 	float OXDelta = Owidth / XDivisions;
+	shield->OXdelta = OXDelta;
 	float OYDelta = Oheight / YDivisions;
 	shield->Factors = NewVec2F(shield->dimensions.x / Owidth, shield->dimensions.y / Oheight);
 
@@ -58,6 +63,9 @@ void FillShieldParticles(shield* shield)
 			shield->Particles[i][j] = false;
 		}
 	}
+
+	shield->destroyed = false;
+	shield->originalSize = 0;
 
 	uint8_t found = false;
 	ALLEGRO_COLOR TempColor;
@@ -75,6 +83,7 @@ void FillShieldParticles(shield* shield)
 			{
 				shield->Particles[i][j] = true;
 				found = false;
+				shield->originalSize++;
 			}
 		}
 	}
@@ -83,20 +92,28 @@ void FillShieldParticles(shield* shield)
 
 void DrawShieldPartitions(shield* shield)
 {
-	float Xdelta = (shield->particleSize.x / shield->Factors.x);
-	float Ydelta = (shield->particleSize.y / shield->Factors.y);
-	for (int i = 0; i < XDivisions; i++)
+	if (shield->destroyed == true)
 	{
-		for (int j = 0 ; j < YDivisions; j++)
+		return;
+	}
+	else
+	{
+		float Xdelta = (shield->particleSize.x / shield->Factors.x);
+		float Ydelta = (shield->particleSize.y / shield->Factors.y);
+		for (int i = 0; i < XDivisions; i++)
 		{
-			if (shield->Particles[i][j] == true)
+			for (int j = 0; j < YDivisions; j++)
 			{
-				/*al_draw_filled_rectangle(shield->pos.x + i * shield->particleSize.x, shield->pos.y + j * shield->particleSize.y,
-					shield->pos.x + (i + 1) * shield->particleSize.x, shield->pos.y + (j + 1) * shield->particleSize.y , al_map_rgb(0,0,255));*/
-				al_draw_scaled_bitmap(shield->Texture, i * Xdelta , j * Ydelta, Xdelta , Ydelta , shield->pos.x + i * shield->particleSize.x ,
-					shield->pos.y + j * shield->particleSize.y , shield->particleSize.x , shield->particleSize.y , NULL);
+				if (shield->Particles[i][j] == true)
+				{
+					/*al_draw_filled_rectangle(shield->pos.x + i * shield->particleSize.x, shield->pos.y + j * shield->particleSize.y,
+						shield->pos.x + (i + 1) * shield->particleSize.x, shield->pos.y + (j + 1) * shield->particleSize.y , al_map_rgb(0,0,255));*/
+					al_draw_scaled_bitmap(shield->Texture, i * Xdelta, j * Ydelta, Xdelta, Ydelta, shield->pos.x + i * shield->particleSize.x,
+						shield->pos.y + j * shield->particleSize.y, shield->particleSize.x, shield->particleSize.y, NULL);
+				}
 			}
 		}
 	}
-
+	
+	return;
 }

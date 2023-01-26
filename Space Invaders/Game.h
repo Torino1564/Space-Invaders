@@ -81,6 +81,8 @@ void ComputeAlienShot();
 void CullBullets();
 void UpdateBullets();
 void AnimateBullets();
+void CollideAlienBullets();
+
 
 
 #define SHIP_SPEED 500
