@@ -16,6 +16,7 @@
 #include "SpriteSheet.h"
 #include "Shield.h"
 #include "Math.h"
+#include "Animation.h"
 
 /* ===================================
 
@@ -36,6 +37,7 @@ int raspi;
 #define ALIEN_TEXTURE1 "Resources/Assets/alien1.png"
 #define BULLET_TEXTURE1 "Resources/Assets/bullet.png"
 #define DEATH_TEXTURE "Resources/Assets/death.png"
+#define EXPLOSION_SPRITE "Resources/Assets/MiniUFOExplosion.png"
 #define SHIP_TEXTURE	"Resources/Assets/Ship.png"
 #define GUN_TEXTURE "Resources/Assets/Gun.png"
 
@@ -43,7 +45,8 @@ int raspi;
 #define SLUG "Resources/Assets/Spaceship_sprite.png"
 #define SHIELD "Resources/Assets/ShieldTexture2.png"
 #define ALIENBULLETS "Resources/Assets/AlienBullet.png"
-
+#define BULLET_EXPLOSION_SS "Resources/Assets/bullet_Explosion_spritesheet.png"
+#define SHIELD_EXPLOSION_SS "Resources/Assets/shieldExplosion.png"
 #define FONT "Resources/Assets/PublicPixel-z84yD.ttf"
 #define HEART "Resources/Assets/heart.png"
 #define DHEART "Resources/Assets/deadheart.png"
@@ -176,6 +179,9 @@ SpriteSheet* MiniUFO;
 SpriteSheet* Slug;
 SpriteSheet* Weapon;
 SpriteSheet* AlienBullet;
+SpriteSheet* MiniUFO_Explosion;
+SpriteSheet* BulletExplosion;
+SpriteSheet* ShieldExplosion;
 
 Vec2 GridDimensions;
 int AlienWidth;
@@ -193,7 +199,7 @@ int YAliens;
 #define BACKGROUNDMUSIC1 "Resources/Audio/spaceinvaders1.mpeg"
 #define BACKGROUNDMUSIC2 NULL
 
-#define ALIENDEATHSFX "Resources/Audio/aliendeathsound.mp3"
+#define ALIENDEATHSFX "Resources/Audio/AlienExplosion2.wav"
 #define ALIEN1SFX	"Resources/Audio/fastinvader1.wav"
 #define ALIEN2SFX	"Resources/Audio/fastinvader2.wav"
 #define ALIEN3SFX	"Resources/Audio/fastinvader3.wav"
@@ -208,6 +214,9 @@ int YAliens;
 
 #define PLAYERSHOTSFX "Resources/Audio/shoot.mp3"
 #define PLAYERDEATHSFX NULL
+
+#define SHIELD_IMPACT "Resources/Audio/shieldImpact.wav"
+#define SHIELD_EXPLOSION "Resources/Audio/ShieldExplosion.wav"
 
 ALLEGRO_MIXER* Mixer;
 
@@ -225,6 +234,8 @@ ALLEGRO_SAMPLE* Explosion1;
 ALLEGRO_SAMPLE* PlayerShotSFX;
 ALLEGRO_SAMPLE* PlayerDeathSFX;
 
+ALLEGRO_SAMPLE* ShieldImpact;
+ALLEGRO_SAMPLE* ShieldDestroyed;
 
 ALLEGRO_SAMPLE* menuMusic;
 ALLEGRO_SAMPLE* level1Music;

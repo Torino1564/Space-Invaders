@@ -29,6 +29,7 @@ int SystemInit()
 	pc = true;
 	raspi = false;
 #endif
+
 	int error = 0;
 
 	al_init();
@@ -45,6 +46,8 @@ int SystemInit()
 
 	al_init_font_addon();
 	al_init_ttf_addon();
+
+	InitAnimations();
 
 	ScreenDimensions = NewVec2(1920, 1080);
 
@@ -219,6 +222,9 @@ int GameInit()
 	Bullet_sound = al_load_sample(PLAYERSHOTSFX);
 	alien_death_sound = al_load_sample(ALIENDEATHSFX);
 
+	ShieldImpact = al_load_sample(SHIELD_IMPACT);
+	ShieldDestroyed = al_load_sample(SHIELD_EXPLOSION);
+
 	instance1 = al_create_sample_instance(PLAYERSHOTSFX);
 
 	// Characters Init
@@ -246,11 +252,17 @@ int GameInit()
 	BulletTexture = al_load_bitmap(BULLET_TEXTURE1);
 
 	AlienBullets[0] = calloc(15, sizeof(Entity));
-	AlienBullet = NewSpriteSheet(ALIENBULLETS, 0.3, 3, 5, 32, 1);
+	AlienBullet = NewSpriteSheet(ALIENBULLETS, (float)((float)1 / (float)12), 3, 5, 32, 1);
+
+	BulletExplosion = NewSpriteSheet(BULLET_EXPLOSION_SS, (float)((float)1 / (float)20), 14, 35, 35, 1);
 
 	DeathTexture = al_load_bitmap(DEATH_TEXTURE);
 
 	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38 , 1);
+
+	MiniUFO_Explosion = NewSpriteSheet(EXPLOSION_SPRITE, (float)((float)1 / (float)12), 22, 70, 70, 1);
+
+	ShieldExplosion = NewSpriteSheet(SHIELD_EXPLOSION_SS, (float)((float)1 / (float)12), 27, 70, 70, 1);
 
 	//Miscellaneous assets
 
@@ -399,7 +411,9 @@ void GameLogic()
 							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
+
 					}
+
 					break;
 				default:
 					break;
@@ -433,6 +447,7 @@ void GameLogic()
 
 	CullBullets();
 	UpdateBullets();
+	UpdateAnimations(DeltaTime);
 
 	ComputeAlienShot();
 
@@ -502,31 +517,33 @@ void GameRender()
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level1Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level1Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	case 1:
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level2Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level2Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	case 2:
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level3Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level3Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	case 3:
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level4Music, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level4Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	}
+
+	
 
 	//player
 	DrawEntity(Gun);
@@ -534,7 +551,7 @@ void GameRender()
 
 	//Enemies
 
-	aliendeath = CollideGrid(Bullets, AlienGrid, Deaths, DeathTexture);
+	aliendeath = CollideGrid(Bullets, AlienGrid, Deaths, MiniUFO_Explosion);
 	score += aliendeath;
 	DrawGrid(AlienGrid);
 
@@ -545,16 +562,6 @@ void GameRender()
 			DrawEntity(Deaths[h]);
 			if (Deaths[h] != NULL)
 			{
-
-//				Deaths[h]->frameCount++
-
-//				if (Deaths[h]->deltaFrame >= Deaths[h]->spriteS->maxDeltaFrame)
-//				{
-//					DestroyEntityLoadedTexture(Deaths[h]);
-//					Deaths[h] = NULL;
-//
-//				}
-//				DestroyEntity(Deaths[h]);
 
 			}
 			
@@ -573,6 +580,14 @@ void GameRender()
 		al_play_sample(alien_death_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 	}
 
+	for (int i = 0; i < numberOfShields; i++)
+	{
+		if (shieldArray[i] != NULL)
+		{
+			DrawShieldPartitions(shieldArray[i]);
+
+		}
+	}
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -590,6 +605,9 @@ void GameRender()
 		}
 	}
 
+	//Animations
+	DrawAnimations();
+
 	//Render GUI
 	//Game Render Rectangle
 	al_draw_rectangle(PlaySpacePos.x, PlaySpacePos.y, PlaySpacePos.x + PlaySpaceArea.x, PlaySpacePos.y + PlaySpaceArea.y, GUIColor, 0);
@@ -602,14 +620,7 @@ void GameRender()
 	//Bottom
 	al_draw_filled_rectangle(0, PlaySpacePos.y + PlaySpaceArea.y, ScreenDimensions.x, ScreenDimensions.y, GUIColor);
 
-	for (int i = 0; i < numberOfShields; i++)
-	{
-		if (shieldArray[i] != NULL)
-		{
-			DrawShieldPartitions(shieldArray[i]);
-
-		}
-	}
+	
 
 
 	//Score
@@ -888,10 +899,20 @@ void CollideAlienBullets()
 										}
 									}
 
-									if (aliveParticleCount <= (shieldArray[AlienBullets[i]->data - 1]->originalSize) * 0.4)
+									if (aliveParticleCount <= (shieldArray[AlienBullets[i]->data - 1]->originalSize) * 0.6)
 									{
 										shieldArray[AlienBullets[i]->data - 1]->destroyed = true;
+										CreateNewAnimation(NewVec2F(shieldArray[AlienBullets[i]->data - 1]->pos.x - shieldArray[AlienBullets[i]->data - 1]->dimensions.x / 2 + ShieldExplosion->frameWidth / 2,
+											shieldArray[AlienBullets[i]->data - 1]->pos.y - shieldArray[AlienBullets[i]->data - 1]->dimensions.y / 2 + ShieldExplosion->frameHeight / 3 ),
+											NewVec2F(0, 0), 0, ShieldExplosion, shieldArray[AlienBullets[i]->data - 1]->dimensions.x * 1.5, shieldArray[AlienBullets[i]->data - 1]->dimensions.y * 1.5);
+									
+										al_play_sample(ShieldDestroyed, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 									}
+
+									CreateNewAnimation(NewVec2F(AlienBullets[i]->Pos.x + AlienBullets[i]->spriteS->frameWidth /4 - BulletExplosion->frameWidth / 2,
+										AlienBullets[i]->Pos.y + AlienBullets[i]->spriteS->frameHeight / 5 - BulletExplosion->frameHeight / 2), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
+
+									al_play_sample(ShieldImpact, 0.3, 0, 0.8, ALLEGRO_PLAYMODE_ONCE, NULL);
 
 									DestroyAnimatedEntitySharedSprite(AlienBullets[i]);
 									AlienBullets[i] = NULL;

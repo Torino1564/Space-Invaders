@@ -5,10 +5,17 @@ int InitAnimations()
 {
 	AnimationBuffer = calloc(MAX_ANIMATION_BUFFER_SIZE, sizeof( Animation *));
 
-	return 0;
+	if (AnimationBuffer == NULL)
+	{
+		return NULL;
+	}
+	else
+	{
+		return 1;
+	}
 }
 
-int CreateNewAnimation(Vec2F pos, Vec2F vel, uint8_t Loops, SpriteSheet * Sprite)
+int CreateNewAnimation(Vec2F pos, Vec2F vel, uint8_t Loops, SpriteSheet * Sprite , float width , float height)
 {
 	Animation * TempAnimation = malloc(sizeof(Animation));
 	if (TempAnimation == NULL)
@@ -16,7 +23,7 @@ int CreateNewAnimation(Vec2F pos, Vec2F vel, uint8_t Loops, SpriteSheet * Sprite
 		return 0;
 	}
 
-	Entity* TempEntity = CreateNewAnimatedEntityLoadedTexture(pos, vel, Sprite, 0, 0);
+	Entity* TempEntity = CreateNewAnimatedEntityLoadedTexture(pos, vel, Sprite, width, height);
 	if (TempEntity == NULL)
 	{
 		return 0;
@@ -25,31 +32,55 @@ int CreateNewAnimation(Vec2F pos, Vec2F vel, uint8_t Loops, SpriteSheet * Sprite
 	TempAnimation->Entity = TempEntity;
 	TempAnimation->Loops = Loops;
 
-	int i;
-	for (i = 0; i < MAX_ANIMATION_BUFFER_SIZE; i++)
+	for (int i = 1; i < MAX_ANIMATION_BUFFER_SIZE; i++)
 	{
-		if ((*AnimationBuffer)[i] != NULL)
+		if ((*AnimationBuffer)[i] == NULL)
 		{
 			(*AnimationBuffer)[i] = TempAnimation;
 			TempAnimation->BufferIndex = i;
 			break;
 		}
 	}
-	if (i == MAX_ANIMATION_BUFFER_SIZE)
-	{
-		(*AnimationBuffer)[i] = TempAnimation;
-		TempAnimation->BufferIndex = i;
-	}
-
 	return 1;
 }
 
-/*
-int DeleteAnimation(Animation* Animation)
+void UpdateAnimations( double dt)
 {
-	if (Animation != NULL)
+	if (AnimationBuffer == NULL)
+		return;
+
+	for (int i = 1; i < MAX_ANIMATION_BUFFER_SIZE; i++)
 	{
-		if ( )
+		if ((*AnimationBuffer)[i] != NULL)
+		{
+			UpdateEntity((*AnimationBuffer)[i]->Entity, dt);
+			if (Animate((*AnimationBuffer)[i]->Entity, dt) == 1)
+			{
+				(*AnimationBuffer)[i]->Loops--;
+
+				if ((*AnimationBuffer)[i]->Loops < 0)
+				{
+					DestroyAnimatedEntitySharedSprite((*AnimationBuffer)[i]->Entity);
+					free((*AnimationBuffer)[i]);
+					(*AnimationBuffer)[i] = NULL;
+
+
+				}
+			}
+
+		}
+	}
+
+
+}
+
+void DrawAnimations()
+{
+	for (int i = 1; i < MAX_ANIMATION_BUFFER_SIZE; i++)
+	{
+		if ((*AnimationBuffer)[i] != NULL)
+		{
+			DrawEntity((*AnimationBuffer)[i]->Entity);
+		}
 	}
 }
-*/

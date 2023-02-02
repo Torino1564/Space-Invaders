@@ -8,7 +8,7 @@
 struct Animation_t
 {
 	Entity* Entity;
-	uint8_t Loops;
+	int Loops;
 	uint16_t BufferIndex;
 
 };
@@ -18,4 +18,6 @@ typedef struct Animation_t Animation;
 Animation * (*AnimationBuffer)[];
 
 int InitAnimations();
-int CreateNewAnimation(Vec2F pos, Vec2F vel, uint8_t Loops, SpriteSheet * Sprite);
+int CreateNewAnimation(Vec2F pos, Vec2F vel, uint8_t Loops, SpriteSheet* Sprite, float width, float height);
+void UpdateAnimations( double dt);
+void DrawAnimations();

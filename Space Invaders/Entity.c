@@ -234,16 +234,18 @@ Entity* CreateNewAnimatedEntityLoadedTexture(Vec2F pos, Vec2F vel, SpriteSheet* 
 	return ent;
 }
 
-void Animate(Entity* ent, float dt)
+int Animate(Entity* ent, float dt) //devuelve 1 cuando da una vuelta por todo el spritesheet
 {
 	ent->deltaFrame += dt;
 	if (ent->deltaFrame >= ent->spriteS->maxDeltaFrame)
 	{
-		ent->deltaFrame = 0;
+		ent->deltaFrame -= ent->spriteS->maxDeltaFrame;
 		ent->frameCount++;
 		if (ent->frameCount >= ent->spriteS->maxFrameCount)
 		{
 			ent->frameCount = 0;
+			return 1;
 		}
 	}
+	return 0;
 }

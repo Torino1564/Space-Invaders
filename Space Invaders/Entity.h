@@ -43,4 +43,4 @@ void DestroyAnimatedEntity(Entity* Entity);
 void DestroyAnimatedEntitySharedSprite(Entity* Entity);
 
 int AreColiding(Entity* e1, Entity* e2);
-void Animate(Entity* ent, float dt);
+int Animate(Entity* ent, float dt);
