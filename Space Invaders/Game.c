@@ -220,6 +220,7 @@ int GameInit()
 	level4Music = al_load_sample(MUSIC_LEVEL4);
 
 	Bullet_sound = al_load_sample(PLAYERSHOTSFX);
+	ShotNotReadySFX = al_load_sample(SHOTNOTREADY);
 	alien_death_sound = al_load_sample(ALIENDEATHSFX);
 
 	ShieldImpact = al_load_sample(SHIELD_IMPACT);
@@ -269,7 +270,7 @@ int GameInit()
 	heart = al_load_bitmap(HEART);
 	deadheart = al_load_bitmap(DHEART);
 
-	numberOfShields = 5;
+	numberOfShields = 3;
 	shieldSize = NewVec2F(150, 70);
 	shieldPadding = (PlaySpaceArea.x - shieldSize.x * numberOfShields ) / (numberOfShields + 1);
 	float shieldYpos = Spaceship->Pos.y - PlaySpaceArea.y * 0.15;
@@ -287,6 +288,7 @@ int GameInit()
 	//Score system init
 
 	font = al_load_ttf_font(FONT, 36, NULL);
+	
 
 	return error;
 }
@@ -366,6 +368,10 @@ void Pause()
 
 void GameLogic()
 {
+	double shootCooldown;
+	shootCooldown = 1;
+	static double shootElapsedTime = 10;
+	shootElapsedTime += DeltaTime;
 	if (!al_is_event_queue_empty(InputEventQueue))
 	{
 		al_get_next_event(InputEventQueue, &TempEvent);
@@ -377,32 +383,40 @@ void GameLogic()
 		case ALLEGRO_EVENT_KEY_DOWN:
 			switch (TempEvent.keyboard.keycode)
 			{
-				case ALLEGRO_KEY_ESCAPE:
-					pause = 1;
+			case ALLEGRO_KEY_ESCAPE:
+				pause = 1;
+				break;
+			case ALLEGRO_KEY_A:
+				Spaceship->Vel.x -= SHIP_SPEED;
+				Gun->Vel.x -= SHIP_SPEED;
+				break;
+			case ALLEGRO_KEY_D:
+				Spaceship->Vel.x += SHIP_SPEED;
+				Gun->Vel.x += SHIP_SPEED;
+				break;
+			case ALLEGRO_KEY_S:
+				Level += 1;
+				Once = 0;
+				break;
+			case ALLEGRO_KEY_F4:
+				if (al_key_down(&KeyboardCurrentState, ALLEGRO_KEY_ALT))
+					running = 0;
+				break;
+			case ALLEGRO_KEY_SPACE:
+				if (shootElapsedTime < shootCooldown)
+				{
+					shotOnCooldown = true;
 					break;
-				case ALLEGRO_KEY_A:
-					Spaceship->Vel.x -= SHIP_SPEED;
-					Gun->Vel.x -= SHIP_SPEED;
-					break;
-				case ALLEGRO_KEY_D:
-					Spaceship->Vel.x += SHIP_SPEED;
-					Gun->Vel.x += SHIP_SPEED;
-					break;
-				case ALLEGRO_KEY_S:
-					Level += 1;
-					Once = 0;
-					break;
-				case ALLEGRO_KEY_F4:
-					if (al_key_down(&KeyboardCurrentState, ALLEGRO_KEY_ALT))
-						running = 0;
-					break;
-				case ALLEGRO_KEY_SPACE:
-					shot = 1;
+				}
+				else
+				{
+					shot = true;
+					shootElapsedTime = 0;
 					for (int i = 0; i < 10; i++)
 					{
 						if (i == 9)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture , al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
 
@@ -413,7 +427,7 @@ void GameLogic()
 						}
 
 					}
-
+				}
 					break;
 				default:
 					break;
@@ -578,6 +592,11 @@ void GameRender()
 	if (aliendeath)
 	{
 		al_play_sample(alien_death_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+	}
+	if (shotOnCooldown)
+	{
+		al_play_sample(ShotNotReadySFX, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+		shotOnCooldown = false;
 	}
 
 	for (int i = 0; i < numberOfShields; i++)

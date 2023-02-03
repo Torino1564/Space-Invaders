@@ -213,6 +213,7 @@ int YAliens;
 #define MUSIC_LEVEL4 "Resources/Audio/Level4.mp3" 
 
 #define PLAYERSHOTSFX "Resources/Audio/shoot.mp3"
+#define SHOTNOTREADY "Resources/Audio/ShotNotReady.wav"
 #define PLAYERDEATHSFX NULL
 
 #define SHIELD_IMPACT "Resources/Audio/shieldImpact.wav"
@@ -232,6 +233,7 @@ ALLEGRO_SAMPLE* Alien4SFX;
 ALLEGRO_SAMPLE* Explosion1;
 
 ALLEGRO_SAMPLE* PlayerShotSFX;
+ALLEGRO_SAMPLE* ShotNotReadySFX;
 ALLEGRO_SAMPLE* PlayerDeathSFX;
 
 ALLEGRO_SAMPLE* ShieldImpact;
@@ -263,6 +265,7 @@ int Level;
 int Once;
 int Moving;
 int shot;
+int shotOnCooldown;
 int aliendeath;
 int lives;
 int score;
