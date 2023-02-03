@@ -903,8 +903,8 @@ void CollideAlienBullets()
 									{
 										shieldArray[AlienBullets[i]->data - 1]->destroyed = true;
 										CreateNewAnimation(NewVec2F(shieldArray[AlienBullets[i]->data - 1]->pos.x - shieldArray[AlienBullets[i]->data - 1]->dimensions.x / 2 + ShieldExplosion->frameWidth / 2,
-											shieldArray[AlienBullets[i]->data - 1]->pos.y - shieldArray[AlienBullets[i]->data - 1]->dimensions.y / 2 + ShieldExplosion->frameHeight / 3 ),
-											NewVec2F(0, 0), 0, ShieldExplosion, shieldArray[AlienBullets[i]->data - 1]->dimensions.x * 1.5, shieldArray[AlienBullets[i]->data - 1]->dimensions.y * 1.5);
+											shieldArray[AlienBullets[i]->data - 1]->pos.y - shieldArray[AlienBullets[i]->data - 1]->dimensions.y + ShieldExplosion->frameHeight / 3 ),
+											NewVec2F(0, 0), 0, ShieldExplosion, shieldArray[AlienBullets[i]->data - 1]->dimensions.x * 1.4, shieldArray[AlienBullets[i]->data - 1]->dimensions.y * 2);
 									
 										al_play_sample(ShieldDestroyed, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 									}
