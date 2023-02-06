@@ -5,20 +5,23 @@ void DrawEntity(Entity* Entity)
 {
 	if (Entity != NULL)
 	{
-		if (Entity->animated == true)
+		if (Entity->data != 66)
 		{
-			if (Entity->spriteS->Texture != NULL && Entity->spriteS->animationNumber < Entity->spriteS->maxAnimationNumber)
+			if (Entity->animated == true)
 			{
-				al_draw_scaled_bitmap(Entity->spriteS->Texture, Entity->frameCount * Entity->spriteS->frameWidth, Entity->spriteS->frameHeight * Entity->spriteS->animationNumber, Entity->spriteS->frameWidth, Entity->spriteS->frameHeight,
+				if (Entity->spriteS->Texture != NULL && Entity->spriteS->animationNumber < Entity->spriteS->maxAnimationNumber)
+				{
+					al_draw_scaled_bitmap(Entity->spriteS->Texture, Entity->frameCount * Entity->spriteS->frameWidth, Entity->spriteS->frameHeight * Entity->spriteS->animationNumber, Entity->spriteS->frameWidth, Entity->spriteS->frameHeight,
+						Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
+				}
+
+			}
+			else if (Entity->Texture != NULL)
+			{
+				al_draw_scaled_bitmap(Entity->Texture, 0, 0,
+					al_get_bitmap_width(Entity->Texture), al_get_bitmap_height(Entity->Texture),
 					Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
 			}
-
-		}
-		else if (Entity->Texture != NULL)
-		{
-			al_draw_scaled_bitmap(Entity->Texture, 0, 0,
-				al_get_bitmap_width(Entity->Texture), al_get_bitmap_height(Entity->Texture),
-				Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
 		}
 
 	}
@@ -236,15 +239,18 @@ Entity* CreateNewAnimatedEntityLoadedTexture(Vec2F pos, Vec2F vel, SpriteSheet* 
 
 int Animate(Entity* ent, float dt) //devuelve 1 cuando da una vuelta por todo el spritesheet
 {
-	ent->deltaFrame += dt;
-	if (ent->deltaFrame >= ent->spriteS->maxDeltaFrame)
+	if (ent != NULL)
 	{
-		ent->deltaFrame -= ent->spriteS->maxDeltaFrame;
-		ent->frameCount++;
-		if (ent->frameCount >= ent->spriteS->maxFrameCount)
+		ent->deltaFrame += dt;
+		if (ent->deltaFrame >= ent->spriteS->maxDeltaFrame)
 		{
-			ent->frameCount = 0;
-			return 1;
+			ent->deltaFrame -= ent->spriteS->maxDeltaFrame;
+			ent->frameCount++;
+			if (ent->frameCount >= ent->spriteS->maxFrameCount)
+			{
+				ent->frameCount = 0;
+				return 1;
+			}
 		}
 	}
 	return 0;

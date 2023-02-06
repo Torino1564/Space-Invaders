@@ -41,7 +41,8 @@ void DestroyMatrix(AlienMatrix* matrix)
 		{
 			if (matrix->matrix[i][j] != NULL)
 			{
-				DestroyEntityLoadedTexture(matrix->matrix[i][j]);
+				DestroyAnimatedEntitySharedSprite(matrix->matrix[i][j]);
+				matrix->matrix[i][j] = NULL;
 			}
 		}
 	}
@@ -98,7 +99,7 @@ void FillMatrixAnimated(AlienMatrix* Matrix, SpriteSheet * SpriteSheet_p)
 	Matrix->AlienCount = Matrix->XAliens * Matrix->YAliens;
 }
 
-int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix, Entity* Deaths[], SpriteSheet* ExplosionSpritesheet)
+int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix, int * aliensDestroyed, SpriteSheet* ExplosionSpritesheet)
 {
 	for (int b = 0; b < 10; b++)
 	{
@@ -122,6 +123,7 @@ int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix, Entity* Deaths[], SpriteS
 						
 
 						Matrix->AlienCount--;
+						//(* aliensDestroyed)++;
 						
 						return true;
 					}

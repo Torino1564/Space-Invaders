@@ -84,3 +84,11 @@ void DrawAnimations()
 		}
 	}
 }
+
+void DestroyAnimation(Animation* animation)
+{
+	DestroyAnimatedEntitySharedSprite(animation->Entity);
+	free((*AnimationBuffer)[animation->BufferIndex]);
+	(*AnimationBuffer)[animation->BufferIndex] = NULL;
+
+}

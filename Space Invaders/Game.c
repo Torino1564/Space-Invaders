@@ -4,36 +4,41 @@ void Game()
 {
 	SystemInit();
 
-	int error = Menu();
-
-	int errorI = GameInit();
-	Level = 0;
-	Once = 0;
-
-	while (running)
+	while (ESTADO != STOP)
 	{
-		GameLoop();
+		switch (ESTADO)
+		{
+			case MENU:
+				Menu();
+				break;
+			case GAME:
+			{
+				GameInit();
+				while (GAMESTATE != EXIT)
+				{
+					GameLoop();
+				}
+				GameDestroy();
+				break;
+			}
+		}
+			
 	}
 
-	GameDestroy();
-
+	SystemDestroy();
 	return;
 }
 
 int SystemInit()
 {
-#ifdef __linux__
-	pc = false;
-	raspi = true;
-#elif _WIN64
-	pc = true;
-	raspi = false;
-#endif
+
 
 	int error = 0;
 
 	al_init();
+	al_init_primitives_addon();
 
+#ifndef RASPI
 	al_init_image_addon();
 
 	al_install_audio();
@@ -42,7 +47,6 @@ int SystemInit()
 	al_install_keyboard();
 	al_install_mouse();
 
-	al_init_primitives_addon();
 
 	al_init_font_addon();
 	al_init_ttf_addon();
@@ -88,11 +92,22 @@ int SystemInit()
 
 	Mixer = al_get_default_mixer();
 
+	LightGrayOverlay = al_load_bitmap(LIGHTGRAYOVERLAY);
+
 	al_reserve_samples(SAMPLE_COUNT);
+
+	font = al_load_ttf_font(FONT, 36, NULL);
+	BigFont = al_load_ttf_font(FONT, 80, NULL);
+#endif
+
+	Display = al_create_display(800, 800);
+
+	ESTADO = MENU;
 }
 
 int Menu()
 {
+#ifndef RASPI
 	int error = 0;
 
 	menu = al_load_bitmap(MENU_BG);
@@ -152,10 +167,14 @@ int Menu()
 
 	}
 	al_stop_samples();
+#endif
+	ESTADO = GAME;
+
 }
 
 int GameInit()
 {
+#ifndef RASPI
 	int error = 0;
 
 	int AlienPaddingX = 20;
@@ -221,6 +240,7 @@ int GameInit()
 
 	Bullet_sound = al_load_sample(PLAYERSHOTSFX);
 	ShotNotReadySFX = al_load_sample(SHOTNOTREADY);
+	ShipImpactSFX = al_load_sample(PLAYERIMPACTSFX);
 	alien_death_sound = al_load_sample(ALIENDEATHSFX);
 
 	ShieldImpact = al_load_sample(SHIELD_IMPACT);
@@ -229,8 +249,6 @@ int GameInit()
 	instance1 = al_create_sample_instance(PLAYERSHOTSFX);
 
 	// Characters Init
-
-	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)17), 16, 44, 38, 1);
 	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38, 1);
 
 	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x/2 - 50/2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
@@ -276,75 +294,159 @@ int GameInit()
 	float shieldYpos = Spaceship->Pos.y - PlaySpaceArea.y * 0.15;
 
 	shieldArray[0] = calloc(numberOfShields, sizeof(shield));
+
+	ShieldTexture = al_load_bitmap(SHIELD);
 	if (shieldArray != NULL)
 	{
 		for (int i = 0; i < numberOfShields; i++)
 		{
-			shieldArray[i] = CreateNewShield(NewVec2F(PlaySpacePos.x + shieldPadding + ( i * (shieldSize.x + shieldPadding)), shieldYpos), NewVec2F(0, 0), NewVec2F(150, 70), 10, SHIELD);
+			shieldArray[i] = CreateNewShield(NewVec2F(PlaySpacePos.x + shieldPadding + ( i * (shieldSize.x + shieldPadding)), shieldYpos), NewVec2F(0, 0), NewVec2F(150, 70), 10, ShieldTexture);
 			FillShieldParticles(shieldArray[i]);
 		}
 	}
 
 	//Score system init
 
-	font = al_load_ttf_font(FONT, 36, NULL);
-	
 
-	return error;
+	Level = 0;
+	Once = 0;
+	
+	lives = 3;
+	aliensDestroyed = 0;
+#endif
+
+	ClearGrid();
+
+	GAMESTATE = PLAYING;
+	return 0;
 }
 
 void GameDestroy()
 {
+#ifndef RASPI
+	for (int i = 0; i < numberOfShields; i++)
+	{
+		if (shieldArray[i] != NULL)
+		{
+			DestroyShield(shieldArray[i]);
+			shieldArray[i] = NULL;
+		}
+	}
+
+	al_destroy_bitmap(ShieldTexture);
+
+	al_destroy_bitmap(heart);
+	al_destroy_bitmap(deadheart);
+
+	DeleteSpriteSheet(BulletExplosion);
+	al_destroy_bitmap(DeathTexture);
+	DeleteSpriteSheet(MiniUFO_Explosion);
+	DeleteSpriteSheet(ShieldExplosion);
+
+	DestroyEntity(Gun);
+	DeleteSpriteSheet(MiniUFO);
+	DeleteSpriteSheet(Slug);
+
 	for (int i = 0; i < 10; i++)
 	{
 		if (Bullets[i] != NULL)
 		{
-			free(Bullets[i]);
+			DestroyEntityLoadedTexture(Bullets[i]);
+			Bullets[i] = NULL;
 		}
 	}
 
-	DestroyMatrix(AlienGrid);
-	DestroyAnimatedEntity(Spaceship);
+	for (int i = 0; i < 15; i++)
+	{
+		if (AlienBullets[i] != NULL)
+		{
+			DestroyAnimatedEntitySharedSprite(AlienBullets[i]);
+			AlienBullets[i] = NULL;
+		}
+	}
+	DeleteSpriteSheet(AlienBullet);
+	al_destroy_bitmap(BulletTexture);
 
-	al_destroy_bitmap(menu);
-	al_destroy_display(DISPLAY);
-	al_destroy_user_event_source(KeyboardEventSource);
-	al_destroy_user_event_source(MouseEventSource);
-	al_destroy_event_queue(InputEventQueue);
+	DestroyMatrix(AlienGrid);
+	DestroyAnimatedEntitySharedSprite(Spaceship);
+	al_destroy_bitmap(AlienTexture);
 
 	al_destroy_bitmap(background1);
 	al_destroy_bitmap(background2);
 	al_destroy_bitmap(background3);
 	al_destroy_bitmap(background4);
+	al_destroy_bitmap(backgroundpause);
+
+	al_destroy_sample(level1Music);
+	al_destroy_sample(level2Music);
+	al_destroy_sample(level3Music);
+	al_destroy_sample(level4Music);
+
+
+	al_destroy_sample(Bullet_sound);
+	al_destroy_sample(ShotNotReadySFX);
+	al_destroy_sample(ShipImpactSFX);
+	al_destroy_sample(alien_death_sound);
+
+
+	al_destroy_sample(ShieldImpact);
+	al_destroy_sample(ShieldDestroyed);
+
+
 
 	al_destroy_sample_instance(instance1);
-	al_destroy_font(font);
+#endif
+	return;
+}
 
+void SystemDestroy()
+{
+#ifndef RASPI
+	al_destroy_font(font);
+	al_destroy_font(BigFont);
+	al_destroy_bitmap(menu);
+	al_destroy_display(DISPLAY);
+	al_destroy_user_event_source(KeyboardEventSource);
+	al_destroy_user_event_source(MouseEventSource);
+	al_destroy_event_queue(InputEventQueue);
 	al_shutdown_primitives_addon();
 	al_uninstall_keyboard();
 	al_uninstall_mouse();
 	al_shutdown_image_addon();
+#endif
 
 	return;
 }
 
 void GameLoop()
 {
-	Preframe();
-	GameLogic();
-	GameRender();
-	Postframe();
-	Pause();
+	while (GAMESTATE != EXIT)
+	{
+		switch (GAMESTATE)
+		{
+			case PLAYING:
+				Preframe();
+				GameLogic();
+				GameRender();
+				Postframe();
+				break;
+			case PAUSE:
+				Pause();
+				break;
+			case END:
+				EndScreen();
+				break;
+		}
+	}
 
 }
 
 void Pause()
 {
-	if (pause)
-	{
-		al_draw_scaled_bitmap(backgroundpause, 0, 0, al_get_bitmap_width(backgroundpause), al_get_bitmap_height(backgroundpause), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
-		al_flip_display();
-	}
+#ifndef RASPI
+	al_draw_scaled_bitmap(backgroundpause, 0, 0, al_get_bitmap_width(backgroundpause), al_get_bitmap_height(backgroundpause), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+	al_flip_display();
+	pause = true;
 	while (pause)
 	{
 		if (!al_is_event_queue_empty(InputEventQueue))
@@ -359,24 +461,52 @@ void Pause()
 				{
 				case ALLEGRO_KEY_ESCAPE:
 					pause = 0;
+					GAMESTATE = PLAYING;
 				}
 
 			}
 		}
 	}
+#endif
+	return;
+}
+
+void EndScreen()
+{
+#ifndef RASPI
+	while (true)
+	{
+		al_draw_scaled_bitmap(LightGrayOverlay, 0, 0, al_get_bitmap_width(LightGrayOverlay), al_get_bitmap_height(LightGrayOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+		al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1, ALLEGRO_ALIGN_CENTER, "YOU DIED!");
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "YOUR SCORE:");
+		char textscore[25];
+		sprintf_s(textscore, 25, "%d", score * 10);
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 4, ALLEGRO_ALIGN_CENTER, textscore);
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 5, ALLEGRO_ALIGN_CENTER, "Invaders Vanquished:");
+		char textInvadersKilled[25];
+		sprintf_s(textInvadersKilled, 25, "%d", aliensDestroyed);
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 6, ALLEGRO_ALIGN_CENTER, textInvadersKilled);
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 7, ALLEGRO_ALIGN_CENTER, "Level Reached:");
+		char textLevel[25];
+		sprintf_s(textLevel, 25, "%d", Level);
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 8, ALLEGRO_ALIGN_CENTER, textLevel);
+
+
+		al_flip_display();
+	}
+#endif
 }
 
 void GameLogic()
 {
+#ifndef RASPI
 	double shootCooldown;
-	shootCooldown = 1;
+	shootCooldown = 0;
 	static double shootElapsedTime = 10;
 	shootElapsedTime += DeltaTime;
 	if (!al_is_event_queue_empty(InputEventQueue))
 	{
 		al_get_next_event(InputEventQueue, &TempEvent);
-
-		lives = 3;
 
 		switch (TempEvent.type)
 		{
@@ -384,7 +514,7 @@ void GameLogic()
 			switch (TempEvent.keyboard.keycode)
 			{
 			case ALLEGRO_KEY_ESCAPE:
-				pause = 1;
+				GAMESTATE = PAUSE;
 				break;
 			case ALLEGRO_KEY_A:
 				Spaceship->Vel.x -= SHIP_SPEED;
@@ -400,7 +530,10 @@ void GameLogic()
 				break;
 			case ALLEGRO_KEY_F4:
 				if (al_key_down(&KeyboardCurrentState, ALLEGRO_KEY_ALT))
-					running = 0;
+				{
+					GAMESTATE = EXIT;
+					ESTADO = STOP;
+				}
 				break;
 			case ALLEGRO_KEY_SPACE:
 				if (shootElapsedTime < shootCooldown)
@@ -472,7 +605,8 @@ void GameLogic()
 	Animate(Spaceship, DeltaTime);
 	AnimateBullets();
 	CollideAlienBullets();
-
+	AlienBulletsHit();
+	ProcessHP();
 
 	if (AlienGrid->AlienCount == 0)
 	{
@@ -495,17 +629,34 @@ void GameLogic()
 				AlienBullets[i] = NULL;
 			}
 		}
+		for (int i = 1; i < MAX_ANIMATION_BUFFER_SIZE; i++)
+		{
+			if ((*AnimationBuffer)[i] != NULL)
+			{
+				DestroyAnimation((*AnimationBuffer)[i]);
+			}
+		}
 		AlienGrid->Pos = GetCentredPosition(AlienGrid, ScreenDimensions);
 		//FillMatrix(AlienGrid, AlienTexture);
 		FillMatrixAnimated(AlienGrid, MiniUFO);
 
 
 	}
+#endif
+
+	TurnOn(2, 4);
+	TurnOn(4, 1);
+	TurnOn(10, 3);
+	TurnOn(1, 14);
+	TurnOn(5, 2);
+
+
 	return;
 }
 
 void GameRender()
 {
+#ifndef RASPI
 	//Background
 	switch ((Level - 1) % 4)
 	{
@@ -565,22 +716,9 @@ void GameRender()
 
 	//Enemies
 
-	aliendeath = CollideGrid(Bullets, AlienGrid, Deaths, MiniUFO_Explosion);
+	aliendeath = CollideGrid(Bullets, AlienGrid, &aliensDestroyed, MiniUFO_Explosion);
 	score += aliendeath;
 	DrawGrid(AlienGrid);
-
-	for (int h = 0; h < 20; h++)
-	{
-		if (Deaths[h] != NULL)
-		{
-			DrawEntity(Deaths[h]);
-			if (Deaths[h] != NULL)
-			{
-
-			}
-			
-		}
-	}
 
 
 	//fight sounds
@@ -688,27 +826,34 @@ const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\
 	al_draw_text(font, al_map_rgb(254, 254, 254), 130, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/100000) % 10]);
 
 	al_flip_display();
+#endif
+#ifdef RASPI
+	PrintGrid();
+#endif
 	return;
 }
 
 void Preframe()
 {
+#ifndef RASPI
 	al_get_keyboard_state(&KeyboardCurrentState);
 
 	t = clock();
-
+#endif
 	return;
 }
 
 void Postframe()
 {
+#ifndef RASPI
 	t = clock() - t;
 	PastFrameTime = DeltaTime;
 	DeltaTime = (double)(t) / (CLOCKS_PER_SEC);
-
+#endif
 	return;
 }
 
+#ifndef RASPI
 void CullBullets()
 {
 	for (int i = 0; i < 10; i++)
@@ -947,3 +1092,84 @@ void CollideAlienBullets()
 		}
 	}
 }
+
+int AlienBulletsHit()
+{
+	for (int i = 1; i < 15; i++)
+	{
+		if (AlienBullets[i] != NULL)
+		{
+			if (AreColiding(AlienBullets[i], Spaceship) || AreColiding(AlienBullets[i], Gun))
+			{
+				CreateNewAnimation(NewVec2F(AlienBullets[i]->Pos.x + AlienBullets[i]->spriteS->frameWidth / 4 - BulletExplosion->frameWidth / 2,
+					AlienBullets[i]->Pos.y + AlienBullets[i]->spriteS->frameHeight / 5 - BulletExplosion->frameHeight / 2), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
+
+				al_play_sample(ShieldImpact, 0.3, 0, 0.8, ALLEGRO_PLAYMODE_ONCE, NULL);
+
+				DestroyAnimatedEntitySharedSprite(AlienBullets[i]);
+				AlienBullets[i] = NULL;
+				lives--;
+
+				return true;
+			}
+
+		}
+	}
+}
+
+void ProcessHP()
+{
+	if (lives <= 0)
+	{
+		Spaceship->data = 66;
+		Gun->data = 66;
+		CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, ShieldExplosion, 200, 300);
+		GAMESTATE = END;
+	}
+}
+#endif
+#ifdef RASPI
+void ClearGrid()
+{
+	for (int i = 0; i < 16; i++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			Grid[i][j] = false;
+		}
+	}
+}
+
+void TurnOn(int x, int y)
+{
+	if (x >= 0 && x < 16 && y >= 0 && y < 16)
+	Grid[x][y] = true;
+}
+
+void PrintGrid()
+{
+	int padding = 25;
+	int startX = 50;
+	int startY = 50;
+
+	for (int i = 0; i < 16; i++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			if (Grid[i][j] == true)
+			{
+				al_draw_filled_circle(startX + padding * i, startY + padding * j, 10, al_map_rgb(255, 0, 0));
+			}
+			else
+			{
+				al_draw_circle(startX + padding * i, startY + padding * j, 10, al_map_rgb(200, 200, 200) , 1);
+
+			}
+		}
+
+	}
+
+	al_draw_rectangle(startX - padding, startY - padding, startX + padding * 16, startY + padding * 16, al_map_rgb(30, 30, 255), 5);
+	al_flip_display();
+}
+#endif

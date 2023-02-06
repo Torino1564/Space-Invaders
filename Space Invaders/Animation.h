@@ -21,3 +21,4 @@ int InitAnimations();
 int CreateNewAnimation(Vec2F pos, Vec2F vel, uint8_t Loops, SpriteSheet* Sprite, float width, float height);
 void UpdateAnimations( double dt);
 void DrawAnimations();
+void DestroyAnimation(Animation* animation);

@@ -2,7 +2,7 @@
 #include "Shield.h"
 
 
-shield* CreateNewShield(Vec2F pos, Vec2F vel, Vec2F Dimensions, uint16_t Xdivisions, char * Texture)
+shield* CreateNewShield(Vec2F pos, Vec2F vel, Vec2F Dimensions, uint16_t Xdivisions, ALLEGRO_BITMAP* texture)
 {
 	shield* TempShield = malloc(sizeof(shield));
 	if (TempShield == NULL)
@@ -21,7 +21,7 @@ shield* CreateNewShield(Vec2F pos, Vec2F vel, Vec2F Dimensions, uint16_t Xdivisi
 
 	TempShield->destroyed = false;
 
-	TempShield->Texture = al_load_bitmap(Texture);
+	TempShield->Texture = texture;
 
 	if (TempShield->Texture != NULL)
 	{
@@ -32,6 +32,13 @@ shield* CreateNewShield(Vec2F pos, Vec2F vel, Vec2F Dimensions, uint16_t Xdivisi
 
 	return TempShield;
 
+}
+
+void DestroyShield(shield* shield)
+{
+	free(shield);
+
+	return;
 }
 
 void DrawShield(shield* shield)

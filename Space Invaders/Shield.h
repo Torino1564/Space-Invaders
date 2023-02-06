@@ -36,7 +36,8 @@ struct shield_t
 
 typedef struct shield_t shield;
 
-shield* CreateNewShield(Vec2F pos, Vec2F vel, Vec2F Dimensions, uint16_t Xdivisions, char * Texture);
+shield* CreateNewShield(Vec2F pos, Vec2F vel, Vec2F Dimensions, uint16_t Xdivisions, ALLEGRO_BITMAP* texture);
 void DrawShield(shield* shield);
 void FillShieldParticles(shield* shield);
 void DrawShieldPartitions(shield* shield);
+void DestroyShield(shield* shield);

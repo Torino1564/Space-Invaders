@@ -13,10 +13,14 @@
 #include "Vec2.h"
 #include <time.h>
 #include "AlienMatrix.h"
-#include "SpriteSheet.h"
 #include "Shield.h"
 #include "Math.h"
+
+
+#ifndef RASPI
 #include "Animation.h"
+#include "SpriteSheet.h"
+
 
 /* ===================================
 
@@ -24,8 +28,6 @@
 
 ====================================== */
 
-int pc;
-int raspi;
 
 /* ===================================
 
@@ -63,8 +65,8 @@ int raspi;
 
 
 #define PAUSE_BG "Resources/Backgrounds/pause.png"
-
-
+#define LIGHTGRAYOVERLAY "Resources/Backgrounds/LightGrayOverlay.png"
+#endif
 /* ===================================
 	
 		Functions
@@ -78,18 +80,27 @@ void GameLoop();
 void GameLogic();
 void GameRender();
 void GameDestroy();
+void SystemDestroy();
 void Preframe();
 void Postframe();
 void Pause();
+void EndScreen();
+#ifndef RASPI
 void ComputeAlienShot();
-
+int AlienBulletsHit();
+void ProcessHP();
 void CullBullets();
 void UpdateBullets();
 void AnimateBullets();
 void CollideAlienBullets();
+#endif
+#ifdef RASPI
+void PrintGrid();
+void TurnOn(int x, int y);
+void ClearGrid();
+#endif
 
-
-
+#ifndef RASPI
 #define SHIP_SPEED 500
 
 Vec2 ScreenDimensions;
@@ -115,6 +126,7 @@ ALLEGRO_BITMAP* background2;
 ALLEGRO_BITMAP* background3;
 ALLEGRO_BITMAP* background4;
 ALLEGRO_BITMAP* backgroundpause;
+ALLEGRO_BITMAP* LightGrayOverlay;
 
 ALLEGRO_BITMAP* heart;
 ALLEGRO_BITMAP* deadheart;
@@ -130,13 +142,13 @@ ALLEGRO_EVENT TempEvent;
 ALLEGRO_EVENT MenuEvent;
 
 ALLEGRO_KEYBOARD_STATE KeyboardCurrentState;
-
+#endif
 Entity * Spaceship;
-
+#ifndef RASPI
 Entity* Gun;
 
 Entity Marco;
-
+#endif
 double DeltaTime;
 
 clock_t t;
@@ -146,13 +158,17 @@ double PastFrameTime;
 /* ==============================
 				GUI
 ================================= */
-
+#ifndef RASPI
 Vec2 PlaySpaceArea;
 Vec2 PlaySpacePos;
 ALLEGRO_COLOR GUIColor;
 ALLEGRO_FONT* font;
-
-
+ALLEGRO_FONT* BigFont;
+#endif
+#ifdef RASPI
+ALLEGRO_DISPLAY* Display;
+char Grid[16][16];
+#endif
 /* ==============================
 			Game Elements
 ================================= */
@@ -161,11 +177,10 @@ ALLEGRO_FONT* font;
 
 Entity * Bullets[10];
 Entity* AlienBullets[15];
-Entity* Deaths[20];
-
+#ifndef RASPI
 ALLEGRO_BITMAP* BulletTexture;
 ALLEGRO_BITMAP* DeathTexture;
-
+#endif
 int numberOfShields;
 shield* shieldArray[10];
 shield* shield1;
@@ -173,6 +188,7 @@ Vec2F shieldSize;
 float shieldPadding;
 
 AlienMatrix * AlienGrid;
+#ifndef RASPI
 ALLEGRO_BITMAP* AlienTexture;
 
 SpriteSheet* MiniUFO;
@@ -182,7 +198,8 @@ SpriteSheet* AlienBullet;
 SpriteSheet* MiniUFO_Explosion;
 SpriteSheet* BulletExplosion;
 SpriteSheet* ShieldExplosion;
-
+ALLEGRO_BITMAP* ShieldTexture;
+#endif
 Vec2 GridDimensions;
 int AlienWidth;
 int AlienHeight;
@@ -195,7 +212,7 @@ int YAliens;
 =============================== */
 
 #define SAMPLE_COUNT 30
-
+#ifndef RASPI
 #define BACKGROUNDMUSIC1 "Resources/Audio/spaceinvaders1.mpeg"
 #define BACKGROUNDMUSIC2 NULL
 
@@ -214,6 +231,7 @@ int YAliens;
 
 #define PLAYERSHOTSFX "Resources/Audio/shoot.mp3"
 #define SHOTNOTREADY "Resources/Audio/ShotNotReady.wav"
+#define PLAYERIMPACTSFX "Resources/Audio/ShipHit.wav"
 #define PLAYERDEATHSFX NULL
 
 #define SHIELD_IMPACT "Resources/Audio/shieldImpact.wav"
@@ -234,6 +252,7 @@ ALLEGRO_SAMPLE* Explosion1;
 
 ALLEGRO_SAMPLE* PlayerShotSFX;
 ALLEGRO_SAMPLE* ShotNotReadySFX;
+ALLEGRO_SAMPLE* ShipImpactSFX;
 ALLEGRO_SAMPLE* PlayerDeathSFX;
 
 ALLEGRO_SAMPLE* ShieldImpact;
@@ -250,10 +269,18 @@ ALLEGRO_SAMPLE* Bullet_sound;
 ALLEGRO_SAMPLE* alien_death_sound;
 
 ALLEGRO_SAMPLE_INSTANCE* instance1;
+#endif
 
 /* =============================
-			Arrays
+			ESTADOS
 =============================== */
+int ESTADO;
+
+enum { MENU, GAME , STOP };
+
+int GAMESTATE;
+
+enum GAMESTATE {PLAYING , PAUSE, END , EXIT};
 
 
 /* =============================
@@ -269,3 +296,4 @@ int shotOnCooldown;
 int aliendeath;
 int lives;
 int score;
+int aliensDestroyed;
