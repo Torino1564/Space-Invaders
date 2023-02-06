@@ -389,10 +389,12 @@ void GameLogic()
 			case ALLEGRO_KEY_A:
 				Spaceship->Vel.x -= SHIP_SPEED;
 				Gun->Vel.x -= SHIP_SPEED;
+				Spaceship->data = 1;
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x += SHIP_SPEED;
 				Gun->Vel.x += SHIP_SPEED;
+				Spaceship->data = 1;
 				break;
 			case ALLEGRO_KEY_S:
 				Level += 1;
@@ -440,10 +442,12 @@ void GameLogic()
 			case ALLEGRO_KEY_A:
 				Spaceship->Vel.x += SHIP_SPEED;
 				Gun->Vel.x += SHIP_SPEED;
+				Spaceship->data = 0;
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x -= SHIP_SPEED;
 				Gun->Vel.x -= SHIP_SPEED;
+				Spaceship->data = 0;
 				break;
 			default:
 				break;
@@ -473,6 +477,8 @@ void GameLogic()
 	AnimateBullets();
 	CollideAlienBullets();
 
+	CreateNewAnimation(NewVec2F(AlienBullets[i]->Pos.x + AlienBullets[i]->spriteS->frameWidth / 4 - BulletExplosion->frameWidth / 2,
+		AlienBullets[i]->Pos.y + AlienBullets[i]->spriteS->frameHeight / 5 - BulletExplosion->frameHeight / 2), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
 
 	if (AlienGrid->AlienCount == 0)
 	{
