@@ -250,8 +250,12 @@ int GameInit()
 
 	// Characters Init
 	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38, 1);
+	Stopping_b = NewSpriteSheet(STOP_BACKWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
+	Stopping_f = NewSpriteSheet(STOP_FORWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
 
 	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x/2 - 50/2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
+	Spaceship->data = 0; //El Spaceship esta quieto esperando movimiento
+
 	if (Spaceship == NULL)
 	{
 		printf("There has been an error creating the player spaceship");
@@ -573,10 +577,12 @@ void GameLogic()
 			case ALLEGRO_KEY_A:
 				Spaceship->Vel.x += SHIP_SPEED;
 				Gun->Vel.x += SHIP_SPEED;
+				Spaceship->data = 1;	//El sp esta parando 
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x -= SHIP_SPEED;
 				Gun->Vel.x -= SHIP_SPEED;
+				Spaceship->data = 2;	//El sp esta parando
 				break;
 			default:
 				break;
@@ -602,9 +608,14 @@ void GameLogic()
 	UpdateEntity(Gun, DeltaTime);
 	ClipToScreen(Spaceship, ScreenDimensions);
 	ClipToEntity(Gun, Spaceship, 20);
-	Animate(Spaceship, DeltaTime);
+
 	AnimateBullets();
 	CollideAlienBullets();
+
+	if (Spaceship->Vel.x)
+	{
+	Animate(Spaceship, DeltaTime);
+	}
 	AlienBulletsHit();
 	ProcessHP();
 
@@ -713,6 +724,23 @@ void GameRender()
 	//player
 	DrawEntity(Gun);
 	DrawEntity(Spaceship);
+
+	if (Spaceship->data)
+	{
+		switch (Spaceship->data)
+		{
+		case 1:
+			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_b, Spaceship->width, Spaceship->height);
+			Spaceship->data = 0;
+			break;
+		case 2:
+			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_f, Spaceship->width, Spaceship->height);
+			Spaceship->data = 0;
+		default:
+			break;
+		}
+		Spaceship->data = 0;
+	}
 
 	//Enemies
 
