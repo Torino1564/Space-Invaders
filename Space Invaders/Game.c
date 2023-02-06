@@ -99,9 +99,9 @@ int SystemInit()
 	font = al_load_ttf_font(FONT, 36, NULL);
 	BigFont = al_load_ttf_font(FONT, 80, NULL);
 #endif
-
+#ifdef RASPI
 	Display = al_create_display(800, 800);
-
+#endif
 	ESTADO = MENU;
 }
 
@@ -318,9 +318,9 @@ int GameInit()
 	lives = 3;
 	aliensDestroyed = 0;
 #endif
-
+#ifdef RASPI
 	ClearGrid();
-
+#endif
 	GAMESTATE = PLAYING;
 	return 0;
 }
@@ -654,13 +654,13 @@ void GameLogic()
 
 	}
 #endif
-
+#ifdef RASPI
 	TurnOn(2, 4);
 	TurnOn(4, 1);
 	TurnOn(10, 3);
 	TurnOn(1, 14);
 	TurnOn(5, 2);
-
+#endif
 
 	return;
 }
