@@ -51,6 +51,9 @@ int raspi;
 #define HEART "Resources/Assets/heart.png"
 #define DHEART "Resources/Assets/deadheart.png"
 
+#define STOP_BACKWARDS "Resources/Assets/Stopping_backwards.png"
+#define STOP_FORWARDS "Resources/Assets/Stopping_forwards.png"
+
 //	Backgrounds
 
 #define MENU_BG	"Resources/Backgrounds/menulogo.png"
@@ -182,6 +185,9 @@ SpriteSheet* AlienBullet;
 SpriteSheet* MiniUFO_Explosion;
 SpriteSheet* BulletExplosion;
 SpriteSheet* ShieldExplosion;
+
+SpriteSheet* Stopping_b;
+SpriteSheet* Stopping_f;
 
 Vec2 GridDimensions;
 int AlienWidth;
