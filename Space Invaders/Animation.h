@@ -1,4 +1,6 @@
 #pragma once
+#ifndef RASPI
+
 #include "Entity.h"
 #include "SpriteSheet.h"
 #include "Vec2_F.h"
@@ -22,3 +24,4 @@ int CreateNewAnimation(Vec2F pos, Vec2F vel, uint8_t Loops, SpriteSheet* Sprite,
 void UpdateAnimations( double dt);
 void DrawAnimations();
 void DestroyAnimation(Animation* animation);
+#endif

@@ -1,6 +1,6 @@
 #pragma once
 #include "AlienMatrix.h"
-
+#ifndef RASPI
 AlienMatrix* NewMatrix( int AlienPaddingX, int AlienPaddingY , int Awidth_p , int Aheight_p, int XAliens_p, int YAliens_p, int speed)
 {
 	AlienMatrix* TempMatrix = malloc(sizeof(AlienMatrix));
@@ -321,3 +321,4 @@ void AnimateMatrix( AlienMatrix* Matrix , float dt )
 		}
 	}
 }
+#endif

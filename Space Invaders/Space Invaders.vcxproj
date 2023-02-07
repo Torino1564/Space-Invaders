@@ -211,6 +211,7 @@
     <ClCompile Include="Animation.c" />
     <ClCompile Include="Entity.c" />
     <ClCompile Include="Game.c" />
+    <ClCompile Include="Graphics.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Math.c" />
     <ClCompile Include="Shield.c" />
@@ -226,6 +227,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Graphics.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Shield.h" />
     <ClInclude Include="SpriteSheet.h" />

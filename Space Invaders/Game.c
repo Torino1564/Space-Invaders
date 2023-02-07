@@ -320,6 +320,10 @@ int GameInit()
 #endif
 #ifdef RASPI
 	ClearGrid();
+	char TestShape[] = { 1 , 1, 1,
+						0 , 1 , 0,
+						0 , 0 , 0};
+	Test = CreateNewEntity(NewVec2(0, 2), NewVec2(1, 0), 1, TestShape, NewVec2(3, 2));
 #endif
 	GAMESTATE = PLAYING;
 	return 0;
@@ -655,11 +659,7 @@ void GameLogic()
 	}
 #endif
 #ifdef RASPI
-	TurnOn(2, 4);
-	TurnOn(4, 1);
-	TurnOn(10, 3);
-	TurnOn(1, 14);
-	TurnOn(5, 2);
+	UpdateEntity(Test , DeltaTime);
 #endif
 
 	return;
@@ -856,6 +856,8 @@ const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\
 	al_flip_display();
 #endif
 #ifdef RASPI
+	ClearGrid();
+	DrawEntity(Test);
 	PrintGrid();
 #endif
 	return;
@@ -865,19 +867,19 @@ void Preframe()
 {
 #ifndef RASPI
 	al_get_keyboard_state(&KeyboardCurrentState);
-
-	t = clock();
 #endif
+	t = clock();
+
 	return;
 }
 
 void Postframe()
 {
-#ifndef RASPI
+
 	t = clock() - t;
 	PastFrameTime = DeltaTime;
 	DeltaTime = (double)(t) / (CLOCKS_PER_SEC);
-#endif
+
 	return;
 }
 
@@ -1157,47 +1159,5 @@ void ProcessHP()
 }
 #endif
 #ifdef RASPI
-void ClearGrid()
-{
-	for (int i = 0; i < 16; i++)
-	{
-		for (int j = 0; j < 16; j++)
-		{
-			Grid[i][j] = false;
-		}
-	}
-}
 
-void TurnOn(int x, int y)
-{
-	if (x >= 0 && x < 16 && y >= 0 && y < 16)
-	Grid[x][y] = true;
-}
-
-void PrintGrid()
-{
-	int padding = 25;
-	int startX = 50;
-	int startY = 50;
-
-	for (int i = 0; i < 16; i++)
-	{
-		for (int j = 0; j < 16; j++)
-		{
-			if (Grid[i][j] == true)
-			{
-				al_draw_filled_circle(startX + padding * i, startY + padding * j, 10, al_map_rgb(255, 0, 0));
-			}
-			else
-			{
-				al_draw_circle(startX + padding * i, startY + padding * j, 10, al_map_rgb(200, 200, 200) , 1);
-
-			}
-		}
-
-	}
-
-	al_draw_rectangle(startX - padding, startY - padding, startX + padding * 16, startY + padding * 16, al_map_rgb(30, 30, 255), 5);
-	al_flip_display();
-}
 #endif

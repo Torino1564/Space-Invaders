@@ -16,7 +16,6 @@
 #include "Shield.h"
 #include "Math.h"
 
-
 #ifndef RASPI
 #include "Animation.h"
 #include "SpriteSheet.h"
@@ -70,6 +69,9 @@
 #define PAUSE_BG "Resources/Backgrounds/pause.png"
 #define LIGHTGRAYOVERLAY "Resources/Backgrounds/LightGrayOverlay.png"
 #endif
+#ifdef RASPI
+#include "Graphics.h"
+#endif
 /* ===================================
 	
 		Functions
@@ -98,9 +100,7 @@ void AnimateBullets();
 void CollideAlienBullets();
 #endif
 #ifdef RASPI
-void PrintGrid();
-void TurnOn(int x, int y);
-void ClearGrid();
+
 #endif
 
 #ifndef RASPI
@@ -169,8 +169,7 @@ ALLEGRO_FONT* font;
 ALLEGRO_FONT* BigFont;
 #endif
 #ifdef RASPI
-ALLEGRO_DISPLAY* Display;
-char Grid[16][16];
+
 #endif
 /* ==============================
 			Game Elements
@@ -189,6 +188,10 @@ shield* shieldArray[10];
 shield* shield1;
 Vec2F shieldSize;
 float shieldPadding;
+
+#ifdef RASPI
+Entity* Test;
+#endif
 
 AlienMatrix * AlienGrid;
 #ifndef RASPI

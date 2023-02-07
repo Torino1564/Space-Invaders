@@ -1,5 +1,6 @@
 #pragma once
 #include "Entity.h"
+#ifndef RASPI
 
 void DrawEntity(Entity* Entity)
 {
@@ -254,4 +255,70 @@ int Animate(Entity* ent, float dt) //devuelve 1 cuando da una vuelta por todo el
 		}
 	}
 	return 0;
+}
+#endif
+
+Entity* CreateNewEntity(Vec2 pos, Vec2 vel, double updateCooldown, char shape[], Vec2 dimensions)
+{
+	Entity* TempEntity = malloc(sizeof(Entity));
+	if (TempEntity == NULL) return NULL;
+
+	TempEntity->pos = pos;
+	TempEntity->vel = vel;
+	TempEntity->updateCooldown = updateCooldown;
+	TempEntity->dimensions = dimensions;
+	TempEntity->timeBuffer = 0;
+
+	for (int i = 0; i < 25; i++)
+	{
+		if (i < (dimensions.x * dimensions.y))
+		{
+			TempEntity->shape[i] = shape[i];
+		}
+		else TempEntity->shape[i] = 0;
+	}
+
+	return TempEntity;
+
+}
+
+void DestroyEntity(Entity* entity)
+{
+	if (entity != NULL)
+	{
+		free(entity);
+	}
+}
+
+void UpdateEntity(Entity* entity, double dt)
+{
+	if (entity != NULL)
+	{
+		entity->timeBuffer += dt;
+		if (entity->timeBuffer >= entity->updateCooldown)
+		{
+			entity->timeBuffer -= entity->updateCooldown;
+			entity->pos = SumVec2(&entity->pos, &entity->vel);
+		}
+	}
+}
+
+void DrawEntity(Entity* entity)
+{
+	if (entity != NULL)
+	{
+		for (int i = 0; i < entity->dimensions.x; i++)
+		{
+			for (int j = 0; j < entity->dimensions.y; j++)
+			{
+				if (entity->shape[i + entity->dimensions.x * j])
+				{
+					if (entity->pos.x + i < 16 && entity->pos.y + j < 16)
+					{
+						TurnOn(entity->pos.x + i, entity->pos.y + j);
+					}
+				}
+			}
+		}
+	}
 }

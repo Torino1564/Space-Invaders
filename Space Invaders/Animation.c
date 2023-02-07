@@ -1,5 +1,6 @@
 #include "Animation.h"
 #pragma once
+#ifndef RASPI
 
 int InitAnimations()
 {
@@ -92,3 +93,4 @@ void DestroyAnimation(Animation* animation)
 	(*AnimationBuffer)[animation->BufferIndex] = NULL;
 
 }
+#endif

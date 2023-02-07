@@ -1,8 +1,10 @@
 #pragma once
-#include "Vec2.h"
-#include "Vec2_F.h"
 #include <allegro5/allegro.h>
 #include <allegro5/allegro5.h>
+#include "Vec2.h"
+#include "Graphics.h"
+#ifndef RASPI
+#include "Vec2_F.h"
 #include "SpriteSheet.h"
 
 typedef struct ALLEGRO_BITMAP ALLEGRO_BITMAP;
@@ -27,6 +29,7 @@ struct Entity_t
 };
 typedef struct Entity_t Entity;
 
+
 void DrawEntity(Entity* Entity);
 
 void UpdateEntity(Entity* Entity , double dt );
@@ -44,3 +47,27 @@ void DestroyAnimatedEntitySharedSprite(Entity* Entity);
 
 int AreColiding(Entity* e1, Entity* e2);
 int Animate(Entity* ent, float dt);
+
+#endif
+
+struct Entity_t
+{
+	Vec2 pos;
+	Vec2 vel;
+
+	double updateCooldown;
+	double timeBuffer;
+
+	char shape[25];
+	Vec2 dimensions;
+
+};
+
+typedef struct Entity_t Entity;
+
+Entity* CreateNewEntity(Vec2 pos, Vec2 vel, double updateCooldown, char * shape , Vec2 dimensions);
+void DestroyEntity(Entity* entity);
+void UpdateEntity(Entity* entity, double dt);
+void DrawEntity(Entity* entity);
+
+

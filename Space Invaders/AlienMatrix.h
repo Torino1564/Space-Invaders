@@ -1,8 +1,10 @@
 #pragma once
 #include "Entity.h"
 #include "Vec2_F.h"
+#include "Vec2.h"
 #include "SpriteSheet.h"
 #include "Animation.h"
+#ifndef RASPI
 
 struct AlienMatrix_t
 {
@@ -41,3 +43,15 @@ void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 
 Vec2F GetCentredPosition(AlienMatrix* Matrix, Vec2 ScreenDimension);
 void AnimateMatrix(AlienMatrix* Matrix, float dt);
 void DeathAnimation(int i, int j);
+#endif
+
+#ifdef RASPI
+
+struct AlienMatrix_t
+{
+	Vec2 pos;
+};
+
+typedef struct AlienMatrix_t AlienMatrix;
+
+#endif
