@@ -19,6 +19,9 @@ AlienMatrix* NewMatrix( int AlienPaddingX, int AlienPaddingY , int Awidth_p , in
 		TempMatrix->height = Aheight_p * YAliens_p + (YAliens_p - 1) * AlienPaddingY;
 
 		TempMatrix->HorizontalSpeed = speed;
+		TempMatrix->VerticalSpeed = 6;
+
+		TempMatrix->MicroTimeBuffer = 0.005;
 
 		for (int i = 0; i < TempMatrix->XAliens; i++)
 		{
@@ -49,20 +52,6 @@ void DestroyMatrix(AlienMatrix* matrix)
 	free(matrix);
 }
 
-void DrawGrid(AlienMatrix* Matrix)
-{
-	for (int i = 0; i < Matrix->XAliens; i++)
-	{
-		for (int j = 0; j < Matrix->YAliens; j++)
-		{
-			if ((Matrix->matrix)[i][j] != NULL)
-			{
-				DrawEntity(Matrix->matrix[i][j]);
-			}
-		}
-	}
-}
-
 void FillMatrix(AlienMatrix* Matrix , ALLEGRO_BITMAP * entityTexture)
 {
 	for (int i = 0; i < Matrix->XAliens; i++)
@@ -74,24 +63,6 @@ void FillMatrix(AlienMatrix* Matrix , ALLEGRO_BITMAP * entityTexture)
 				(Matrix->matrix)[i][j] = CreateNewEntityLoadedTexture(
 					NewVec2F(Matrix->Pos.x + (Matrix->AlienWidth + Matrix->AlienPaddingX) * i, Matrix->Pos.y + (Matrix->AlienHeight + Matrix->AlienPaddingY) * j),
 					NewVec2F(0, 0), entityTexture, Matrix->AlienWidth, Matrix->AlienHeight);
-			}
-		}
-	}
-
-	Matrix->AlienCount = Matrix->XAliens * Matrix->YAliens;
-}
-
-void FillMatrixAnimated(AlienMatrix* Matrix, SpriteSheet * SpriteSheet_p)
-{
-	for (int i = 0; i < Matrix->XAliens; i++)
-	{
-		for (int j = 0; j < Matrix->YAliens; j++)
-		{
-			if ((Matrix->matrix)[i][j] == NULL)
-			{
-				(Matrix->matrix)[i][j] = CreateNewAnimatedEntityLoadedTexture(
-					NewVec2F(Matrix->Pos.x + (Matrix->AlienWidth + Matrix->AlienPaddingX) * i, Matrix->Pos.y + (Matrix->AlienHeight + Matrix->AlienPaddingY) * j),
-					NewVec2F(0, 0), SpriteSheet_p, Matrix->AlienWidth, Matrix->AlienHeight);
 			}
 		}
 	}
@@ -191,6 +162,149 @@ void UpdateMatrix(AlienMatrix* Matrix, double dt , Vec2 PlayAreaPos , Vec2 PlayA
 	return;
 }
 
+
+
+Vec2F GetCentredPosition(AlienMatrix* Matrix, Vec2 ScreenDimension)
+{
+	return NewVec2F( ScreenDimension.x/2 - Matrix->width/2 , 50 );
+}
+
+void AnimateMatrix( AlienMatrix* Matrix , float dt )
+{
+	for (int i = 0; i < Matrix->XAliens; i++)
+	{
+		for (int j = 0; j < Matrix->YAliens; j++)
+		{
+			if (Matrix->matrix[i][j] != NULL)
+			{
+				Matrix->matrix[i][j]->deltaFrame += dt;
+				if (Matrix->matrix[i][j]->deltaFrame + dt >= Matrix->matrix[i][j]->spriteS->maxDeltaFrame)
+				{
+					Matrix->matrix[i][j]->deltaFrame = 0;
+					Matrix->matrix[i][j]->frameCount++;
+					if (Matrix->matrix[i][j]->frameCount >= Matrix->matrix[i][j]->spriteS->maxFrameCount)
+					{
+						Matrix->matrix[i][j]->frameCount = 0;
+					}
+				}
+			}
+		}
+	}
+}
+
+void FillMatrixAnimated(AlienMatrix* Matrix, SpriteSheet* SpriteSheet_p)
+{
+	for (int i = 0; i < Matrix->XAliens; i++)
+	{
+		for (int j = 0; j < Matrix->YAliens; j++)
+		{
+			if ((Matrix->matrix)[i][j] == NULL)
+			{
+				(Matrix->matrix)[i][j] = CreateNewAnimatedEntityLoadedTexture(
+					NewVec2F(Matrix->Pos.x + (Matrix->AlienWidth + Matrix->AlienPaddingX) * i, Matrix->Pos.y + (Matrix->AlienHeight + Matrix->AlienPaddingY) * j),
+					NewVec2F(0, 0), SpriteSheet_p, Matrix->AlienWidth, Matrix->AlienHeight);
+			}
+		}
+	}
+
+	Matrix->AlienCount = Matrix->XAliens * Matrix->YAliens;
+}
+#endif
+
+#ifdef RASPI
+AlienMatrix* CreateNewAlienMatrix(Vec2 Pos, int HorizontalSpeed, int XAliens, int YAliens, Vec2 AlienDimensions, int Padding, char shape[])
+{
+
+	AlienMatrix* TempMatrix = malloc(sizeof(AlienMatrix));
+	if (TempMatrix == NULL)  return NULL;
+
+	TempMatrix->Pos = Pos;
+	TempMatrix->HorizontalSpeed = HorizontalSpeed;
+	TempMatrix->VerticalSpeed = 1;
+
+	TempMatrix->XAliens = XAliens;
+	TempMatrix->YAliens = YAliens;
+	TempMatrix->AlienDimensions = AlienDimensions;
+	TempMatrix->AlienPadding = Padding;
+
+	TempMatrix->MicroTimeBuffer = 0.05;
+	
+	for (int i = 0; i < 25; i++)
+	{
+		if (i < AlienDimensions.x * AlienDimensions.y)
+		{
+			TempMatrix->Shape[i] = shape[i];
+		}
+		else
+		{
+			TempMatrix->Shape[i] = 0;
+		}
+	}
+
+
+	for (int i = 0; i < XAliens; i++)
+	{
+		for (int j = 0; j < YAliens; j++)
+		{
+			TempMatrix->matrix[i][j] = NULL;
+		}
+	}
+
+	return TempMatrix;
+
+}
+
+void DestroyAlienMatrix(AlienMatrix* Matrix)
+{
+	for (int i = 0; i < Matrix->XAliens; i++)
+	{
+		for (int j = 0; j < Matrix->YAliens; j++)
+		{
+			if (Matrix->matrix[i][j] != NULL)
+			{
+				DestroyEntity(Matrix->matrix[i][j]);
+				Matrix->matrix[i][j] = NULL;
+			}
+		}
+	}
+
+	free(Matrix);
+}
+
+void FillMatrix(AlienMatrix* Matrix)
+{
+	for (int i = 0; i < Matrix->XAliens; i++)
+	{
+		for (int j = 0; j < Matrix->YAliens; j++)
+		{
+			if ((Matrix->matrix)[i][j] == NULL)
+			{
+				Matrix->matrix[i][j] = CreateNewEntity(NewVec2(Matrix->Pos.x + (Matrix->AlienDimensions.x + Matrix->AlienPadding) * i,
+					Matrix->Pos.y + (Matrix->AlienDimensions.y + Matrix->AlienPadding) * j), NewVec2(0, 0), 0, Matrix->Shape, Matrix->AlienDimensions);
+
+			}
+		}
+	}
+
+	Matrix->AlienCount = Matrix->XAliens * Matrix->YAliens;
+}
+
+#endif
+
+void DrawGrid(AlienMatrix* Matrix)
+{
+	for (int i = 0; i < Matrix->XAliens; i++)
+	{
+		for (int j = 0; j < Matrix->YAliens; j++)
+		{
+			if ((Matrix->matrix)[i][j] != NULL)
+			{
+				DrawEntity(Matrix->matrix[i][j]);
+			}
+		}
+	}
+}
+
 void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim)
 {
 	static double UpdateTimeBuffer;
@@ -228,7 +342,7 @@ void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 
 
 	if (updating)
 	{
-		if (MicroTimeBuffer >= 0.005)
+		if (MicroTimeBuffer >= Matrix->MicroTimeBuffer)
 		{
 			MicroTimeBuffer = 0;
 
@@ -258,34 +372,45 @@ void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 
 					found = true;
 				}
 			}
-			if ( Matrix->matrix[Xcoord][Ycoord] != NULL && found)
+			if (Matrix->matrix[Xcoord][Ycoord] != NULL && found)
 			{
 				Matrix->matrix[Xcoord][Ycoord]->Pos.x += Matrix->HorizontalSpeed;
+#ifndef RASPI
 				if ((Matrix->matrix)[Xcoord][Ycoord]->Pos.x - (Matrix->AlienWidth / 2) <= PlayAreaPos.x ||
 					((Matrix->matrix)[Xcoord][Ycoord]->Pos.x + (1.5 * Matrix->AlienWidth) >= PlayAreaPos.x + PlayAreaDim.x))
 				{
 					bounce = true;
 
 				}
+#endif
+#ifdef RASPI
+				if (Matrix->matrix[Xcoord][Ycoord]->Pos.x + Matrix->matrix[Xcoord][Ycoord]->dimensions.x >= 16 ||
+					Matrix->matrix[Xcoord][Ycoord]->Pos.x <= 0)
+				{
+					bounce = true;
+				}
+#endif
+
+
 				Xcoord++;
 			}
-			
+
 		}
 	}
-	
+
 	if (bounce && !updating)
 	{
 		Matrix->HorizontalSpeed *= -1;
 		bounce = false;
 
-		Matrix->Pos.y += 6;
+		Matrix->Pos.y += Matrix->VerticalSpeed;
 		for (int i = 0; i < Matrix->XAliens; i++)
 		{
 			for (int j = 0; j < Matrix->YAliens; j++)
 			{
 				if (Matrix->matrix[i][j] != NULL)
 				{
-					Matrix->matrix[i][j]->Pos.y += 6;
+					Matrix->matrix[i][j]->Pos.y += Matrix->VerticalSpeed;
 				}
 			}
 		}
@@ -293,32 +418,3 @@ void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 
 	}
 
 }
-
-Vec2F GetCentredPosition(AlienMatrix* Matrix, Vec2 ScreenDimension)
-{
-	return NewVec2F( ScreenDimension.x/2 - Matrix->width/2 , 50 );
-}
-
-void AnimateMatrix( AlienMatrix* Matrix , float dt )
-{
-	for (int i = 0; i < Matrix->XAliens; i++)
-	{
-		for (int j = 0; j < Matrix->YAliens; j++)
-		{
-			if (Matrix->matrix[i][j] != NULL)
-			{
-				Matrix->matrix[i][j]->deltaFrame += dt;
-				if (Matrix->matrix[i][j]->deltaFrame + dt >= Matrix->matrix[i][j]->spriteS->maxDeltaFrame)
-				{
-					Matrix->matrix[i][j]->deltaFrame = 0;
-					Matrix->matrix[i][j]->frameCount++;
-					if (Matrix->matrix[i][j]->frameCount >= Matrix->matrix[i][j]->spriteS->maxFrameCount)
-					{
-						Matrix->matrix[i][j]->frameCount = 0;
-					}
-				}
-			}
-		}
-	}
-}
-#endif

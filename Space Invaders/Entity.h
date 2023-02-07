@@ -50,10 +50,11 @@ int Animate(Entity* ent, float dt);
 
 #endif
 
+#ifdef RASPI
 struct Entity_t
 {
-	Vec2 pos;
-	Vec2 vel;
+	Vec2 Pos;
+	Vec2 Vel;
 
 	double updateCooldown;
 	double timeBuffer;
@@ -69,5 +70,6 @@ Entity* CreateNewEntity(Vec2 pos, Vec2 vel, double updateCooldown, char * shape 
 void DestroyEntity(Entity* entity);
 void UpdateEntity(Entity* entity, double dt);
 void DrawEntity(Entity* entity);
+#endif
 
 

@@ -191,8 +191,8 @@ int GameInit()
 	int SpaceshipYcoord = 950;
 	int GunYcoord = 880;
 
-	PlaySpaceArea = NewVec2( 1000 , ScreenDimensions.y);
-	PlaySpacePos = NewVec2(ScreenDimensions.x/2 - PlaySpaceArea.x/2, 0);
+	PlaySpaceArea = NewVec2(1000, ScreenDimensions.y);
+	PlaySpacePos = NewVec2(ScreenDimensions.x / 2 - PlaySpaceArea.x / 2, 0);
 	GUIColor = al_map_rgb(40, 60, 20);
 
 	AlienTexture = al_load_bitmap(ALIEN_TEXTURE1);
@@ -202,13 +202,13 @@ int GameInit()
 		error = -1;
 	}
 
-	AlienGrid = NewMatrix( AlienPaddingX, AlienPaddingY, AlienWidth, AlienHeight , XAliens, YAliens, 15 );
+	AlienGrid = NewMatrix(AlienPaddingX, AlienPaddingY, AlienWidth, AlienHeight, XAliens, YAliens, 15);
 	if (AlienGrid == NULL)
 	{
 		printf("There has been an error creating the Alien Matrix");
 		error = -2;
 	}
-	
+
 	// Background Init
 	background1 = al_load_bitmap(LVL1_BG);
 	background2 = al_load_bitmap(LVL2_BG);
@@ -253,7 +253,7 @@ int GameInit()
 	Stopping_b = NewSpriteSheet(STOP_BACKWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
 	Stopping_f = NewSpriteSheet(STOP_FORWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
 
-	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x/2 - 50/2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
+	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x / 2 - 50 / 2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
 	Spaceship->data = 0; //El Spaceship esta quieto esperando movimiento
 
 	if (Spaceship == NULL)
@@ -281,7 +281,7 @@ int GameInit()
 
 	DeathTexture = al_load_bitmap(DEATH_TEXTURE);
 
-	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38 , 1);
+	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38, 1);
 
 	MiniUFO_Explosion = NewSpriteSheet(EXPLOSION_SPRITE, (float)((float)1 / (float)12), 22, 70, 70, 1);
 
@@ -294,7 +294,7 @@ int GameInit()
 
 	numberOfShields = 3;
 	shieldSize = NewVec2F(150, 70);
-	shieldPadding = (PlaySpaceArea.x - shieldSize.x * numberOfShields ) / (numberOfShields + 1);
+	shieldPadding = (PlaySpaceArea.x - shieldSize.x * numberOfShields) / (numberOfShields + 1);
 	float shieldYpos = Spaceship->Pos.y - PlaySpaceArea.y * 0.15;
 
 	shieldArray[0] = calloc(numberOfShields, sizeof(shield));
@@ -304,7 +304,7 @@ int GameInit()
 	{
 		for (int i = 0; i < numberOfShields; i++)
 		{
-			shieldArray[i] = CreateNewShield(NewVec2F(PlaySpacePos.x + shieldPadding + ( i * (shieldSize.x + shieldPadding)), shieldYpos), NewVec2F(0, 0), NewVec2F(150, 70), 10, ShieldTexture);
+			shieldArray[i] = CreateNewShield(NewVec2F(PlaySpacePos.x + shieldPadding + (i * (shieldSize.x + shieldPadding)), shieldYpos), NewVec2F(0, 0), NewVec2F(150, 70), 10, ShieldTexture);
 			FillShieldParticles(shieldArray[i]);
 		}
 	}
@@ -314,16 +314,23 @@ int GameInit()
 
 	Level = 0;
 	Once = 0;
-	
+
 	lives = 3;
 	aliensDestroyed = 0;
 #endif
 #ifdef RASPI
 	ClearGrid();
-	char TestShape[] = { 1 , 1, 1,
-						0 , 1 , 0,
-						0 , 0 , 0};
-	Test = CreateNewEntity(NewVec2(0, 2), NewVec2(1, 0), 1, TestShape, NewVec2(3, 2));
+	char AlienShape[] = { 1 , 1, 1,
+						0 , 1 , 0 };
+	AlienGrid = CreateNewAlienMatrix(NewVec2(0, 2), 1, 3, 2, NewVec2(3, 2), 1, AlienShape);
+	FillMatrix(AlienGrid);
+
+	char PlayerShape[] = { 0 , 1, 0,
+						1 , 1 , 1 };
+	Spaceship = CreateNewEntity(NewVec2(6, 12), NewVec2(0, 0), 0.5, PlayerShape, NewVec2(3, 2));
+
+
+
 #endif
 	GAMESTATE = PLAYING;
 	return 0;
@@ -659,7 +666,8 @@ void GameLogic()
 	}
 #endif
 #ifdef RASPI
-	UpdateEntity(Test , DeltaTime);
+	UpdateMatrixDynamic( AlienGrid,DeltaTime,NewVec2(0,0) , NewVec2(0, 0));
+	UpdateEntity(Spaceship , DeltaTime);
 #endif
 
 	return;
@@ -857,7 +865,10 @@ const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\
 #endif
 #ifdef RASPI
 	ClearGrid();
-	DrawEntity(Test);
+	
+	DrawGrid(AlienGrid);
+	DrawEntity(Spaceship);
+
 	PrintGrid();
 #endif
 	return;

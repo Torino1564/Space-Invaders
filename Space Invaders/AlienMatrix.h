@@ -13,6 +13,7 @@ struct AlienMatrix_t
 	Vec2F Pos;
 
 	int HorizontalSpeed;
+	int VerticalSpeed;
 
 	int width;
 	int height;
@@ -28,6 +29,8 @@ struct AlienMatrix_t
 	int YAliens;
 
 	int AlienCount;
+
+	double MicroTimeBuffer;
 };
 
 typedef struct AlienMatrix_t AlienMatrix;
@@ -49,9 +52,34 @@ void DeathAnimation(int i, int j);
 
 struct AlienMatrix_t
 {
-	Vec2 pos;
+	Entity* matrix[6][4];
+
+	Vec2 Pos;
+	int HorizontalSpeed;
+	int VerticalSpeed;
+
+	int XAliens;
+	int YAliens;
+
+	Vec2 AlienDimensions;
+	int AlienPadding;
+	char Shape[25];
+
+	int AlienCount;
+
+	double MicroTimeBuffer;
 };
 
 typedef struct AlienMatrix_t AlienMatrix;
 
+AlienMatrix* CreateNewAlienMatrix(Vec2 Pos, int HorizontalSpeed, int XAliens, int YAliens , Vec2 AlienDimensions , int Padding , char shape[]);
+void FillMatrix(AlienMatrix* Matrix);
+void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim);
+void DrawGrid(AlienMatrix* Matrix);
+void DestroyAlienMatrix(AlienMatrix* Matrix);
+
+
+
+
 #endif
+

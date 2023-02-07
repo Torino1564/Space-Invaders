@@ -258,13 +258,14 @@ int Animate(Entity* ent, float dt) //devuelve 1 cuando da una vuelta por todo el
 }
 #endif
 
+#ifdef RASPI
 Entity* CreateNewEntity(Vec2 pos, Vec2 vel, double updateCooldown, char shape[], Vec2 dimensions)
 {
 	Entity* TempEntity = malloc(sizeof(Entity));
 	if (TempEntity == NULL) return NULL;
 
-	TempEntity->pos = pos;
-	TempEntity->vel = vel;
+	TempEntity->Pos = pos;
+	TempEntity->Vel = vel;
 	TempEntity->updateCooldown = updateCooldown;
 	TempEntity->dimensions = dimensions;
 	TempEntity->timeBuffer = 0;
@@ -298,7 +299,7 @@ void UpdateEntity(Entity* entity, double dt)
 		if (entity->timeBuffer >= entity->updateCooldown)
 		{
 			entity->timeBuffer -= entity->updateCooldown;
-			entity->pos = SumVec2(&entity->pos, &entity->vel);
+			entity->Pos = SumVec2(&entity->Pos, &entity->Vel);
 		}
 	}
 }
@@ -313,12 +314,13 @@ void DrawEntity(Entity* entity)
 			{
 				if (entity->shape[i + entity->dimensions.x * j])
 				{
-					if (entity->pos.x + i < 16 && entity->pos.y + j < 16)
+					if (entity->Pos.x + i < 16 && entity->Pos.y + j < 16)
 					{
-						TurnOn(entity->pos.x + i, entity->pos.y + j);
+						TurnOn(entity->Pos.x + i, entity->Pos.y + j);
 					}
 				}
 			}
 		}
 	}
 }
+#endif

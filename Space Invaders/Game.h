@@ -101,7 +101,10 @@ void CollideAlienBullets();
 #endif
 #ifdef RASPI
 
+AlienMatrix* AlienGrid;
 #endif
+
+Entity* Spaceship;
 
 #ifndef RASPI
 #define SHIP_SPEED 500
@@ -145,13 +148,12 @@ ALLEGRO_EVENT TempEvent;
 ALLEGRO_EVENT MenuEvent;
 
 ALLEGRO_KEYBOARD_STATE KeyboardCurrentState;
-#endif
-Entity * Spaceship;
-#ifndef RASPI
+
 Entity* Gun;
 
 Entity Marco;
 #endif
+
 double DeltaTime;
 
 clock_t t;
