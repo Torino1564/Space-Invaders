@@ -89,8 +89,11 @@ void DrawAnimations()
 void DestroyAnimation(Animation* animation)
 {
 	DestroyAnimatedEntitySharedSprite(animation->Entity);
+
+	int tempBufferIndex = animation->BufferIndex;
+
 	free((*AnimationBuffer)[animation->BufferIndex]);
-	(*AnimationBuffer)[animation->BufferIndex] = NULL;
+	(*AnimationBuffer)[tempBufferIndex] = NULL;
 
 }
 #endif
