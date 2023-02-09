@@ -77,6 +77,7 @@ void FillMatrix(AlienMatrix* Matrix);
 void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim);
 void DrawGrid(AlienMatrix* Matrix);
 void DestroyAlienMatrix(AlienMatrix* Matrix);
+int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix, int* aliensDestroyed);
 
 
 

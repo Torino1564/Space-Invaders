@@ -101,6 +101,7 @@ int SystemInit()
 #endif
 #ifdef RASPI
 	Display = al_create_display(800, 800);
+	initInput();
 #endif
 	ESTADO = MENU;
 }
@@ -311,27 +312,45 @@ int GameInit()
 
 	//Score system init
 
-
-	Level = 0;
 	Once = 0;
 
-	lives = 3;
-	aliensDestroyed = 0;
 #endif
 #ifdef RASPI
 	ClearGrid();
 	char AlienShape[] = { 1 , 1, 1,
 						0 , 1 , 0 };
-	AlienGrid = CreateNewAlienMatrix(NewVec2(0, 2), 1, 3, 2, NewVec2(3, 2), 1, AlienShape);
+	AlienGrid = CreateNewAlienMatrix(NewVec2(2, 1), 1, 3, 2, NewVec2(3, 2), 1, AlienShape);
 	FillMatrix(AlienGrid);
 
 	char PlayerShape[] = { 0 , 1, 0,
 						1 , 1 , 1 };
-	Spaceship = CreateNewEntity(NewVec2(6, 12), NewVec2(0, 0), 0.5, PlayerShape, NewVec2(3, 2));
+	Spaceship = CreateNewEntity(NewVec2(6, 13), NewVec2(0, 0), 0.1, PlayerShape, NewVec2(3, 2));
 
+	BulletShape[0] = ( 1 );
 
+	for (int i = 0; i < MAX_BULLETS; i++)
+	{
+		Bullets[i] = NULL;
+	}
+
+	numberOfShields = 3;
+	char shieldShape[] = { 1,1,1,1
+						,1,0,0,1 };
+	Vec2 shieldDimensions = NewVec2(4, 2);
+
+	shieldArray[0] = calloc(numberOfShields, sizeof(Entity));
+
+	for (int i = 0; i < numberOfShields; i++)
+	{
+		shieldArray[i] = CreateNewEntity(NewVec2(1 + i * (shieldDimensions.x + 1), 10), NewVec2(0, 0), 1, shieldShape, shieldDimensions);
+	}
 
 #endif
+
+	Level = 0;
+	aliensDestroyed = 0;
+	lives = 3;
+
 	GAMESTATE = PLAYING;
 	return 0;
 }
@@ -514,10 +533,11 @@ void EndScreen()
 
 void GameLogic()
 {
-#ifndef RASPI
 	double shootCooldown;
-	shootCooldown = 0;
 	static double shootElapsedTime = 10;
+#ifndef RASPI
+	
+	shootCooldown = 0;
 	shootElapsedTime += DeltaTime;
 	if (!al_is_event_queue_empty(InputEventQueue))
 	{
@@ -668,6 +688,71 @@ void GameLogic()
 #ifdef RASPI
 	UpdateMatrixDynamic( AlienGrid,DeltaTime,NewVec2(0,0) , NewVec2(0, 0));
 	UpdateEntity(Spaceship , DeltaTime);
+
+	shootCooldown = 1;
+	shootElapsedTime += DeltaTime;
+	if (isPressingKey(ALLEGRO_KEY_A))
+	{
+		Spaceship->Vel = NewVec2(-1, 0);
+	}
+	else if (isPressingKey(ALLEGRO_KEY_D))
+	{
+		Spaceship->Vel = NewVec2(1, 0);
+	}
+	else
+	{
+		Spaceship->Vel = NewVec2(0, 0);
+	}
+
+	if (isPressingKey(ALLEGRO_KEY_SPACE))
+	{
+		if (shootElapsedTime >= shootCooldown)
+		{
+			shootElapsedTime = 0;
+			for (int i = 1; i < MAX_BULLETS; i++)
+			{
+				if (Bullets[i] == NULL)
+				{
+					Bullets[i] = CreateNewEntity(NewVec2(Spaceship->Pos.x + Spaceship->dimensions.x / 2, Spaceship->Pos.y), NewVec2(0, -1), 0.1, BulletShape, NewVec2(1, 1));
+					i = MAX_BULLETS;
+				}
+			}
+		}
+		
+	}
+	UpdateBullets();
+	CullBullets();
+	CollideGrid(Bullets, AlienGrid, aliensDestroyed);
+	ClamToScreen(Spaceship);
+
+	ComputeAlienShot();
+	AlienBulletsHit();
+	ProcessHP();
+	ColideAlienBullets();
+
+	if (AlienGrid->AlienCount <= 0)
+	{
+		Level++;
+		for (int i = 0; i < MAX_BULLETS; i++)
+		{
+			if (Bullets[i] != NULL)
+			{
+				DestroyEntity(Bullets[i]);
+				Bullets[i] = NULL;
+			}
+		}
+		for (int i = 0; i < MAX_ALIEN_BULLETS; i++)
+		{
+			if (AlienBullets[i] != NULL)
+			{
+				DestroyEntity(AlienBullets[i]);
+				AlienBullets[i] = NULL;
+			}
+		}
+		AlienGrid->Pos = NewVec2(2, 1);
+		FillMatrix(AlienGrid);
+	}
+
 #endif
 
 	return;
@@ -869,6 +954,15 @@ const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\
 	DrawGrid(AlienGrid);
 	DrawEntity(Spaceship);
 
+	DrawBullets();
+	for (int i = 0; i < numberOfShields; i++)
+	{
+		if (shieldArray[i] != NULL)
+		{
+			DrawEntity(shieldArray[i]);
+		}
+	}
+
 	PrintGrid();
 #endif
 	return;
@@ -895,52 +989,6 @@ void Postframe()
 }
 
 #ifndef RASPI
-void CullBullets()
-{
-	for (int i = 0; i < 10; i++)
-	{
-		if (Bullets[i] != NULL)
-		{
-			if (Bullets[i]->Pos.y < 0)
-			{
-				DestroyEntityLoadedTexture(Bullets[i]);
-				Bullets[i] = NULL;
-			}
-		}
-	}
-
-	for (int i = 0; i < 15; i++)
-	{
-		if (AlienBullets[i] != NULL)
-		{
-			if (AlienBullets[i]->Pos.y > ScreenDimensions.y)
-			{
-				DestroyAnimatedEntitySharedSprite(AlienBullets[i]);
-				AlienBullets[i] = NULL;
-			}
-		}
-	}
-}
-
-void UpdateBullets()
-{
-	for (int i = 0; i < 10; i++)
-	{
-		if (Bullets[i] != NULL)
-		{
-			UpdateEntity(Bullets[i], DeltaTime);
-		}
-	}
-
-	for (int i = 0; i < 15; i++)
-	{
-		if (AlienBullets[i] != NULL)
-		{
-			UpdateEntity(AlienBullets[i], DeltaTime);
-		}
-	}
-}
-
 void ComputeAlienShot()
 {
 	static float timeBuffer;
@@ -1133,13 +1181,169 @@ void CollideAlienBullets()
 		}
 	}
 }
+#endif
+#ifdef RASPI
+void ComputeAlienShot()
+{
+	static float timeBuffer;
+
+	timeBuffer += DeltaTime;
+
+	if (timeBuffer >= BASE_ALIEN_SHOT_SPEED)
+	{
+		timeBuffer = 0;
+
+		float minimumDistanceToPlayer = 9999;
+		float TempDistanceToPlayer;
+		int closestAlienColumnToPlayer = (int)(AlienGrid->XAliens / 2);
+		int lastAlienRow = 0;
+
+		for (int i = 0; i < AlienGrid->XAliens; i++)
+		{
+			for (int j = (AlienGrid->YAliens - 1); j >= 0; j--)
+			{
+				if (AlienGrid->matrix[i][j] != NULL)
+				{
+					TempDistanceToPlayer = AbsoluteValue(AlienGrid->matrix[i][j]->Pos.x + (AlienGrid->matrix[i][j]->dimensions.x / 2) - (Spaceship->Pos.x + (Spaceship->dimensions.x / 2)));
+
+					if (TempDistanceToPlayer < minimumDistanceToPlayer)
+					{
+						minimumDistanceToPlayer = TempDistanceToPlayer;
+						closestAlienColumnToPlayer = i;
+						lastAlienRow = j;
+					}
+					j = -1;
+				}
+			}
+		}
+
+		for (int i = 1; i < 15; i++)
+		{
+			if (AlienBullets[i] == NULL)
+			{
+				if (AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow] != NULL)
+				{
+					AlienBullets[i] = CreateNewEntity(NewVec2(AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.x + AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->dimensions.x / 2, AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.y + AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->dimensions.y)
+						, NewVec2(0, 1), 0.2, BulletShape, NewVec2(1, 1));
+					break;
+				}
+
+			}
+		}
+	}
+
+}
+
+void ColideAlienBullets()
+{
+	for (int i = 0; i < MAX_ALIEN_BULLETS; i++)
+	{
+		if (AlienBullets[i] != NULL)
+		{
+			for (int j = 0; j < numberOfShields; j++)
+			{
+				if (shieldArray[j] != NULL)
+				{
+					if (ColideAndDestroy(shieldArray[j], AlienBullets[i]))
+					{
+						DestroyEntity(AlienBullets[i]);
+						AlienBullets[i] = NULL;
+
+					}
+				}
+			}
+		}
+	}
+}
+#endif
+
+void UpdateBullets()
+{
+	for (int i = 0; i < MAX_BULLETS; i++)
+	{
+		if (Bullets[i] != NULL)
+		{
+			UpdateEntity(Bullets[i], DeltaTime);
+		}
+	}
+
+	for (int i = 0; i < MAX_ALIEN_BULLETS; i++)
+	{
+		if (AlienBullets[i] != NULL)
+		{
+			UpdateEntity(AlienBullets[i], DeltaTime);
+		}
+	}
+}
+
+void CullBullets()
+{
+	for (int i = 0; i < 10; i++)
+	{
+		if (Bullets[i] != NULL)
+		{
+			if (Bullets[i]->Pos.y < 0)
+			{
+#ifndef RASPI
+				DestroyEntityLoadedTexture(Bullets[i]);
+#endif
+#ifdef RASPI
+				DestroyEntity(Bullets[i]);
+#endif
+				Bullets[i] = NULL;
+			}
+		}
+	}
+
+	for (int i = 0; i < 15; i++)
+	{
+		if (AlienBullets[i] != NULL)
+		{
+#ifndef RASPI
+			if (AlienBullets[i]->Pos.y > ScreenDimensions.y)
+			{
+				DestroyAnimatedEntitySharedSprite(AlienBullets[i]);
+				AlienBullets[i] = NULL;
+			}
+#endif
+#ifdef RASPI
+			if (AlienBullets[i]->Pos.y > 16)
+			{
+				DestroyEntity(AlienBullets[i]);
+				AlienBullets[i] = NULL;
+			}
+#endif
+		}
+	}
+}
+
+void DrawBullets()
+{
+	for (int i = 1; i < MAX_BULLETS; i++)
+	{
+		if (Bullets[i] != NULL)
+		{
+			DrawEntity(Bullets[i]);
+		}
+	}
+
+	for (int i = 1; i < MAX_ALIEN_BULLETS; i++)
+	{
+		if (AlienBullets[i] != NULL)
+		{
+			DrawEntity(AlienBullets[i]);
+		}
+	}
+}
 
 int AlienBulletsHit()
 {
+
 	for (int i = 1; i < 15; i++)
 	{
 		if (AlienBullets[i] != NULL)
 		{
+#ifndef RASPI
 			if (AreColiding(AlienBullets[i], Spaceship) || AreColiding(AlienBullets[i], Gun))
 			{
 				CreateNewAnimation(NewVec2F(AlienBullets[i]->Pos.x + AlienBullets[i]->spriteS->frameWidth / 4 - BulletExplosion->frameWidth / 2,
@@ -1153,22 +1357,31 @@ int AlienBulletsHit()
 
 				return true;
 			}
-
+#endif
+#ifdef RASPI
+			if (AreColiding(AlienBullets[i], Spaceship))
+			{
+				DestroyEntity(AlienBullets[i]);
+				AlienBullets[i] = NULL;
+				lives--;
+				return true;
+			}
+#endif
 		}
+
 	}
+	return false;
 }
 
 void ProcessHP()
 {
 	if (lives <= 0)
 	{
+#ifndef RASPI
 		Spaceship->data = 66;
 		Gun->data = 66;
 		CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, ShieldExplosion, 200, 300);
+#endif
 		GAMESTATE = END;
 	}
 }
-#endif
-#ifdef RASPI
-
-#endif

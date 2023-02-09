@@ -289,6 +289,36 @@ void FillMatrix(AlienMatrix* Matrix)
 	Matrix->AlienCount = Matrix->XAliens * Matrix->YAliens;
 }
 
+int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix, int* aliensDestroyed)
+{
+	for (int b = 0; b < 10; b++)
+	{
+		for (int i = 0; i < Matrix->XAliens; i++)
+		{
+			for (int j = 0; j < Matrix->YAliens; j++)
+			{
+				if (Bullet[b] != NULL && (Matrix->matrix)[i][j] != NULL)
+				{
+					if (AreColiding((Matrix->matrix)[i][j], Bullet[b]))
+					{
+						DestroyEntity(Bullet[b]);
+						Bullet[b] = NULL;
+
+						DestroyEntity((Matrix->matrix)[i][j]);
+						(Matrix->matrix)[i][j] = NULL;
+
+
+						Matrix->AlienCount--;
+
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
 #endif
 
 void DrawGrid(AlienMatrix* Matrix)

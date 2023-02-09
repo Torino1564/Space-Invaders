@@ -41,3 +41,7 @@ void DrawShield(shield* shield);
 void FillShieldParticles(shield* shield);
 void DrawShieldPartitions(shield* shield);
 void DestroyShield(shield* shield);
+#ifdef RASPI
+
+
+#endif

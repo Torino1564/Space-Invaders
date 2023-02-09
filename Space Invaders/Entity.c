@@ -186,24 +186,6 @@ void DestroyAnimatedEntitySharedSprite(Entity* Entity)
 	return;
 }
 
-int AreColiding(Entity* e0, Entity* e1)
-{
-	if (e1 != NULL && e0 != NULL)
-	{
-		float right0 = e0->Pos.x + e0->width;
-		float bottom0 = e0->Pos.y + e0->height;
-		float right1 = e1->Pos.x + e1->width;
-		float bottom1 = e1->Pos.y + e1->height;
-
-		return
-			right0 >= e1->Pos.x &&
-			e0->Pos.x <= right1 &&
-			bottom0 >= e1->Pos.y &&
-			e0->Pos.y <= bottom1;
-	}
-	else return 0;
-}
-
 Entity* CreateNewAnimatedEntityLoadedTexture(Vec2F pos, Vec2F vel, SpriteSheet* SpriteSheet_p, int width_p, int height_p)
 {
 	Entity* ent = malloc(sizeof(Entity));
@@ -323,4 +305,70 @@ void DrawEntity(Entity* entity)
 		}
 	}
 }
+
+void ClamToScreen(Entity* entity)
+{
+	if (entity->Pos.x < 0)
+	{
+		entity->Pos.x = 0;
+	}
+	if (entity->Pos.x + entity->dimensions.x >= 16)
+	{
+		entity->Pos.x = 16 - entity->dimensions.x;
+	}
+}
+
+int ColideAndDestroy(Entity* destroyed, Entity* e1)
+{
+	if (e1 != NULL && destroyed != NULL)
+	{
+		float right0 = destroyed->Pos.x + destroyed->dimensions.x - 1;
+		float bottom0 = destroyed->Pos.y + destroyed->dimensions.y - 1;
+		float right1 = e1->Pos.x + e1->dimensions.x - 1;
+		float bottom1 = e1->Pos.y + e1->dimensions.y - 1;
+
+		if (right0 >= e1->Pos.x &&
+			destroyed->Pos.x <= right1 &&
+			bottom0 >= e1->Pos.y &&
+			destroyed->Pos.y <= bottom1)
+		{
+			int position = e1->Pos.x - destroyed->Pos.x + (destroyed->dimensions.x * (e1->Pos.y - destroyed->Pos.y));
+			if (position < destroyed->dimensions.x * destroyed->dimensions.y)
+			{
+				destroyed->shape[position] = 0;
+				return true;
+			}
+
+		}
+	}
+	return false;
+}
+
 #endif
+
+int AreColiding(Entity* e0, Entity* e1)
+{
+	if (e1 != NULL && e0 != NULL)
+	{
+#ifndef RASPI
+		float right0 = e0->Pos.x + e0->width;
+		float bottom0 = e0->Pos.y + e0->height;
+		float right1 = e1->Pos.x + e1->width;
+		float bottom1 = e1->Pos.y + e1->height;
+#endif
+#ifdef RASPI
+		float right0 = e0->Pos.x + e0->dimensions.x - 1;
+		float bottom0 = e0->Pos.y + e0->dimensions.y - 1;
+		float right1 = e1->Pos.x + e1->dimensions.x - 1;
+		float bottom1 = e1->Pos.y + e1->dimensions.y - 1;
+#endif
+
+		return
+			right0 >= e1->Pos.x &&
+			e0->Pos.x <= right1 &&
+			bottom0 >= e1->Pos.y &&
+			e0->Pos.y <= bottom1;
+	}
+	else return 0;
+}
+

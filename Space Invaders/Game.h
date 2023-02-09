@@ -15,6 +15,9 @@
 #include "AlienMatrix.h"
 #include "Shield.h"
 #include "Math.h"
+#ifdef RASPI
+#include "Input.h"
+#endif
 
 #ifndef RASPI
 #include "Animation.h"
@@ -90,18 +93,19 @@ void Preframe();
 void Postframe();
 void Pause();
 void EndScreen();
-#ifndef RASPI
+void UpdateBullets();
+void CullBullets();
 void ComputeAlienShot();
+void DrawBullets();
 int AlienBulletsHit();
 void ProcessHP();
-void CullBullets();
-void UpdateBullets();
+#ifndef RASPI
 void AnimateBullets();
 void CollideAlienBullets();
 #endif
 #ifdef RASPI
+void ColideAlienBullets();
 
-AlienMatrix* AlienGrid;
 #endif
 
 Entity* Spaceship;
@@ -178,21 +182,30 @@ ALLEGRO_FONT* BigFont;
 ================================= */
 
 #define BASE_ALIEN_SHOT_SPEED 2.5
+#define MAX_BULLETS 10
+#define MAX_ALIEN_BULLETS 15
 
-Entity * Bullets[10];
-Entity* AlienBullets[15];
+Entity * Bullets[MAX_BULLETS];
+Entity* AlienBullets[MAX_ALIEN_BULLETS];
 #ifndef RASPI
 ALLEGRO_BITMAP* BulletTexture;
 ALLEGRO_BITMAP* DeathTexture;
 #endif
 int numberOfShields;
+#ifndef RASPI
 shield* shieldArray[10];
 shield* shield1;
 Vec2F shieldSize;
 float shieldPadding;
+#endif
+#ifdef RASPI
+Entity* shieldArray[4];
+#endif
 
 #ifdef RASPI
-Entity* Test;
+
+char BulletShape[1];
+
 #endif
 
 AlienMatrix * AlienGrid;

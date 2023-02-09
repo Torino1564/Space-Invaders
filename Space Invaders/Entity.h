@@ -70,6 +70,10 @@ Entity* CreateNewEntity(Vec2 pos, Vec2 vel, double updateCooldown, char * shape 
 void DestroyEntity(Entity* entity);
 void UpdateEntity(Entity* entity, double dt);
 void DrawEntity(Entity* entity);
+void ClamToScreen(Entity* entity);
+int AreColiding(Entity* e0, Entity* e1);
+int ColideAndDestroy(Entity* destroyed, Entity* e1);
+
 #endif
 
 
