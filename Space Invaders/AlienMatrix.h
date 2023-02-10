@@ -2,10 +2,10 @@
 #include "Entity.h"
 #include "Vec2_F.h"
 #include "Vec2.h"
+
+#ifndef RASPI
 #include "SpriteSheet.h"
 #include "Animation.h"
-#ifndef RASPI
-
 struct AlienMatrix_t
 {
 	Entity * matrix[20][10];

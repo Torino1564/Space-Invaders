@@ -335,8 +335,16 @@ int ColideAndDestroy(Entity* destroyed, Entity* e1)
 			int position = e1->Pos.x - destroyed->Pos.x + (destroyed->dimensions.x * (e1->Pos.y - destroyed->Pos.y));
 			if (position < destroyed->dimensions.x * destroyed->dimensions.y)
 			{
-				destroyed->shape[position] = 0;
-				return true;
+				if (destroyed->shape[position] == true)
+				{
+					destroyed->shape[position] = 0;
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+				
 			}
 
 		}

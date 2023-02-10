@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Raspi">
+      <UniqueIdentifier>{63a895b3-99cd-4c19-8ab1-5c69d33ce372}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
@@ -88,6 +91,15 @@
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\libs\joydisp\disdrv.h">
+      <Filter>Raspi</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\libs\joydisp\joydrv.h">
+      <Filter>Raspi</Filter>
+    </ClInclude>
+    <ClInclude Include="Resources\libs\joydisp\termlib.h">
+      <Filter>Raspi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

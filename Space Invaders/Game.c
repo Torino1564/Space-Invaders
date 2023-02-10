@@ -34,9 +34,10 @@ int SystemInit()
 
 
 	int error = 0;
-
+#ifndef RASPI_TEST
 	al_init();
 	al_init_primitives_addon();
+#endif
 
 #ifndef RASPI
 	al_init_image_addon();
@@ -62,14 +63,6 @@ int SystemInit()
 		error = 1;
 	}
 
-//	timer = al_create_timer(1 / 60);
-//	
-//	if (timer == NULL)
-//	{
-//		printf("There has been an error with the timer initialization");
-//		error = 1;
-//	}
-
 	KeyboardEventSource = al_get_keyboard_event_source();
 	if (KeyboardEventSource == NULL)
 	{
@@ -93,11 +86,10 @@ int SystemInit()
 
 	al_register_event_source(InputEventQueue, KeyboardEventSource);
 	al_register_event_source(InputEventQueue, MouseEventSource);
-//	al_register_event_source(InputEventQueue, al_get_timer_event_source(timer));
-	
+
 
 	PastFrameTime = 0;
-	DeltaTime = 1;
+	DeltaTime = 0;
 
 	Mixer = al_get_default_mixer();
 
@@ -109,7 +101,7 @@ int SystemInit()
 	BigFont = al_load_ttf_font(FONT, 80, NULL);
 #endif
 #ifdef RASPI
-	Display = al_create_display(800, 800);
+	InitGraphics();
 	initInput();
 #endif
 	ESTADO = MENU;
@@ -272,10 +264,7 @@ int GameInit()
 		error = -1;
 	}
 
-
-	// Gun settings
 	Gun = CreateNewEntity(NewVec2F(0, GunYcoord), NewVec2F(0, 0), GUN_TEXTURE, GunWidth, GunHeight);
-	Cooldown = 0;
 
 	Bullets[0] = malloc(sizeof(Entity) * 10);
 	if (Bullets != NULL)
@@ -336,7 +325,7 @@ int GameInit()
 
 	char PlayerShape[] = { 0 , 1, 0,
 						1 , 1 , 1 };
-	Spaceship = CreateNewEntity(NewVec2(6, 13), NewVec2(0, 0), 0.1, PlayerShape, NewVec2(3, 2));
+	Spaceship = CreateNewEntity(NewVec2(6, 13), NewVec2(0, 0), 0.1 * TIME_MULTIPLIER , PlayerShape, NewVec2(3, 2));
 
 	BulletShape[0] = ( 1 );
 
@@ -522,7 +511,6 @@ void EndScreen()
 #ifndef RASPI
 	while (true)
 	{
-		al_stop_samples();
 		al_draw_scaled_bitmap(LightGrayOverlay, 0, 0, al_get_bitmap_width(LightGrayOverlay), al_get_bitmap_height(LightGrayOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
 		al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1, ALLEGRO_ALIGN_CENTER, "YOU DIED!");
 		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "YOUR SCORE:");
@@ -546,9 +534,11 @@ void EndScreen()
 
 void GameLogic()
 {
-	static	double shootElapsedTime = 10;
-	static double animtime = 0;
+	double shootCooldown;
+	static double shootElapsedTime = 10;
 #ifndef RASPI
+	
+	shootCooldown = 0;
 	shootElapsedTime += DeltaTime;
 	if (!al_is_event_queue_empty(InputEventQueue))
 	{
@@ -563,11 +553,8 @@ void GameLogic()
 				GAMESTATE = PAUSE;
 				break;
 			case ALLEGRO_KEY_A:
-				if (!Spaceship->data)
-				{
-					Spaceship->Vel.x -= SHIP_SPEED;
-					Gun->Vel.x -= SHIP_SPEED;
-				}
+				Spaceship->Vel.x -= SHIP_SPEED;
+				Gun->Vel.x -= SHIP_SPEED;
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x += SHIP_SPEED;
@@ -585,17 +572,13 @@ void GameLogic()
 				}
 				break;
 			case ALLEGRO_KEY_SPACE:
-
-
-
-				if ((t/CLOCKS_PER_SEC) < Cooldown)
+				if (shootElapsedTime < shootCooldown)
 				{
-					cantfire = 1;
+					shotOnCooldown = true;
 					break;
 				}
 				else
 				{
-					Cooldown += COOLDOWN;
 					shot = true;
 					shootElapsedTime = 0;
 					for (int i = 0; i < 10; i++)
@@ -626,12 +609,12 @@ void GameLogic()
 			case ALLEGRO_KEY_A:
 				Spaceship->Vel.x += SHIP_SPEED;
 				Gun->Vel.x += SHIP_SPEED;
-				Spaceship->data = 1;	//El sp esta parando de atras
+				Spaceship->data = 1;	//El sp esta parando 
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x -= SHIP_SPEED;
 				Gun->Vel.x -= SHIP_SPEED;
-				Spaceship->data = 2;	//El sp esta parando de adelante
+				Spaceship->data = 2;	//El sp esta parando
 				break;
 			default:
 				break;
@@ -707,13 +690,13 @@ void GameLogic()
 	UpdateMatrixDynamic( AlienGrid,DeltaTime,NewVec2(0,0) , NewVec2(0, 0));
 	UpdateEntity(Spaceship , DeltaTime);
 
-	Cooldown = 1;
+	shootCooldown = 1;
 	shootElapsedTime += DeltaTime;
-	if (isPressingKey(ALLEGRO_KEY_A))
+	if (isPressingKey(LEFT))
 	{
 		Spaceship->Vel = NewVec2(-1, 0);
 	}
-	else if (isPressingKey(ALLEGRO_KEY_D))
+	else if (isPressingKey(RIGHT))
 	{
 		Spaceship->Vel = NewVec2(1, 0);
 	}
@@ -722,16 +705,16 @@ void GameLogic()
 		Spaceship->Vel = NewVec2(0, 0);
 	}
 
-	if (isPressingKey(ALLEGRO_KEY_SPACE))
+	if (isPressingKey(SHOOT))
 	{
-		if (shootElapsedTime >= Cooldown)
+		if (shootElapsedTime >= shootCooldown)
 		{
 			shootElapsedTime = 0;
 			for (int i = 1; i < MAX_BULLETS; i++)
 			{
 				if (Bullets[i] == NULL)
 				{
-					Bullets[i] = CreateNewEntity(NewVec2(Spaceship->Pos.x + Spaceship->dimensions.x / 2, Spaceship->Pos.y), NewVec2(0, -1), 0.1, BulletShape, NewVec2(1, 1));
+					Bullets[i] = CreateNewEntity(NewVec2(Spaceship->Pos.x + Spaceship->dimensions.x / 2, Spaceship->Pos.y), NewVec2(0, -1), 0.1 * TIME_MULTIPLIER, BulletShape, NewVec2(1, 1));
 					i = MAX_BULLETS;
 				}
 			}
@@ -847,7 +830,6 @@ void GameRender()
 		case 2:
 			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_f, Spaceship->width, Spaceship->height);
 			Spaceship->data = 0;
-			break;
 		default:
 			break;
 		}
@@ -865,16 +847,16 @@ void GameRender()
 	if (shot)
 	{
 		al_play_sample(Bullet_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-		shot = false;
+		shot = 0;
 	}
 	if (aliendeath)
 	{
 		al_play_sample(alien_death_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 	}
-	if (cantfire)
+	if (shotOnCooldown)
 	{
 		al_play_sample(ShotNotReadySFX, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-		cantfire = false;
+		shotOnCooldown = false;
 	}
 
 	for (int i = 0; i < numberOfShields; i++)
@@ -981,6 +963,21 @@ const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\
 			DrawEntity(shieldArray[i]);
 		}
 	}
+
+	if (lives > 2)
+	{
+		TurnOn(13, 15);
+		
+	}
+	if (lives > 1)
+	{
+		TurnOn(14, 15);
+	}
+	if (lives > 0)
+	{
+		TurnOn(15, 15);
+	}
+
 
 	PrintGrid();
 #endif
@@ -1208,7 +1205,7 @@ void ComputeAlienShot()
 
 	timeBuffer += DeltaTime;
 
-	if (timeBuffer >= BASE_ALIEN_SHOT_SPEED)
+	if (timeBuffer >= BASE_ALIEN_SHOT_SPEED * TIME_MULTIPLIER)
 	{
 		timeBuffer = 0;
 
@@ -1243,7 +1240,7 @@ void ComputeAlienShot()
 				if (AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow] != NULL)
 				{
 					AlienBullets[i] = CreateNewEntity(NewVec2(AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.x + AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->dimensions.x / 2, AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.y + AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->dimensions.y)
-						, NewVec2(0, 1), 0.2, BulletShape, NewVec2(1, 1));
+						, NewVec2(0, 1), 0.2 * TIME_MULTIPLIER, BulletShape, NewVec2(1, 1));
 					break;
 				}
 
@@ -1402,5 +1399,14 @@ void ProcessHP()
 		CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, ShieldExplosion, 200, 300);
 #endif
 		GAMESTATE = END;
+	}
+}
+
+void MotherShip()
+{
+	static int isMotherShipSpawned = false;
+	if (Level % 3 == 0 && isMotherShipSpawned == false)
+	{
+		isMotherShipSpawned = true;
 	}
 }

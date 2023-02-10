@@ -1,4 +1,6 @@
 #pragma once
+
+#ifndef RASPI_TEST
 #include <allegro5/allegro.h>
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_native_dialog.h>
@@ -8,18 +10,22 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_primitives.h>
+#endif
+
 #include <stdio.h>
 #include "Entity.h"
 #include "Vec2.h"
+
 #include <time.h>
 #include "AlienMatrix.h"
-#include "Shield.h"
+
 #include "Math.h"
 #ifdef RASPI
 #include "Input.h"
 #endif
 
 #ifndef RASPI
+#include "Shield.h"
 #include "Animation.h"
 #include "SpriteSheet.h"
 
@@ -71,21 +77,11 @@
 
 #define PAUSE_BG "Resources/Backgrounds/pause.png"
 #define LIGHTGRAYOVERLAY "Resources/Backgrounds/LightGrayOverlay.png"
-
-/* ===================================
-
-		Constants
-
- ==================================== */
-
-#define COOLDOWN 1
-
 #endif
-
 #ifdef RASPI
+
 #include "Graphics.h"
 #endif
-
 /* ===================================
 	
 		Functions
@@ -203,6 +199,8 @@ ALLEGRO_BITMAP* BulletTexture;
 ALLEGRO_BITMAP* DeathTexture;
 #endif
 int numberOfShields;
+double motherShipCooldown;
+
 #ifndef RASPI
 shield* shieldArray[10];
 shield* shield1;
@@ -235,7 +233,6 @@ SpriteSheet* Stopping_b;
 SpriteSheet* Stopping_f;
 
 ALLEGRO_BITMAP* ShieldTexture;
-//ALLEGRO_TIMER* timer;
 #endif
 Vec2 GridDimensions;
 int AlienWidth;
@@ -329,9 +326,8 @@ int Level;
 int Once;
 int Moving;
 int shot;
-int cantfire;
+int shotOnCooldown;
 int aliendeath;
 int lives;
 int score;
 int aliensDestroyed;
-double Cooldown;

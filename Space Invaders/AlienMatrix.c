@@ -364,7 +364,7 @@ void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 
 		UpdateTimeBuffer += dt;
 	}
 
-	if (UpdateTimeBuffer >= (0.05 + 1.25 * (Matrix->AlienCount / (double)(Matrix->XAliens * Matrix->YAliens))))
+	if (UpdateTimeBuffer >= ((0.05 + 1.25 * (Matrix->AlienCount / (double)(Matrix->XAliens * Matrix->YAliens))) * TIME_MULTIPLIER))
 	{
 		UpdateTimeBuffer = 0;
 		updating = true;
@@ -372,7 +372,7 @@ void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 
 
 	if (updating)
 	{
-		if (MicroTimeBuffer >= Matrix->MicroTimeBuffer)
+		if (MicroTimeBuffer >= Matrix->MicroTimeBuffer * TIME_MULTIPLIER)
 		{
 			MicroTimeBuffer = 0;
 

@@ -1,6 +1,13 @@
 #pragma once
+#ifndef RASPI_TEST
 #include <allegro5/allegro.h>
 #include <allegro5/allegro5.h>
+#endif
+#ifdef RASPI_TEST
+#define true 1
+#define false 0
+#endif
+
 #include "Vec2.h"
 #include "Graphics.h"
 #ifndef RASPI
