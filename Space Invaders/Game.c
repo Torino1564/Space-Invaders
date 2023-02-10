@@ -1408,5 +1408,6 @@ void MotherShip()
 	if (Level % 3 == 0 && isMotherShipSpawned == false)
 	{
 		isMotherShipSpawned = true;
+
 	}
 }

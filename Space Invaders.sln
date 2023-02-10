@@ -9,6 +9,8 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Raspi_Test|x64 = Raspi_Test|x64
+		Raspi_Test|x86 = Raspi_Test|x86
 		Raspi|x64 = Raspi|x64
 		Raspi|x86 = Raspi|x86
 		Release|x64 = Release|x64
@@ -19,6 +21,10 @@ Global
 		{91025B3A-ECA7-44E3-8862-5E9366ADDDA0}.Debug|x64.Build.0 = Debug|x64
 		{91025B3A-ECA7-44E3-8862-5E9366ADDDA0}.Debug|x86.ActiveCfg = Debug|Win32
 		{91025B3A-ECA7-44E3-8862-5E9366ADDDA0}.Debug|x86.Build.0 = Debug|Win32
+		{91025B3A-ECA7-44E3-8862-5E9366ADDDA0}.Raspi_Test|x64.ActiveCfg = Raspi_Test|x64
+		{91025B3A-ECA7-44E3-8862-5E9366ADDDA0}.Raspi_Test|x64.Build.0 = Raspi_Test|x64
+		{91025B3A-ECA7-44E3-8862-5E9366ADDDA0}.Raspi_Test|x86.ActiveCfg = Raspi_Test|Win32
+		{91025B3A-ECA7-44E3-8862-5E9366ADDDA0}.Raspi_Test|x86.Build.0 = Raspi_Test|Win32
 		{91025B3A-ECA7-44E3-8862-5E9366ADDDA0}.Raspi|x64.ActiveCfg = Raspi|x64
 		{91025B3A-ECA7-44E3-8862-5E9366ADDDA0}.Raspi|x64.Build.0 = Raspi|x64
 		{91025B3A-ECA7-44E3-8862-5E9366ADDDA0}.Raspi|x86.ActiveCfg = Raspi|Win32
