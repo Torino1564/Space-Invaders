@@ -275,7 +275,7 @@ int GameInit()
 
 	// Gun settings
 	Gun = CreateNewEntity(NewVec2F(0, GunYcoord), NewVec2F(0, 0), GUN_TEXTURE, GunWidth, GunHeight);
-	Cooldown = COOLDOWN;
+	Cooldown = 0;
 
 	Bullets[0] = malloc(sizeof(Entity) * 10);
 	if (Bullets != NULL)
@@ -547,6 +547,7 @@ void EndScreen()
 void GameLogic()
 {
 	static	double shootElapsedTime = 10;
+	static double animtime = 0;
 #ifndef RASPI
 	shootElapsedTime += DeltaTime;
 	if (!al_is_event_queue_empty(InputEventQueue))
@@ -562,8 +563,11 @@ void GameLogic()
 				GAMESTATE = PAUSE;
 				break;
 			case ALLEGRO_KEY_A:
-				Spaceship->Vel.x -= SHIP_SPEED;
-				Gun->Vel.x -= SHIP_SPEED;
+				if (!Spaceship->data)
+				{
+					Spaceship->Vel.x -= SHIP_SPEED;
+					Gun->Vel.x -= SHIP_SPEED;
+				}
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x += SHIP_SPEED;
@@ -581,6 +585,9 @@ void GameLogic()
 				}
 				break;
 			case ALLEGRO_KEY_SPACE:
+
+
+
 				if ((t/CLOCKS_PER_SEC) < Cooldown)
 				{
 					cantfire = 1;
@@ -840,6 +847,7 @@ void GameRender()
 		case 2:
 			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_f, Spaceship->width, Spaceship->height);
 			Spaceship->data = 0;
+			break;
 		default:
 			break;
 		}
