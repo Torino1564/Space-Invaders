@@ -71,10 +71,21 @@
 
 #define PAUSE_BG "Resources/Backgrounds/pause.png"
 #define LIGHTGRAYOVERLAY "Resources/Backgrounds/LightGrayOverlay.png"
+
+/* ===================================
+
+		Constants
+
+ ==================================== */
+
+#define COOLDOWN 1
+
 #endif
+
 #ifdef RASPI
 #include "Graphics.h"
 #endif
+
 /* ===================================
 	
 		Functions
@@ -224,6 +235,7 @@ SpriteSheet* Stopping_b;
 SpriteSheet* Stopping_f;
 
 ALLEGRO_BITMAP* ShieldTexture;
+//ALLEGRO_TIMER* timer;
 #endif
 Vec2 GridDimensions;
 int AlienWidth;
@@ -317,8 +329,9 @@ int Level;
 int Once;
 int Moving;
 int shot;
-int shotOnCooldown;
+int cantfire;
 int aliendeath;
 int lives;
 int score;
 int aliensDestroyed;
+double Cooldown;

@@ -62,6 +62,14 @@ int SystemInit()
 		error = 1;
 	}
 
+//	timer = al_create_timer(1 / 60);
+//	
+//	if (timer == NULL)
+//	{
+//		printf("There has been an error with the timer initialization");
+//		error = 1;
+//	}
+
 	KeyboardEventSource = al_get_keyboard_event_source();
 	if (KeyboardEventSource == NULL)
 	{
@@ -85,10 +93,11 @@ int SystemInit()
 
 	al_register_event_source(InputEventQueue, KeyboardEventSource);
 	al_register_event_source(InputEventQueue, MouseEventSource);
-
+//	al_register_event_source(InputEventQueue, al_get_timer_event_source(timer));
+	
 
 	PastFrameTime = 0;
-	DeltaTime = 0;
+	DeltaTime = 1;
 
 	Mixer = al_get_default_mixer();
 
@@ -263,7 +272,10 @@ int GameInit()
 		error = -1;
 	}
 
+
+	// Gun settings
 	Gun = CreateNewEntity(NewVec2F(0, GunYcoord), NewVec2F(0, 0), GUN_TEXTURE, GunWidth, GunHeight);
+	Cooldown = COOLDOWN;
 
 	Bullets[0] = malloc(sizeof(Entity) * 10);
 	if (Bullets != NULL)
@@ -510,6 +522,7 @@ void EndScreen()
 #ifndef RASPI
 	while (true)
 	{
+		al_stop_samples();
 		al_draw_scaled_bitmap(LightGrayOverlay, 0, 0, al_get_bitmap_width(LightGrayOverlay), al_get_bitmap_height(LightGrayOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
 		al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1, ALLEGRO_ALIGN_CENTER, "YOU DIED!");
 		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "YOUR SCORE:");
@@ -533,11 +546,8 @@ void EndScreen()
 
 void GameLogic()
 {
-	double shootCooldown;
-	static double shootElapsedTime = 10;
+	static	double shootElapsedTime = 10;
 #ifndef RASPI
-	
-	shootCooldown = 0;
 	shootElapsedTime += DeltaTime;
 	if (!al_is_event_queue_empty(InputEventQueue))
 	{
@@ -571,13 +581,14 @@ void GameLogic()
 				}
 				break;
 			case ALLEGRO_KEY_SPACE:
-				if (shootElapsedTime < shootCooldown)
+				if ((t/CLOCKS_PER_SEC) < Cooldown)
 				{
-					shotOnCooldown = true;
+					cantfire = 1;
 					break;
 				}
 				else
 				{
+					Cooldown += COOLDOWN;
 					shot = true;
 					shootElapsedTime = 0;
 					for (int i = 0; i < 10; i++)
@@ -608,12 +619,12 @@ void GameLogic()
 			case ALLEGRO_KEY_A:
 				Spaceship->Vel.x += SHIP_SPEED;
 				Gun->Vel.x += SHIP_SPEED;
-				Spaceship->data = 1;	//El sp esta parando 
+				Spaceship->data = 1;	//El sp esta parando de atras
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x -= SHIP_SPEED;
 				Gun->Vel.x -= SHIP_SPEED;
-				Spaceship->data = 2;	//El sp esta parando
+				Spaceship->data = 2;	//El sp esta parando de adelante
 				break;
 			default:
 				break;
@@ -689,7 +700,7 @@ void GameLogic()
 	UpdateMatrixDynamic( AlienGrid,DeltaTime,NewVec2(0,0) , NewVec2(0, 0));
 	UpdateEntity(Spaceship , DeltaTime);
 
-	shootCooldown = 1;
+	Cooldown = 1;
 	shootElapsedTime += DeltaTime;
 	if (isPressingKey(ALLEGRO_KEY_A))
 	{
@@ -706,7 +717,7 @@ void GameLogic()
 
 	if (isPressingKey(ALLEGRO_KEY_SPACE))
 	{
-		if (shootElapsedTime >= shootCooldown)
+		if (shootElapsedTime >= Cooldown)
 		{
 			shootElapsedTime = 0;
 			for (int i = 1; i < MAX_BULLETS; i++)
@@ -846,16 +857,16 @@ void GameRender()
 	if (shot)
 	{
 		al_play_sample(Bullet_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-		shot = 0;
+		shot = false;
 	}
 	if (aliendeath)
 	{
 		al_play_sample(alien_death_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 	}
-	if (shotOnCooldown)
+	if (cantfire)
 	{
 		al_play_sample(ShotNotReadySFX, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-		shotOnCooldown = false;
+		cantfire = false;
 	}
 
 	for (int i = 0; i < numberOfShields; i++)
