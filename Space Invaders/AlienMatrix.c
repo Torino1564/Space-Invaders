@@ -109,16 +109,16 @@ int CollideEntity(Entity* BigUFOent, Entity* Bullets[])
 {
 	for (int b = 0; b < 10; b++)
 	{
-		if (Bullets[b] != NULL && BigUFOent != NULL)
+		if (*(Bullets + b) != NULL && BigUFOent != NULL)
 		{
 			if (AreColiding(BigUFOent, Bullets[b]))
 			{
 				DestroyEntityLoadedTexture(Bullets[b]);
 				Bullets[b] = NULL;
 
-				//		CreateNewAnimation(NewVec2F((Matrix->matrix)[i][j]->Pos.x + Matrix->AlienWidth / 2 - ExplosionSpritesheet->frameWidth / 2,
-				//		(Matrix->matrix)[i][j]->Pos.y + Matrix->AlienHeight / 2 - ExplosionSpritesheet->frameHeight / 2)
-				//		, NewVec2F(0, 10), 0, ExplosionSpritesheet, Matrix->AlienWidth * 1.9, Matrix->AlienHeight * 1.9);
+				//				CreateNewAnimation(NewVec2F((Matrix->matrix)[i][j]->Pos.x + Matrix->AlienWidth / 2 - ExplosionSpritesheet->frameWidth / 2,
+				//					(Matrix->matrix)[i][j]->Pos.y + Matrix->AlienHeight / 2 - ExplosionSpritesheet->frameHeight / 2)
+				//					, NewVec2F(0, 10), 0, ExplosionSpritesheet, Matrix->AlienWidth * 1.9, Matrix->AlienHeight * 1.9);
 
 				DestroyAnimatedEntitySharedSprite(BigUFOent);
 				BigUFOent = NULL;

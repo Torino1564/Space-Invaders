@@ -487,6 +487,8 @@ int GameInit()
 	ShieldImpact = al_load_sample(SHIELD_IMPACT);
 	ShieldDestroyed = al_load_sample(SHIELD_EXPLOSION);
 
+	BigExplosion = NewSpriteSheet(BIG_EXPLOSION, (float)((float)1 / (float)20), 28, 81, 94, 1);
+
 	instance1 = al_create_sample_instance(PLAYERSHOTSFX);
 
 	// Characters Init
@@ -933,22 +935,19 @@ void GameLogic()
 	UpdateEntity(BigUFOent, DeltaTime);
 	Animate(BigUFOent, DeltaTime);
 
-
 //	CollideEntity(BigUFOent, Bullets);
 
 	for (int b = 0; b < 10; b++)
 	{
-		if (*(Bullets+b) != NULL && BigUFOent != NULL)
+		if (*(Bullets + b) != NULL && BigUFOent != NULL)
 		{
 			if (AreColiding(BigUFOent, Bullets[b]))
 			{
+				CreateNewAnimation(BigUFOent->Pos, NewVec2F(0, 0), 0, BigExplosion, 79, 94);
+
 				DestroyEntityLoadedTexture(Bullets[b]);
 				Bullets[b] = NULL;
-
-				//				CreateNewAnimation(NewVec2F((Matrix->matrix)[i][j]->Pos.x + Matrix->AlienWidth / 2 - ExplosionSpritesheet->frameWidth / 2,
-				//					(Matrix->matrix)[i][j]->Pos.y + Matrix->AlienHeight / 2 - ExplosionSpritesheet->frameHeight / 2)
-				//					, NewVec2F(0, 10), 0, ExplosionSpritesheet, Matrix->AlienWidth * 1.9, Matrix->AlienHeight * 1.9);
-
+				
 				DestroyAnimatedEntitySharedSprite(BigUFOent);
 				BigUFOent = NULL;
 
@@ -956,6 +955,7 @@ void GameLogic()
 			}
 		}
 	}
+
 
 	ClipToScreen(Spaceship, ScreenDimensions);
 	ClipToEntity(Gun, Spaceship, 20);
