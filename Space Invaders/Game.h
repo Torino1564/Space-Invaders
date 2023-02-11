@@ -214,6 +214,7 @@ Entity* HardcoreFace;
 
 Entity * Bullets[MAX_BULLETS];
 Entity* AlienBullets[MAX_ALIEN_BULLETS];
+Entity* BigUFOent;
 #ifndef RASPI
 ALLEGRO_BITMAP* BulletTexture;
 ALLEGRO_BITMAP* DeathTexture;

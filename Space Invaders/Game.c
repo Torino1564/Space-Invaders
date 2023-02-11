@@ -535,6 +535,8 @@ int GameInit()
 	heart = al_load_bitmap(HEART);
 	deadheart = al_load_bitmap(DHEART);
 
+//	BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(500, 500), NewVec2F(100, 0), BigUFO, 56, 38);
+
 	numberOfShields = 3;
 	shieldSize = NewVec2F(150, 70);
 	shieldPadding = (PlaySpaceArea.x - shieldSize.x * numberOfShields) / (numberOfShields + 1);
@@ -791,6 +793,7 @@ void GameLogic()
 	{
 	case 1: 
 		Cooldown_c = 0;
+		fire_ready = 1; 
 	case 2:
 		Cooldown_c = 0.3;
 	case 3:
@@ -805,10 +808,13 @@ void GameLogic()
 	}
 	if ((t / CLOCKS_PER_SEC) > Mothership_time)
 	{
-		Mothership_time = (t / CLOCKS_PER_SEC) + 5;
-		i = CreateNewAnimation(NewVec2F(1000, 1000), NewVec2F(100, 0), 10, BigUFO, 56, 38);
+		Mothership_time = (t / CLOCKS_PER_SEC) + 3;
+		BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(500, 500), NewVec2F(50, 0), BigUFO, 56, 38);
 
+//		i = CreateNewAnimation(NewVec2F(500, 500), NewVec2F(100, 0), 10, BigUFO, 56, 38);
 	}
+
+
 
 	if (!al_is_event_queue_empty(InputEventQueue))
 	{
@@ -923,6 +929,33 @@ void GameLogic()
 
 	UpdateEntity(Spaceship, DeltaTime);
 	UpdateEntity(Gun, DeltaTime);
+
+	UpdateEntity(BigUFOent, DeltaTime);
+	Animate(BigUFOent, DeltaTime);
+
+//	CollideEntity(BigUFOent, Bullets);
+
+	for (int b = 0; b < 10; b++)
+	{
+		if (*(Bullets+b) != NULL && BigUFOent != NULL)
+		{
+			if (AreColiding(BigUFOent, Bullets[b]))
+			{
+				DestroyEntityLoadedTexture(Bullets[b]);
+				Bullets[b] = NULL;
+
+				//				CreateNewAnimation(NewVec2F((Matrix->matrix)[i][j]->Pos.x + Matrix->AlienWidth / 2 - ExplosionSpritesheet->frameWidth / 2,
+				//					(Matrix->matrix)[i][j]->Pos.y + Matrix->AlienHeight / 2 - ExplosionSpritesheet->frameHeight / 2)
+				//					, NewVec2F(0, 10), 0, ExplosionSpritesheet, Matrix->AlienWidth * 1.9, Matrix->AlienHeight * 1.9);
+
+				DestroyAnimatedEntitySharedSprite(BigUFOent);
+				BigUFOent = NULL;
+
+				return true;
+			}
+		}
+	}
+
 	ClipToScreen(Spaceship, ScreenDimensions);
 	ClipToEntity(Gun, Spaceship, 20);
 
@@ -1103,6 +1136,9 @@ void GameRender()
 	//player
 	DrawEntity(Gun);
 	DrawEntity(Spaceship);
+	
+	DrawEntity(BigUFOent);
+
 
 //	if (Spaceship->data)
 //	{
