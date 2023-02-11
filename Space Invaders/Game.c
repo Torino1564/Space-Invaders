@@ -170,6 +170,245 @@ int Menu()
 	}
 	al_stop_samples();
 #endif
+#ifdef RASPI
+	ClearGrid();
+	char PlayButtonShape[] = { 0,0,0,0,
+							   1,0,0,0,
+							   1,1,0,0,
+							   1,1,1,0,
+							   1,1,0,0,
+							   1,0,0,0,
+							   0,0,0,0 };
+	PlayButton = CreateNewEntity(NewVec2(7, 1), NewVec2(0, 0), 2000, PlayButtonShape, NewVec2(4, 7));
+
+	char PickCircleShape[] = {1,1,1,1,1,1,1,
+							 1,0,0,0,0,0,1,
+							 1,0,0,0,0,0,1,
+							 1,0,0,0,0,0,1,
+							 1,0,0,0,0,0,1,
+							 1,0,0,0,0,0,1,
+							 1,1,1,1,1,1,1 };
+	PickCircle = CreateNewEntity(NewVec2(5, 1), NewVec2(0, 0), 2000, PickCircleShape, NewVec2(7, 7));
+
+	char SmallPickCircleShape[] = { 1,1,1,1,1,1,
+								    1,0,0,0,0,1,
+								    1,0,0,0,0,1,
+									1,0,0,0,0,1,
+									1,0,0,0,0,1,
+									1,1,1,1,1,1};
+	FacePickCircle = CreateNewEntity(NewVec2(5, 1), NewVec2(0, 0), 2000, SmallPickCircleShape, NewVec2(6, 6));
+
+	int MENU_STATE;
+	enum MENU_STATE { MAIN_MENU , DIFFICULTY_MENU };
+
+	MENU_STATE = MAIN_MENU;
+
+	static double twinkleBuffer;
+	double twinkleCoodlwon = 0.2 * TIME_MULTIPLIER;
+	int showCircle = 1;
+
+	enum PICKER_STATE { PLAY, EASY, NORMAL, HARD, HARDCORE, BACK };
+	int PICKER_STATE = PLAY;
+
+	char EasyShape[] = { 0,0,0,0,0,0,
+						 0,1,0,0,1,0,
+						 0,0,0,0,0,0,
+						 0,1,0,0,1,0,
+						 0,0,1,1,0,0,
+						 0,0,0,0,0,0 };
+
+	char NormalShape[] = { 0,0,0,0,0,0,
+						   0,1,0,0,1,0,
+						   0,0,0,0,0,0,
+						   0,0,0,0,0,0,
+						   0,1,1,1,1,0,
+						   0,0,0,0,0,0 };
+
+	char HardShape[] = { 0,0,0,0,0,0,
+						 0,1,0,0,1,0,
+						 0,0,0,0,0,0,
+						 0,0,1,1,0,0,
+						 0,1,0,0,1,0,
+						 0,0,0,0,0,0 };
+
+	char HardcoreShape[] = { 0,0,0,0,0,0,
+							 0,1,0,0,1,0,
+							 0,1,0,1,1,0,
+							 0,1,1,0,1,0,
+							 0,1,0,0,1,0,
+							 0,0,0,0,0,0 };
+
+	EasyFace = CreateNewEntity(NewVec2(2, 2), NewVec2(0, 0), 2000, EasyShape, NewVec2(6, 6));
+	NormalFace = CreateNewEntity(NewVec2(8, 2), NewVec2(0, 0), 2000, NormalShape, NewVec2(6, 6));
+	HardFace = CreateNewEntity(NewVec2(2, 8), NewVec2(0, 0), 2000, HardShape, NewVec2(6, 6));
+	HardcoreFace = CreateNewEntity(NewVec2(8, 8), NewVec2(0, 0), 2000, HardcoreShape, NewVec2(6, 6));
+
+	int HasMovedAlready = 0;
+	static double lastMovement;
+	double pickcooldown = 0.5;
+
+	while (ESTADO == MENU)
+	{
+		t = clock();
+		ClearGrid();
+
+		switch (MENU_STATE)
+		{
+		case MAIN_MENU:
+		{
+			lastMovement += DeltaTime;
+			if (isPressingKey(SHOOT) && !HasMovedAlready)
+			{
+				switch (PICKER_STATE)
+					case PLAY:
+						MENU_STATE = DIFFICULTY_MENU;
+						PICKER_STATE = EASY;
+						lastMovement = 0;
+						break;
+			}
+
+			twinkleBuffer += DeltaTime;
+			if (twinkleBuffer >= twinkleCoodlwon)
+			{
+				twinkleBuffer -= twinkleCoodlwon;
+				showCircle *= -1;
+			}
+			if (showCircle == 1)
+			{
+				DrawEntity(PickCircle);
+			}
+			DrawEntity(PlayButton);
+			PrintGrid();
+			t = clock() - t;
+			DeltaTime = (double)(t) / (CLOCKS_PER_SEC);
+
+		}
+		break;
+		case DIFFICULTY_MENU:
+
+			lastMovement += DeltaTime;
+			if (isPressingKey(UP) && !HasMovedAlready)
+			{
+				switch (PICKER_STATE)
+				{
+				case EASY:
+				case NORMAL:
+					break;
+				case HARD:
+					PICKER_STATE = EASY;
+					break;
+				case HARDCORE:
+					PICKER_STATE = NORMAL;
+
+				}
+			}
+			if (isPressingKey(DOWN) && !HasMovedAlready)
+			{
+				switch (PICKER_STATE)
+				{
+				case EASY:
+					PICKER_STATE = HARD;
+					break;
+				case NORMAL:
+					PICKER_STATE = HARDCORE;
+					break;
+				case HARD:
+				case HARDCORE:
+					break;
+				}
+			}
+			if (isPressingKey(RIGHT) && !HasMovedAlready)
+			{
+				switch (PICKER_STATE)
+				{
+				case EASY:
+					PICKER_STATE = NORMAL;
+					break;
+				case NORMAL:
+					break;
+				case HARD:
+					PICKER_STATE = HARDCORE;
+					break;
+				case HARDCORE:
+					break;
+				}
+			}
+			if (isPressingKey(LEFT) && !HasMovedAlready)
+			{
+				switch (PICKER_STATE)
+				{
+				case EASY:
+					break;
+				case NORMAL:
+					PICKER_STATE = EASY;
+					break;
+				case HARD:
+					break;
+				case HARDCORE:
+					PICKER_STATE = HARD;
+					break;
+				}
+			}
+
+			switch (PICKER_STATE)
+			{
+			case EASY:
+				FacePickCircle->Pos = EasyFace->Pos;
+				break;
+			case NORMAL:
+				FacePickCircle->Pos = NormalFace->Pos;
+				break;
+			case HARD:
+				FacePickCircle->Pos = HardFace->Pos;
+				break;
+			case HARDCORE:
+				FacePickCircle->Pos = HardcoreFace->Pos;
+				break;
+			}
+
+			ClearGrid();
+			twinkleBuffer += DeltaTime;
+			if (twinkleBuffer >= twinkleCoodlwon)
+			{
+				twinkleBuffer -= twinkleCoodlwon;
+				showCircle *= -1;
+			}
+			if (showCircle == 1)
+			{
+				DrawEntity(FacePickCircle);
+			}
+
+			if (isPressingKey(SHOOT) && lastMovement > pickcooldown)
+			{
+				difficulty = PICKER_STATE;
+				ESTADO = GAME;
+			}
+
+
+				
+			DrawEntity(EasyFace);
+			DrawEntity(NormalFace);
+			DrawEntity(HardFace);
+			DrawEntity(HardcoreFace);
+			PrintGrid();
+
+			t = clock() - t;
+			DeltaTime = (double)(t) / (CLOCKS_PER_SEC);
+
+		break;
+		}
+
+		
+
+	}
+	DestroyEntity(PlayButton);
+	DestroyEntity(PickCircle);
+	DestroyEntity(FacePickCircle);
+	DestroyEntity(EasyFace);
+	DestroyEntity(NormalFace);
+	DestroyEntity(HardFace);
+	DestroyEntity(HardcoreFace);
+#endif
 	ESTADO = GAME;
 
 }
@@ -535,7 +774,7 @@ void EndScreen()
 void GameLogic()
 {
 	double shootCooldown;
-	static double shootElapsedTime = 10;
+	static double shootElapsedTime = 0;
 #ifndef RASPI
 	
 	shootCooldown = 0;

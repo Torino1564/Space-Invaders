@@ -23,6 +23,12 @@ int isPressingKey(int key)
 	case RIGHT:
 		key = ALLEGRO_KEY_D;
 		break;
+	case UP:
+		key = ALLEGRO_KEY_W;
+		break;
+	case DOWN:
+		key = ALLEGRO_KEY_S;
+		break;
 	case SHOOT:
 		key = ALLEGRO_KEY_SPACE;
 		break;
@@ -46,6 +52,16 @@ int isPressingKey(int key)
 		case RIGHT:
 		{
 			if (TempCoords.x > 0) return 1;
+			break;
+		}
+		case UP:
+		{
+			if (TempCoords.y < 0) return 1;
+			break;
+		}
+		case DOWN:
+		{
+			if (TempCoords.y > 0) return 1;
 			break;
 		}
 		case SHOOT:

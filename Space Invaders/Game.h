@@ -113,6 +113,7 @@ void CollideAlienBullets();
 #ifdef RASPI
 void ColideAlienBullets();
 
+
 #endif
 
 Entity* Spaceship;
@@ -182,6 +183,14 @@ ALLEGRO_FONT* font;
 ALLEGRO_FONT* BigFont;
 #endif
 #ifdef RASPI
+
+Entity* PlayButton;
+Entity* PickCircle;
+Entity* FacePickCircle;
+Entity* EasyFace;
+Entity* NormalFace;
+Entity* HardFace;
+Entity* HardcoreFace;
 
 #endif
 /* ==============================
@@ -331,3 +340,4 @@ int aliendeath;
 int lives;
 int score;
 int aliensDestroyed;
+int difficulty;

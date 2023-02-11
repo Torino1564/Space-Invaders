@@ -10,7 +10,7 @@
 ALLEGRO_KEYBOARD_STATE* TempState;
 #endif
 
-enum Input { LEFT, RIGHT, SHOOT };
+enum Input { LEFT, RIGHT, UP, DOWN, SHOOT };
 
 void initInput();
 

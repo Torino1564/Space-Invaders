@@ -58,6 +58,7 @@ int Animate(Entity* ent, float dt);
 #endif
 
 #ifdef RASPI
+#define MAX_SHAPE 50
 struct Entity_t
 {
 	Vec2 Pos;
@@ -66,7 +67,7 @@ struct Entity_t
 	double updateCooldown;
 	double timeBuffer;
 
-	char shape[25];
+	char shape[MAX_SHAPE];
 	Vec2 dimensions;
 
 };

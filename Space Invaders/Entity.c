@@ -252,7 +252,7 @@ Entity* CreateNewEntity(Vec2 pos, Vec2 vel, double updateCooldown, char shape[],
 	TempEntity->dimensions = dimensions;
 	TempEntity->timeBuffer = 0;
 
-	for (int i = 0; i < 25; i++)
+	for (int i = 0; i < MAX_SHAPE; i++)
 	{
 		if (i < (dimensions.x * dimensions.y))
 		{
