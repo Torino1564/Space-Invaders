@@ -581,7 +581,6 @@ void GameLogic()
 	{
 		Mothership_time = (t / CLOCKS_PER_SEC) + 5;
 		i = CreateNewAnimation(NewVec2F(1000, 1000), NewVec2F(100, 0), 10, BigUFO, 56, 38);
-
 	}
 
 	if (!al_is_event_queue_empty(InputEventQueue))
