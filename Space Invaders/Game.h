@@ -78,8 +78,6 @@
 
  ==================================== */
 
-#define COOLDOWN 1
-
 #endif
 
 #ifdef RASPI
@@ -167,6 +165,9 @@ ALLEGRO_KEYBOARD_STATE KeyboardCurrentState;
 Entity* Gun;
 
 Entity Marco;
+
+Entity* Stop_forwards;
+Entity* Stop_backwards;
 #endif
 
 double DeltaTime;
@@ -230,9 +231,8 @@ SpriteSheet* AlienBullet;
 SpriteSheet* MiniUFO_Explosion;
 SpriteSheet* BulletExplosion;
 SpriteSheet* ShieldExplosion;
-
-SpriteSheet* Stopping_b;
-SpriteSheet* Stopping_f;
+SpriteSheet* Stp_b;
+SpriteSheet* Stp_f;
 
 ALLEGRO_BITMAP* ShieldTexture;
 //ALLEGRO_TIMER* timer;
@@ -334,4 +334,6 @@ int aliendeath;
 int lives;
 int score;
 int aliensDestroyed;
+int animation_finished;
 double Cooldown;
+double Cooldown_c;

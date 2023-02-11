@@ -260,8 +260,8 @@ int GameInit()
 
 	// Characters Init
 	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38, 1);
-	Stopping_b = NewSpriteSheet(STOP_BACKWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
-	Stopping_f = NewSpriteSheet(STOP_FORWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
+	Stp_b = NewSpriteSheet(STOP_BACKWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
+	Stp_f = NewSpriteSheet(STOP_FORWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
 
 	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x / 2 - 50 / 2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
 	Spaceship->data = 0; //El Spaceship esta quieto esperando movimiento
@@ -546,10 +546,32 @@ void EndScreen()
 
 void GameLogic()
 {
-	static	double shootElapsedTime = 10;
 	static double animtime = 0;
+
+
 #ifndef RASPI
-	shootElapsedTime += DeltaTime;
+
+	static double Cooldown = 0;
+	int fire_ready = 0;
+	static int once = 1;
+
+	switch (Level)
+	{
+	case 1: 
+		Cooldown_c = 0;
+	case 2:
+		Cooldown_c = 0.3;
+	case 3:
+		Cooldown_c = 0.4;
+	default:
+		break;
+	}
+
+	if ((t / CLOCKS_PER_SEC) > Cooldown)
+	{
+		fire_ready = 1;
+	}
+
 	if (!al_is_event_queue_empty(InputEventQueue))
 	{
 		al_get_next_event(InputEventQueue, &TempEvent);
@@ -563,11 +585,8 @@ void GameLogic()
 				GAMESTATE = PAUSE;
 				break;
 			case ALLEGRO_KEY_A:
-				if (!Spaceship->data)
-				{
-					Spaceship->Vel.x -= SHIP_SPEED;
-					Gun->Vel.x -= SHIP_SPEED;
-				}
+				Spaceship->Vel.x -= SHIP_SPEED;
+				Gun->Vel.x -= SHIP_SPEED;
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x += SHIP_SPEED;
@@ -586,18 +605,11 @@ void GameLogic()
 				break;
 			case ALLEGRO_KEY_SPACE:
 
-
-
-				if ((t/CLOCKS_PER_SEC) < Cooldown)
+				if (fire_ready)
 				{
-					cantfire = 1;
-					break;
-				}
-				else
-				{
-					Cooldown += COOLDOWN;
+					Cooldown = t / CLOCKS_PER_SEC + Cooldown_c;
+					fire_ready = 0;
 					shot = true;
-					shootElapsedTime = 0;
 					for (int i = 0; i < 10; i++)
 					{
 						if (i == 9)
@@ -614,6 +626,10 @@ void GameLogic()
 
 					}
 				}
+//				else
+//				{
+//					fire_attempt = true;
+//				}
 					break;
 				default:
 					break;
@@ -626,12 +642,20 @@ void GameLogic()
 			case ALLEGRO_KEY_A:
 				Spaceship->Vel.x += SHIP_SPEED;
 				Gun->Vel.x += SHIP_SPEED;
-				Spaceship->data = 1;	//El sp esta parando de atras
+				if (animation_finished || once)
+				{
+					Spaceship->data = 1;	//El sp esta parando de atras
+					once = 0;
+				}
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x -= SHIP_SPEED;
 				Gun->Vel.x -= SHIP_SPEED;
-				Spaceship->data = 2;	//El sp esta parando de adelante
+				if (animation_finished || once)
+				{
+					Spaceship->data = 2;	//El sp esta parando de adelante
+					once = 0;
+				}
 				break;
 			default:
 				break;
@@ -650,6 +674,14 @@ void GameLogic()
 	CullBullets();
 	UpdateBullets();
 	UpdateAnimations(DeltaTime);
+	UpdateEntity(Stop_backwards, DeltaTime);
+	UpdateEntity(Stop_forwards, DeltaTime);
+
+	if (animation_finished)
+	{
+		DestroyAnimatedEntitySharedSprite(Stop_backwards);
+		DestroyAnimatedEntitySharedSprite(Stop_forwards);
+	}
 
 	ComputeAlienShot();
 
@@ -841,11 +873,13 @@ void GameRender()
 		switch (Spaceship->data)
 		{
 		case 1:
-			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_b, Spaceship->width, Spaceship->height);
+//			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_b, Spaceship->width, Spaceship->height);
+//			Stop_backwards = CreateNewAnimatedEntityLoadedTexture(Spaceship->Pos, NewVec2F(0, 0), Stp_b, Spaceship->width, Spaceship->height);
 			Spaceship->data = 0;
 			break;
 		case 2:
-			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_f, Spaceship->width, Spaceship->height);
+//			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_f, Spaceship->width, Spaceship->height);
+//			Stop_forwards = CreateNewAnimatedEntityLoadedTexture(Spaceship->Pos, NewVec2F(0, 0), Stp_f, Spaceship->width, Spaceship->height);
 			Spaceship->data = 0;
 			break;
 		default:
