@@ -46,6 +46,7 @@
 #define GUN_TEXTURE "Resources/Assets/Gun.png"
 
 #define MINIUFO1SP "Resources/Assets/MiniUFO1Sp.png"
+#define BIGUFO1SP "Resources/Assets/BigUFO1Sp.png"
 #define SLUG "Resources/Assets/Spaceship_sprite.png"
 #define SHIELD "Resources/Assets/ShieldTexture2.png"
 #define ALIENBULLETS "Resources/Assets/AlienBullet.png"
@@ -225,6 +226,9 @@ AlienMatrix * AlienGrid;
 ALLEGRO_BITMAP* AlienTexture;
 
 SpriteSheet* MiniUFO;
+
+SpriteSheet* BigUFO;
+
 SpriteSheet* Slug;
 SpriteSheet* Weapon;
 SpriteSheet* AlienBullet;
