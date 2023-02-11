@@ -39,7 +39,7 @@ int CreateNewAnimation(Vec2F pos, Vec2F vel, uint8_t Loops, SpriteSheet * Sprite
 		{
 			(*AnimationBuffer)[i] = TempAnimation;
 			TempAnimation->BufferIndex = i;
-			break;
+			return i;
 		}
 	}
 	return 1;

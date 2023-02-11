@@ -491,8 +491,8 @@ int GameInit()
 
 	// Characters Init
 	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38, 1);
-	Stopping_b = NewSpriteSheet(STOP_BACKWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
-	Stopping_f = NewSpriteSheet(STOP_FORWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
+	Stp_b = NewSpriteSheet(STOP_BACKWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
+	Stp_f = NewSpriteSheet(STOP_FORWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
 
 	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x / 2 - 50 / 2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
 	Spaceship->data = 0; //El Spaceship esta quieto esperando movimiento
@@ -525,6 +525,8 @@ int GameInit()
 	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38, 1);
 
 	MiniUFO_Explosion = NewSpriteSheet(EXPLOSION_SPRITE, (float)((float)1 / (float)12), 22, 70, 70, 1);
+
+	BigUFO = NewSpriteSheet(BIGUFO1SP, (float)((float)1 / (float)12), 12, 56, 38, 1);
 
 	ShieldExplosion = NewSpriteSheet(SHIELD_EXPLOSION_SS, (float)((float)1 / (float)12), 27, 70, 70, 1);
 
@@ -619,6 +621,7 @@ void GameDestroy()
 
 	DestroyEntity(Gun);
 	DeleteSpriteSheet(MiniUFO);
+	DeleteSpriteSheet(BigUFO);
 	DeleteSpriteSheet(Slug);
 
 	for (int i = 0; i < 10; i++)
@@ -776,9 +779,37 @@ void GameLogic()
 	double shootCooldown;
 	static double shootElapsedTime = 0;
 #ifndef RASPI
-	
-	shootCooldown = 0;
-	shootElapsedTime += DeltaTime;
+
+	static double Cooldown = 0;
+	int fire_ready = 0;
+	static int once = 1;
+	static double Mothership_time = 0;
+	int i = NULL;
+	int j;
+
+	switch (Level)
+	{
+	case 1: 
+		Cooldown_c = 0;
+	case 2:
+		Cooldown_c = 0.3;
+	case 3:
+		Cooldown_c = 0.4;
+	default:
+		break;
+	}
+
+	if ((t / CLOCKS_PER_SEC) > Cooldown)
+	{
+		fire_ready = 1;
+	}
+	if ((t / CLOCKS_PER_SEC) > Mothership_time)
+	{
+		Mothership_time = (t / CLOCKS_PER_SEC) + 5;
+		i = CreateNewAnimation(NewVec2F(1000, 1000), NewVec2F(100, 0), 10, BigUFO, 56, 38);
+
+	}
+
 	if (!al_is_event_queue_empty(InputEventQueue))
 	{
 		al_get_next_event(InputEventQueue, &TempEvent);
@@ -811,15 +842,12 @@ void GameLogic()
 				}
 				break;
 			case ALLEGRO_KEY_SPACE:
-				if (shootElapsedTime < shootCooldown)
+
+				if (fire_ready)
 				{
-					shotOnCooldown = true;
-					break;
-				}
-				else
-				{
+					Cooldown = t / CLOCKS_PER_SEC + Cooldown_c;
+					fire_ready = 0;
 					shot = true;
-					shootElapsedTime = 0;
 					for (int i = 0; i < 10; i++)
 					{
 						if (i == 9)
@@ -836,6 +864,10 @@ void GameLogic()
 
 					}
 				}
+//				else
+//				{
+//					fire_attempt = true;
+//				}
 					break;
 				default:
 					break;
@@ -848,12 +880,20 @@ void GameLogic()
 			case ALLEGRO_KEY_A:
 				Spaceship->Vel.x += SHIP_SPEED;
 				Gun->Vel.x += SHIP_SPEED;
-				Spaceship->data = 1;	//El sp esta parando 
+//				if (animation_finished || once)
+//				{
+//					Spaceship->data = 1;	//El sp esta parando de atras
+//					once = 0;
+//				}
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x -= SHIP_SPEED;
 				Gun->Vel.x -= SHIP_SPEED;
-				Spaceship->data = 2;	//El sp esta parando
+//				if (animation_finished || once)
+//				{
+//					Spaceship->data = 2;	//El sp esta parando de adelante
+//					once = 0;
+//				}
 				break;
 			default:
 				break;
@@ -872,6 +912,12 @@ void GameLogic()
 	CullBullets();
 	UpdateBullets();
 	UpdateAnimations(DeltaTime);
+
+//	if (animation_finished)
+//	{
+//		DestroyAnimatedEntitySharedSprite(Stop_backwards);
+//		DestroyAnimatedEntitySharedSprite(Stop_forwards);
+//	}
 
 	ComputeAlienShot();
 
@@ -1058,22 +1104,25 @@ void GameRender()
 	DrawEntity(Gun);
 	DrawEntity(Spaceship);
 
-	if (Spaceship->data)
-	{
-		switch (Spaceship->data)
-		{
-		case 1:
-			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_b, Spaceship->width, Spaceship->height);
-			Spaceship->data = 0;
-			break;
-		case 2:
-			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_f, Spaceship->width, Spaceship->height);
-			Spaceship->data = 0;
-		default:
-			break;
-		}
-		Spaceship->data = 0;
-	}
+//	if (Spaceship->data)
+//	{
+//		switch (Spaceship->data)
+//		{
+//		case 1:
+//			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_b, Spaceship->width, Spaceship->height);
+//			Stop_backwards = CreateNewAnimatedEntityLoadedTexture(Spaceship->Pos, NewVec2F(0, 0), Stp_b, Spaceship->width, Spaceship->height);
+//			Spaceship->data = 0;
+//			break;
+//		case 2:
+//			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_f, Spaceship->width, Spaceship->height);
+//			Stop_forwards = CreateNewAnimatedEntityLoadedTexture(Spaceship->Pos, NewVec2F(0, 0), Stp_f, Spaceship->width, Spaceship->height);
+//			Spaceship->data = 0;
+//			break;
+//		default:
+//			break;
+//		}
+//		Spaceship->data = 0;
+//	}
 
 	//Enemies
 

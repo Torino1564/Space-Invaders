@@ -52,6 +52,7 @@
 #define GUN_TEXTURE "Resources/Assets/Gun.png"
 
 #define MINIUFO1SP "Resources/Assets/MiniUFO1Sp.png"
+#define BIGUFO1SP "Resources/Assets/BigUFO1Sp.png"
 #define SLUG "Resources/Assets/Spaceship_sprite.png"
 #define SHIELD "Resources/Assets/ShieldTexture2.png"
 #define ALIENBULLETS "Resources/Assets/AlienBullet.png"
@@ -77,6 +78,13 @@
 
 #define PAUSE_BG "Resources/Backgrounds/pause.png"
 #define LIGHTGRAYOVERLAY "Resources/Backgrounds/LightGrayOverlay.png"
+
+/* ===================================
+
+		Constants
+
+ ==================================== */
+
 #endif
 #ifdef RASPI
 
@@ -164,6 +172,9 @@ ALLEGRO_KEYBOARD_STATE KeyboardCurrentState;
 Entity* Gun;
 
 Entity Marco;
+
+Entity* Stop_forwards;
+Entity* Stop_backwards;
 #endif
 
 double DeltaTime;
@@ -231,15 +242,17 @@ AlienMatrix * AlienGrid;
 ALLEGRO_BITMAP* AlienTexture;
 
 SpriteSheet* MiniUFO;
+
+SpriteSheet* BigUFO;
+
 SpriteSheet* Slug;
 SpriteSheet* Weapon;
 SpriteSheet* AlienBullet;
 SpriteSheet* MiniUFO_Explosion;
 SpriteSheet* BulletExplosion;
 SpriteSheet* ShieldExplosion;
-
-SpriteSheet* Stopping_b;
-SpriteSheet* Stopping_f;
+SpriteSheet* Stp_b;
+SpriteSheet* Stp_f;
 
 ALLEGRO_BITMAP* ShieldTexture;
 #endif
@@ -341,3 +354,6 @@ int lives;
 int score;
 int aliensDestroyed;
 int difficulty;
+int animation_finished;
+double Cooldown;
+double Cooldown_c;
