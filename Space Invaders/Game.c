@@ -933,6 +933,7 @@ void GameLogic()
 	UpdateEntity(BigUFOent, DeltaTime);
 	Animate(BigUFOent, DeltaTime);
 
+
 //	CollideEntity(BigUFOent, Bullets);
 
 	for (int b = 0; b < 10; b++)
