@@ -58,6 +58,7 @@
 #define ALIENBULLETS "Resources/Assets/AlienBullet.png"
 #define BULLET_EXPLOSION_SS "Resources/Assets/bullet_Explosion_spritesheet.png"
 #define SHIELD_EXPLOSION_SS "Resources/Assets/shieldExplosion.png"
+#define BIG_EXPLOSION "Resources/Assets/Big_Explosion.png"
 #define FONT "Resources/Assets/PublicPixel-z84yD.ttf"
 #define HEART "Resources/Assets/heart.png"
 #define DHEART "Resources/Assets/deadheart.png"
@@ -219,6 +220,7 @@ double pickcooldown;
 
 Entity * Bullets[MAX_BULLETS];
 Entity* AlienBullets[MAX_ALIEN_BULLETS];
+Entity* BigUFOent;
 #ifndef RASPI
 ALLEGRO_BITMAP* BulletTexture;
 ALLEGRO_BITMAP* DeathTexture;
@@ -254,6 +256,7 @@ SpriteSheet* Slug;
 SpriteSheet* Weapon;
 SpriteSheet* AlienBullet;
 SpriteSheet* MiniUFO_Explosion;
+SpriteSheet* BigExplosion;
 SpriteSheet* BulletExplosion;
 SpriteSheet* ShieldExplosion;
 SpriteSheet* Stp_b;

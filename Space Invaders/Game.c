@@ -490,6 +490,8 @@ int GameInit()
 	ShieldImpact = al_load_sample(SHIELD_IMPACT);
 	ShieldDestroyed = al_load_sample(SHIELD_EXPLOSION);
 
+	BigExplosion = NewSpriteSheet(BIG_EXPLOSION, (float)((float)1 / (float)20), 28, 81, 94, 1);
+
 	instance1 = al_create_sample_instance(PLAYERSHOTSFX);
 
 	// Characters Init
@@ -537,6 +539,8 @@ int GameInit()
 
 	heart = al_load_bitmap(HEART);
 	deadheart = al_load_bitmap(DHEART);
+
+//	BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(500, 500), NewVec2F(100, 0), BigUFO, 56, 38);
 
 	numberOfShields = 3;
 	shieldSize = NewVec2F(150, 70);
@@ -866,6 +870,7 @@ void EndScreen()
 void GameLogic()
 {
 	double shootCooldown;
+	double MotherShip_cooldown = 40;
 	static double shootElapsedTime = 0;
 #ifndef RASPI
 
@@ -880,6 +885,7 @@ void GameLogic()
 	{
 	case 1: 
 		Cooldown_c = 0;
+		fire_ready = 1; 
 	case 2:
 		Cooldown_c = 0.3;
 	case 3:
@@ -894,10 +900,13 @@ void GameLogic()
 	}
 	if ((t / CLOCKS_PER_SEC) > Mothership_time)
 	{
-		Mothership_time = (t / CLOCKS_PER_SEC) + 5;
-		i = CreateNewAnimation(NewVec2F(1000, 1000), NewVec2F(100, 0), 10, BigUFO, 56, 38);
+		Mothership_time = (t / CLOCKS_PER_SEC) + MotherShip_cooldown;
+		BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(500, 50), NewVec2F(200, 0), BigUFO, 56, 38);
 
+//		i = CreateNewAnimation(NewVec2F(500, 500), NewVec2F(100, 0), 10, BigUFO, 56, 38);
 	}
+
+
 
 	if (!al_is_event_queue_empty(InputEventQueue))
 	{
@@ -1012,6 +1021,32 @@ void GameLogic()
 
 	UpdateEntity(Spaceship, DeltaTime);
 	UpdateEntity(Gun, DeltaTime);
+
+	UpdateEntity(BigUFOent, DeltaTime);
+	Animate(BigUFOent, DeltaTime);
+
+//	CollideEntity(BigUFOent, Bullets);
+
+	for (int b = 0; b < 10; b++)
+	{
+		if (*(Bullets + b) != NULL && BigUFOent != NULL)
+		{
+			if (AreColiding(BigUFOent, Bullets[b]))
+			{
+				CreateNewAnimation(BigUFOent->Pos, NewVec2F(0, 0), 0, BigExplosion, 79, 94);
+
+				DestroyEntityLoadedTexture(Bullets[b]);
+				Bullets[b] = NULL;
+				
+				DestroyAnimatedEntitySharedSprite(BigUFOent);
+				BigUFOent = NULL;
+
+				return true;
+			}
+		}
+	}
+
+
 	ClipToScreen(Spaceship, ScreenDimensions);
 	ClipToEntity(Gun, Spaceship, 20);
 
@@ -1028,6 +1063,7 @@ void GameLogic()
 	if (AlienGrid->AlienCount == 0)
 	{
 		Level += 1;	//Pasa al siguiente nivel
+		Mothership_time = (t / CLOCKS_PER_SEC) + MotherShip_cooldown;
 		Once = 0;	//Resetea para el sonido
 
 		for (int i = 0; i < 10; i++) //Limpia las balas que quedan volando cuando se quedan sin aliens
@@ -1054,6 +1090,7 @@ void GameLogic()
 			}
 		}
 		AlienGrid->Pos = GetCentredPosition(AlienGrid, ScreenDimensions);
+		AlienGrid->Pos.y += 60;
 		//FillMatrix(AlienGrid, AlienTexture);
 		FillMatrixAnimated(AlienGrid, MiniUFO);
 
@@ -1166,28 +1203,28 @@ void GameRender()
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level1Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level1Music, 0.4, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	case 1:
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level2Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level2Music, 0.4, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	case 2:
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level3Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level3Music, 0.4, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	case 3:
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level4Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level4Music, 0.4, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	}
@@ -1197,6 +1234,9 @@ void GameRender()
 	//player
 	DrawEntity(Gun);
 	DrawEntity(Spaceship);
+	
+	DrawEntity(BigUFOent);
+
 
 //	if (Spaceship->data)
 //	{
@@ -1228,16 +1268,16 @@ void GameRender()
 	//fight sounds
 	if (shot)
 	{
-		al_play_sample(Bullet_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+		al_play_sample(Bullet_sound, 0.1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 		shot = 0;
 	}
 	if (aliendeath)
 	{
-		al_play_sample(alien_death_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+		al_play_sample(alien_death_sound, 0.1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 	}
 	if (shotOnCooldown)
 	{
-		al_play_sample(ShotNotReadySFX, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+		al_play_sample(ShotNotReadySFX, 0.1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 		shotOnCooldown = false;
 	}
 
