@@ -562,6 +562,7 @@ int GameInit()
 	//Score system init
 
 	Once = 0;
+	lives = 3;
 
 #endif
 #ifdef RASPI
