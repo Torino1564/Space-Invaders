@@ -1001,6 +1001,7 @@ void GameLogic()
 			}
 		}
 		AlienGrid->Pos = GetCentredPosition(AlienGrid, ScreenDimensions);
+		AlienGrid->Pos.y += 60;
 		//FillMatrix(AlienGrid, AlienTexture);
 		FillMatrixAnimated(AlienGrid, MiniUFO);
 
@@ -1108,28 +1109,28 @@ void GameRender()
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level1Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level1Music, 0.4, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	case 1:
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level2Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level2Music, 0.4, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	case 2:
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level3Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level3Music, 0.4, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	case 3:
 		if (Once == 0)
 		{
 			al_stop_samples();
-			al_play_sample(level4Music, 0.2, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
+			al_play_sample(level4Music, 0.4, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 			Once = 1;
 		}
 	}
@@ -1173,16 +1174,16 @@ void GameRender()
 	//fight sounds
 	if (shot)
 	{
-		al_play_sample(Bullet_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+		al_play_sample(Bullet_sound, 0.1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 		shot = 0;
 	}
 	if (aliendeath)
 	{
-		al_play_sample(alien_death_sound, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+		al_play_sample(alien_death_sound, 0.1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 	}
 	if (shotOnCooldown)
 	{
-		al_play_sample(ShotNotReadySFX, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+		al_play_sample(ShotNotReadySFX, 0.1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 		shotOnCooldown = false;
 	}
 
