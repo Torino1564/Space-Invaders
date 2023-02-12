@@ -878,14 +878,12 @@ void GameLogic()
 	int fire_ready = 0;
 	static int once = 1;
 	static double Mothership_time = 0;
-	int i = NULL;
-	int j;
 
 	switch (Level)
 	{
 	case 1: 
-		Cooldown_c = 0;
-		fire_ready = 1; 
+		Cooldown_c = 0.1;
+		//fire_ready = 1; 
 	case 2:
 		Cooldown_c = 0.3;
 	case 3:
@@ -962,10 +960,6 @@ void GameLogic()
 
 					}
 				}
-//				else
-//				{
-//					fire_attempt = true;
-//				}
 					break;
 				default:
 					break;
@@ -1238,25 +1232,6 @@ void GameRender()
 	DrawEntity(BigUFOent);
 
 
-//	if (Spaceship->data)
-//	{
-//		switch (Spaceship->data)
-//		{
-//		case 1:
-//			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_b, Spaceship->width, Spaceship->height);
-//			Stop_backwards = CreateNewAnimatedEntityLoadedTexture(Spaceship->Pos, NewVec2F(0, 0), Stp_b, Spaceship->width, Spaceship->height);
-//			Spaceship->data = 0;
-//			break;
-//		case 2:
-//			CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, Stopping_f, Spaceship->width, Spaceship->height);
-//			Stop_forwards = CreateNewAnimatedEntityLoadedTexture(Spaceship->Pos, NewVec2F(0, 0), Stp_f, Spaceship->width, Spaceship->height);
-//			Spaceship->data = 0;
-//			break;
-//		default:
-//			break;
-//		}
-//		Spaceship->data = 0;
-//	}
 
 	//Enemies
 
