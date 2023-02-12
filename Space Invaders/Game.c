@@ -94,6 +94,7 @@ int SystemInit()
 	Mixer = al_get_default_mixer();
 
 	LightGrayOverlay = al_load_bitmap(LIGHTGRAYOVERLAY);
+	BlackOverlay = al_load_bitmap(BLACKOVERLAY);
 
 	al_reserve_samples(SAMPLE_COUNT);
 
@@ -650,6 +651,7 @@ void GameDestroy()
 	al_destroy_bitmap(DeathTexture);
 	DeleteSpriteSheet(MiniUFO_Explosion);
 	DeleteSpriteSheet(ShieldExplosion);
+	DeleteSpriteSheet(BigUFO);
 
 	DestroyEntity(Gun);
 	DeleteSpriteSheet(MiniUFO);
@@ -696,7 +698,7 @@ void GameDestroy()
 	al_destroy_sample(ShotNotReadySFX);
 	al_destroy_sample(ShipImpactSFX);
 	al_destroy_sample(alien_death_sound);
-
+	al_destroy_sample(BigUFO_sound);
 
 	al_destroy_sample(ShieldImpact);
 	al_destroy_sample(ShieldDestroyed);
@@ -755,7 +757,7 @@ void Pause()
 #ifndef RASPI
 	al_draw_scaled_bitmap(backgroundpause, 0, 0, al_get_bitmap_width(backgroundpause), al_get_bitmap_height(backgroundpause), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
 	al_flip_display();
-	pause = true;
+	int pause = true;
 	while (pause)
 	{
 		if (!al_is_event_queue_empty(InputEventQueue))
@@ -882,9 +884,12 @@ void Pause()
 void EndScreen()
 {
 #ifndef RASPI
-	while (true)
+	int end = true;
+	while (end)
 	{
-		al_draw_scaled_bitmap(LightGrayOverlay, 0, 0, al_get_bitmap_width(LightGrayOverlay), al_get_bitmap_height(LightGrayOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+		al_stop_samples();
+
+		al_draw_scaled_bitmap(BlackOverlay, 0, 0, al_get_bitmap_width(BlackOverlay), al_get_bitmap_height(BlackOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
 		al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1, ALLEGRO_ALIGN_CENTER, "YOU DIED!");
 		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "YOUR SCORE:");
 		char textscore[25];
@@ -897,11 +902,30 @@ void EndScreen()
 		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 7, ALLEGRO_ALIGN_CENTER, "Level Reached:");
 		char textLevel[25];
 		sprintf_s(textLevel, 25, "%d", Level);
-		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 8, ALLEGRO_ALIGN_CENTER, textLevel);
-
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 8 -25, ALLEGRO_ALIGN_CENTER, textLevel);
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 8 + 70, ALLEGRO_ALIGN_CENTER, "PRESS SPACE TO CONTINUE");
 
 		al_flip_display();
+
+		if (!al_is_event_queue_empty(InputEventQueue))
+		{
+			al_get_next_event(InputEventQueue, &TempEvent);
+
+
+			switch (TempEvent.type)
+			{
+			case ALLEGRO_EVENT_KEY_DOWN:
+				switch (TempEvent.keyboard.keycode)
+				{
+				case ALLEGRO_KEY_SPACE:
+					end = 0;
+					GAMESTATE = MENU;
+				}
+
+			}
+		}
 	}
+
 #endif
 }
 
@@ -966,6 +990,7 @@ void GameLogic()
 				break;
 			case ALLEGRO_KEY_S:
 				Level += 1;
+				lives -= 1;
 				Once = 0;
 				break;
 			case ALLEGRO_KEY_F4:
@@ -1851,7 +1876,6 @@ void ProcessHP()
 		Spaceship->data = 66;
 		Gun->data = 66;
 		CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, ShieldExplosion, 200, 300);
-		al_stop_samples();
 #endif
 		GAMESTATE = END;
 	}

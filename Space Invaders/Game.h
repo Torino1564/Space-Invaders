@@ -79,6 +79,7 @@
 
 #define PAUSE_BG "Resources/Backgrounds/pause.png"
 #define LIGHTGRAYOVERLAY "Resources/Backgrounds/LightGrayOverlay.png"
+#define BLACKOVERLAY "Resources/Backgrounds/BlackOverlay.png"
 
 /* ===================================
 
@@ -154,6 +155,7 @@ ALLEGRO_BITMAP* background3;
 ALLEGRO_BITMAP* background4;
 ALLEGRO_BITMAP* backgroundpause;
 ALLEGRO_BITMAP* LightGrayOverlay;
+ALLEGRO_BITMAP* BlackOverlay;
 
 ALLEGRO_BITMAP* heart;
 ALLEGRO_BITMAP* deadheart;
@@ -167,6 +169,8 @@ ALLEGRO_EVENT_QUEUE* InputEventQueue;
 ALLEGRO_EVENT TempEvent;
 
 ALLEGRO_EVENT MenuEvent;
+
+ALLEGRO_EVENT EndEvent;
 
 ALLEGRO_KEYBOARD_STATE KeyboardCurrentState;
 
@@ -355,7 +359,6 @@ enum GAMESTATE {PLAYING , PAUSE, END , EXIT};
 			global variables
 =============================== */
 
-int pause;
 int Level;
 int Once;
 int Moving;
