@@ -781,6 +781,7 @@ void EndScreen()
 void GameLogic()
 {
 	double shootCooldown;
+	double MotherShip_cooldown = 40;
 	static double shootElapsedTime = 0;
 #ifndef RASPI
 
@@ -810,8 +811,8 @@ void GameLogic()
 	}
 	if ((t / CLOCKS_PER_SEC) > Mothership_time)
 	{
-		Mothership_time = (t / CLOCKS_PER_SEC) + 3;
-		BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(500, 500), NewVec2F(50, 0), BigUFO, 56, 38);
+		Mothership_time = (t / CLOCKS_PER_SEC) + MotherShip_cooldown;
+		BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(500, 50), NewVec2F(200, 0), BigUFO, 56, 38);
 
 //		i = CreateNewAnimation(NewVec2F(500, 500), NewVec2F(100, 0), 10, BigUFO, 56, 38);
 	}
@@ -973,6 +974,7 @@ void GameLogic()
 	if (AlienGrid->AlienCount == 0)
 	{
 		Level += 1;	//Pasa al siguiente nivel
+		Mothership_time = (t / CLOCKS_PER_SEC) + MotherShip_cooldown;
 		Once = 0;	//Resetea para el sonido
 
 		for (int i = 0; i < 10; i++) //Limpia las balas que quedan volando cuando se quedan sin aliens
