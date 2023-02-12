@@ -32,6 +32,9 @@ int isPressingKey(int key)
 	case SHOOT:
 		key = ALLEGRO_KEY_SPACE;
 		break;
+	case PAUSE_KEY:
+		key = ALLEGRO_KEY_ESCAPE;
+		break;
 	}
 	al_get_keyboard_state(TempState);
 
@@ -46,31 +49,38 @@ int isPressingKey(int key)
 	{
 		case LEFT:
 		{
-			if (TempCoords.x < 0) return 1;
+			if (TempCoords.x < -50) return 1;
 			break;
 		}
 		case RIGHT:
 		{
-			if (TempCoords.x > 0) return 1;
-			break;
-		}
-		case UP:
-		{
-			if (TempCoords.y < 0) return 1;
+			if (TempCoords.x > 50) return 1;
 			break;
 		}
 		case DOWN:
 		{
-			if (TempCoords.y > 0) return 1;
+			if (TempCoords.y < -50) return 1;
+			break;
+		}
+		case UP:
+		{
+			if (TempCoords.y > 50) return 1;
 			break;
 		}
 		case SHOOT:
 		{
-			if (TempSwitch = J_PRESS)
+			if (joy_get_switch() == J_PRESS)
 			{
 				return 1;
 			}
 			break;
+		}
+		case PAUSE_KEY:
+		{
+			if (TempCoords.y <= -120)
+			{
+				return 1;
+			}
 		}
 	}
 	return 0;

@@ -196,12 +196,17 @@ ALLEGRO_FONT* BigFont;
 #ifdef RASPI
 
 Entity* PlayButton;
+Entity* StopButton;
 Entity* PickCircle;
 Entity* FacePickCircle;
 Entity* EasyFace;
 Entity* NormalFace;
 Entity* HardFace;
 Entity* HardcoreFace;
+
+int HasMovedAlready;
+static double lastMovement;
+double pickcooldown;
 
 #endif
 /* ==============================

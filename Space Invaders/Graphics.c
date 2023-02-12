@@ -12,7 +12,18 @@ void ClearGrid()
 	}
 #endif
 #ifdef RASPI_TEST
-	disp_clear();
+
+	dcoord_t TempPoint;
+
+	for (int i = 0; i < 16; i++)
+	{
+		for (int j = 0; j < 16; j++)
+		{
+			TempPoint = (dcoord_t){ i,j };
+			disp_write(TempPoint, D_OFF);
+
+		}
+	}
 #endif
 }
 
@@ -47,7 +58,7 @@ void PrintGrid()
 			}
 			else
 			{
-				al_draw_circle(startX + padding * i, startY + padding * j, 10, al_map_rgb(50, 50, 50), 1);
+				//al_draw_circle(startX + padding * i, startY + padding * j, 10, al_map_rgb(50, 50, 50), 1);
 
 			}
 		}

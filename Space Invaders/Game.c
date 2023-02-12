@@ -103,6 +103,9 @@ int SystemInit()
 #ifdef RASPI
 	InitGraphics();
 	initInput();
+
+	pickcooldown = 0.5 * TIME_MULTIPLIER;
+	HasMovedAlready = 0;
 #endif
 	ESTADO = MENU;
 }
@@ -191,11 +194,12 @@ int Menu()
 	PickCircle = CreateNewEntity(NewVec2(5, 1), NewVec2(0, 0), 2000, PickCircleShape, NewVec2(7, 7));
 
 	char SmallPickCircleShape[] = { 1,1,1,1,1,1,
-								    1,0,0,0,0,1,
-								    1,0,0,0,0,1,
 									1,0,0,0,0,1,
 									1,0,0,0,0,1,
-									1,1,1,1,1,1};
+									1,0,0,0,0,1,
+									1,0,0,0,0,1,
+									1,1,1,1,1,1 };
+
 	FacePickCircle = CreateNewEntity(NewVec2(5, 1), NewVec2(0, 0), 2000, SmallPickCircleShape, NewVec2(6, 6));
 
 	int MENU_STATE;
@@ -214,7 +218,7 @@ int Menu()
 						 0,1,0,0,1,0,
 						 0,0,0,0,0,0,
 						 0,1,0,0,1,0,
-						 0,0,1,1,0,0,
+						 0,1,1,1,1,0,
 						 0,0,0,0,0,0 };
 
 	char NormalShape[] = { 0,0,0,0,0,0,
@@ -227,15 +231,15 @@ int Menu()
 	char HardShape[] = { 0,0,0,0,0,0,
 						 0,1,0,0,1,0,
 						 0,0,0,0,0,0,
-						 0,0,1,1,0,0,
+						 0,1,1,1,1,0,
 						 0,1,0,0,1,0,
 						 0,0,0,0,0,0 };
 
 	char HardcoreShape[] = { 0,0,0,0,0,0,
 							 0,1,0,0,1,0,
 							 0,1,0,1,1,0,
+							 0,1,1,1,1,0,
 							 0,1,1,0,1,0,
-							 0,1,0,0,1,0,
 							 0,0,0,0,0,0 };
 
 	EasyFace = CreateNewEntity(NewVec2(2, 2), NewVec2(0, 0), 2000, EasyShape, NewVec2(6, 6));
@@ -243,9 +247,6 @@ int Menu()
 	HardFace = CreateNewEntity(NewVec2(2, 8), NewVec2(0, 0), 2000, HardShape, NewVec2(6, 6));
 	HardcoreFace = CreateNewEntity(NewVec2(8, 8), NewVec2(0, 0), 2000, HardcoreShape, NewVec2(6, 6));
 
-	int HasMovedAlready = 0;
-	static double lastMovement;
-	double pickcooldown = 0.5;
 
 	while (ESTADO == MENU)
 	{
@@ -257,8 +258,9 @@ int Menu()
 		case MAIN_MENU:
 		{
 			lastMovement += DeltaTime;
-			if (isPressingKey(SHOOT) && !HasMovedAlready)
+			if (isPressingKey(SHOOT) && lastMovement > pickcooldown)
 			{
+				lastMovement = 0;
 				switch (PICKER_STATE)
 					case PLAY:
 						MENU_STATE = DIFFICULTY_MENU;
@@ -382,6 +384,7 @@ int Menu()
 			{
 				difficulty = PICKER_STATE;
 				ESTADO = GAME;
+				lastMovement = 0;
 			}
 
 
@@ -745,6 +748,92 @@ void Pause()
 		}
 	}
 #endif
+#ifdef RASPI
+
+	enum PICKER_STATE { RESUME, LEAVE };
+	int PICKER_STATE = RESUME;
+
+	char PickCircleShape[] = { 1,1,1,1,1,1,1,
+							   1,0,0,0,0,0,1,
+							   1,0,0,0,0,0,1,
+							   1,0,0,0,0,0,1,
+							   1,0,0,0,0,0,1,
+							   1,0,0,0,0,0,1,
+							   1,1,1,1,1,1,1 };
+	PickCircle = CreateNewEntity(NewVec2(0, 0), NewVec2(0, 0), 2000, PickCircleShape, NewVec2(7, 7));
+
+	char ResumeShape[] = { 1,0,0,0,
+						   1,1,0,0,
+						   1,1,1,0,
+						   1,1,0,0,
+						   1,0,0,0 };
+	PlayButton = CreateNewEntity(NewVec2(3, 9), NewVec2(0, 0), 2000, ResumeShape, NewVec2(4, 5));
+
+	char StopShape[] = { 0,0,0,0,
+						 0,1,1,1,
+						 0,1,1,1,
+						 0,1,1,1,
+						 0,0,0,0 };
+	StopButton = CreateNewEntity(NewVec2(9, 9), NewVec2(0, 0), 2000, StopShape, NewVec2(4, 5));
+
+	while (GAMESTATE == PAUSE)
+	{
+		ClearGrid();
+
+		if (isPressingKey(RIGHT))
+		{
+			switch (PICKER_STATE)
+			{
+			case RESUME:
+				PICKER_STATE = LEAVE;
+				break;
+			case LEAVE:
+				break;
+			}
+		}
+		if (isPressingKey(LEFT))
+		{
+			switch (PICKER_STATE)
+			{
+			case RESUME:
+				break;
+			case LEAVE:
+				PICKER_STATE = RESUME;
+				break;
+			}
+		}
+
+		if (isPressingKey(SHOOT))
+		{
+			switch (PICKER_STATE)
+			{
+			case RESUME:
+				GAMESTATE = PLAYING;
+				break;
+			case LEAVE:
+				GAMESTATE = EXIT;
+				ESTADO = MENU;
+				lastMovement = 0;
+			}
+		}
+
+		switch (PICKER_STATE)
+		{
+		case RESUME:
+			PickCircle->Pos = (Vec2){1,8};
+			break;
+		case LEAVE:
+			PickCircle->Pos = (Vec2){ 8,8 };
+			break;
+		}
+
+		DrawEntity(PlayButton);
+		DrawEntity(StopButton);
+		DrawEntity(PickCircle);
+
+		PrintGrid();
+	}
+#endif
 	return;
 }
 
@@ -975,7 +1064,7 @@ void GameLogic()
 	UpdateMatrixDynamic( AlienGrid,DeltaTime,NewVec2(0,0) , NewVec2(0, 0));
 	UpdateEntity(Spaceship , DeltaTime);
 
-	shootCooldown = 1;
+	shootCooldown = 1 * TIME_MULTIPLIER;
 	shootElapsedTime += DeltaTime;
 	if (isPressingKey(LEFT))
 	{
@@ -1005,6 +1094,11 @@ void GameLogic()
 			}
 		}
 		
+	}
+
+	if (isPressingKey(PAUSE_KEY))
+	{
+		GAMESTATE = PAUSE;
 	}
 	UpdateBullets();
 	CullBullets();
