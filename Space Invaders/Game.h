@@ -300,6 +300,7 @@ int YAliens;
 
 #define SHIELD_IMPACT "Resources/Audio/shieldImpact.wav"
 #define SHIELD_EXPLOSION "Resources/Audio/ShieldExplosion.wav"
+#define BIGUFO_MUSIC "Resources/Audio/ufo_lowpitch.wav"
 
 ALLEGRO_MIXER* Mixer;
 
@@ -331,6 +332,9 @@ ALLEGRO_SAMPLE* level4Music;
 
 ALLEGRO_SAMPLE* Bullet_sound;
 ALLEGRO_SAMPLE* alien_death_sound;
+ALLEGRO_SAMPLE* BigUFO_sound;
+
+ALLEGRO_SAMPLE_ID* BigUFO_sound_id;
 
 ALLEGRO_SAMPLE_INSTANCE* instance1;
 #endif
@@ -368,3 +372,5 @@ double Cooldown_c;
 enum PICKER_STATE { PLAY, EASY, NORMAL, HARD, HARDCORE, BACK };
 double AlienShootInterval;
 double AlienShotSpeed;
+double Cooldown_c;
+int BigUfo_passing;

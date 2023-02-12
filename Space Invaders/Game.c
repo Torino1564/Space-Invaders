@@ -485,6 +485,7 @@ int GameInit()
 	ShotNotReadySFX = al_load_sample(SHOTNOTREADY);
 	ShipImpactSFX = al_load_sample(PLAYERIMPACTSFX);
 	alien_death_sound = al_load_sample(ALIENDEATHSFX);
+	BigUFO_sound = al_load_sample(BIGUFO_MUSIC);
 
 	ShieldImpact = al_load_sample(SHIELD_IMPACT);
 	ShieldDestroyed = al_load_sample(SHIELD_EXPLOSION);
@@ -919,7 +920,7 @@ void GameLogic()
 	{
 	case 1: 
 		Cooldown_c = 0.1;
-		//fire_ready = 1; 
+		fire_ready = 1; 
 	case 2:
 		Cooldown_c = 0.3;
 	case 3:
@@ -935,8 +936,8 @@ void GameLogic()
 	if ((t / CLOCKS_PER_SEC) > Mothership_time)
 	{
 		Mothership_time = (t / CLOCKS_PER_SEC) + MotherShip_cooldown;
-		BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(500, 50), NewVec2F(200, 0), BigUFO, 56, 38);
-
+		BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(430, 50), NewVec2F(200, 0), BigUFO, 56, 38);
+		BigUfo_passing = 1;
 //		i = CreateNewAnimation(NewVec2F(500, 500), NewVec2F(100, 0), 10, BigUFO, 56, 38);
 	}
 
@@ -1277,23 +1278,6 @@ void GameRender()
 		}
 	}
 
-	
-
-	//player
-	DrawEntity(Gun);
-	DrawEntity(Spaceship);
-	
-	DrawEntity(BigUFOent);
-
-
-
-	//Enemies
-
-	aliendeath = CollideGrid(Bullets, AlienGrid, &aliensDestroyed, MiniUFO_Explosion);
-	score += aliendeath;
-	DrawGrid(AlienGrid);
-
-
 	//fight sounds
 	if (shot)
 	{
@@ -1309,6 +1293,24 @@ void GameRender()
 		al_play_sample(ShotNotReadySFX, 0.1, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 		shotOnCooldown = false;
 	}
+
+	if (BigUfo_passing)
+	{
+		BigUfo_passing = 0;
+		al_play_sample(BigUFO_sound, 0.2, 0, 1.0, ALLEGRO_PLAYMODE_ONCE, &BigUFO_sound_id);
+	}
+
+	//player
+	DrawEntity(Gun);
+	DrawEntity(Spaceship);
+	
+	DrawEntity(BigUFOent);
+
+	//Enemies
+
+	aliendeath = CollideGrid(Bullets, AlienGrid, &aliensDestroyed, MiniUFO_Explosion);
+	score += aliendeath;
+	DrawGrid(AlienGrid);
 
 	for (int i = 0; i < numberOfShields; i++)
 	{
@@ -1848,6 +1850,7 @@ void ProcessHP()
 		Spaceship->data = 66;
 		Gun->data = 66;
 		CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, ShieldExplosion, 200, 300);
+		al_stop_samples();
 #endif
 		GAMESTATE = END;
 	}
