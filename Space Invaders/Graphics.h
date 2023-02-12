@@ -22,3 +22,4 @@ void InitGraphics();
 void PrintGrid();
 void TurnOn(int x, int y);
 void ClearGrid();
+void PrintNumber(int number, Vec2 pos);

@@ -365,3 +365,6 @@ int difficulty;
 int animation_finished;
 double Cooldown;
 double Cooldown_c;
+enum PICKER_STATE { PLAY, EASY, NORMAL, HARD, HARDCORE, BACK };
+double AlienShootInterval;
+double AlienShotSpeed;

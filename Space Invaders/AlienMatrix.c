@@ -331,6 +331,7 @@ int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix, int* aliensDestroyed)
 						DestroyEntity((Matrix->matrix)[i][j]);
 						(Matrix->matrix)[i][j] = NULL;
 
+						(* aliensDestroyed)++;
 
 						Matrix->AlienCount--;
 

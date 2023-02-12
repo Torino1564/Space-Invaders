@@ -211,7 +211,6 @@ int Menu()
 	double twinkleCoodlwon = 0.2 * TIME_MULTIPLIER;
 	int showCircle = 1;
 
-	enum PICKER_STATE { PLAY, EASY, NORMAL, HARD, HARDCORE, BACK };
 	int PICKER_STATE = PLAY;
 
 	char EasyShape[] = { 0,0,0,0,0,0,
@@ -435,7 +434,7 @@ int GameInit()
 	int SpaceshipYcoord = 950;
 	int GunYcoord = 880;
 
-	PlaySpaceArea = NewVec2(1000, ScreenDimensions.y);
+	PlaySpaceArea = (Vec2){ 1000, ScreenDimensions.y };
 	PlaySpacePos = NewVec2(ScreenDimensions.x / 2 - PlaySpaceArea.x / 2, 0);
 	GUIColor = al_map_rgb(40, 60, 20);
 
@@ -594,11 +593,35 @@ int GameInit()
 		shieldArray[i] = CreateNewEntity(NewVec2(1 + i * (shieldDimensions.x + 1), 10), NewVec2(0, 0), 1, shieldShape, shieldDimensions);
 	}
 
+	switch (difficulty)
+	{
+	case EASY:
+		AlienShootInterval = 5;
+		AlienShotSpeed = 0.4;
+		lives = 3;
+		break;
+	case NORMAL:
+		AlienShootInterval = 2.5;
+		AlienShotSpeed = 0.2;
+		lives = 3;
+		break;
+	case HARD:
+		AlienShootInterval = 1;
+		AlienShotSpeed = 0.1;
+		lives = 3;
+		break;
+	case HARDCORE:
+		AlienShootInterval = 1;
+		AlienShotSpeed = 0.1;
+		lives = 1;
+		break;
+	}
+
 #endif
 
 	Level = 0;
 	aliensDestroyed = 0;
-	lives = 3;
+	score = 0;
 
 	GAMESTATE = PLAYING;
 	return 0;
@@ -834,6 +857,19 @@ void Pause()
 		DrawEntity(PlayButton);
 		DrawEntity(StopButton);
 		DrawEntity(PickCircle);
+
+		// Print Score
+
+		//if (score > 99)
+		{
+			int FirstDigit = score / 100;
+			int SecondDigit =  ( score - FirstDigit  * 100 ) / 10;
+			int ThirdDigit = score - FirstDigit * 100 - SecondDigit * 10;
+			PrintNumber(FirstDigit, (Vec2) { 1, 1 });
+			PrintNumber(SecondDigit, (Vec2) { 6, 1 });
+			PrintNumber(ThirdDigit, (Vec2) { 11, 1 });
+			
+		}
 
 		PrintGrid();
 	}
@@ -1119,7 +1155,7 @@ void GameLogic()
 			{
 				if (Bullets[i] == NULL)
 				{
-					Bullets[i] = CreateNewEntity(NewVec2(Spaceship->Pos.x + Spaceship->dimensions.x / 2, Spaceship->Pos.y), NewVec2(0, -1), 0.1 * TIME_MULTIPLIER, BulletShape, NewVec2(1, 1));
+					Bullets[i] = CreateNewEntity(NewVec2(Spaceship->Pos.x + Spaceship->dimensions.x / 2, Spaceship->Pos.y), NewVec2(0, -1), 0.1  * TIME_MULTIPLIER , BulletShape, NewVec2(1, 1));
 					i = MAX_BULLETS;
 				}
 			}
@@ -1133,7 +1169,7 @@ void GameLogic()
 	}
 	UpdateBullets();
 	CullBullets();
-	CollideGrid(Bullets, AlienGrid, aliensDestroyed);
+	CollideGrid(Bullets, AlienGrid, &aliensDestroyed);
 	ClamToScreen(Spaceship);
 
 	ComputeAlienShot();
@@ -1162,6 +1198,24 @@ void GameLogic()
 		}
 		AlienGrid->Pos = NewVec2(2, 1);
 		FillMatrix(AlienGrid);
+	}
+
+	score = aliensDestroyed + (5 * Level);
+
+	if (Level % 3 == 0)
+	{
+		char shieldShape[] = { 1,1,1,1
+							  ,1,0,0,1 };
+		Vec2 shieldDimensions = NewVec2(4, 2);
+
+		for (int i = 0; i < numberOfShields; i++)
+		{
+			if (shieldArray != NULL)
+			{
+				DestroyEntity(shieldArray[i]);
+				shieldArray[i] = CreateNewEntity(NewVec2(1 + i * (shieldDimensions.x + 1), 10), NewVec2(0, 0), 1, shieldShape, shieldDimensions);
+			}
+		}
 	}
 
 #endif
@@ -1602,7 +1656,7 @@ void ComputeAlienShot()
 
 	timeBuffer += DeltaTime;
 
-	if (timeBuffer >= BASE_ALIEN_SHOT_SPEED * TIME_MULTIPLIER)
+	if (timeBuffer >= ((AlienShootInterval * 0.75 + AlienShootInterval * 0.25 * 1/(Level + 1)) * TIME_MULTIPLIER))
 	{
 		timeBuffer = 0;
 
@@ -1637,7 +1691,7 @@ void ComputeAlienShot()
 				if (AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow] != NULL)
 				{
 					AlienBullets[i] = CreateNewEntity(NewVec2(AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.x + AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->dimensions.x / 2, AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.y + AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->dimensions.y)
-						, NewVec2(0, 1), 0.2 * TIME_MULTIPLIER, BulletShape, NewVec2(1, 1));
+						, NewVec2(0, 1), (AlienShotSpeed * 0.75 + (AlienShotSpeed * 0.25 * 1 / (Level + 1))) * TIME_MULTIPLIER, BulletShape, NewVec2(1, 1));
 					break;
 				}
 

@@ -84,3 +84,181 @@ void InitGraphics()
 #endif
 
 }
+
+void PrintNumber(int number, Vec2 pos)
+{
+    switch (number)
+    {
+    case 0:
+        TurnOn(pos.x, pos.y);
+        TurnOn(pos.x + 1, pos.y);
+        TurnOn(pos.x + 2, pos.y);
+        TurnOn(pos.x + 3, pos.y);
+
+        TurnOn(pos.x + 3, pos.y + 1);
+        TurnOn(pos.x + 3, pos.y + 2);
+        TurnOn(pos.x + 3, pos.y + 3);
+        TurnOn(pos.x + 3, pos.y + 4);
+
+        TurnOn(pos.x + 2, pos.y + 4);
+        TurnOn(pos.x + 1, pos.y + 4);
+        TurnOn(pos.x, pos.y + 4);
+
+        TurnOn(pos.x, pos.y + 3);
+        TurnOn(pos.x, pos.y + 2);
+        TurnOn(pos.x, pos.y + 1);
+        break;
+    case 1:
+        TurnOn(pos.x + 3, pos.y);
+        TurnOn(pos.x + 3, pos.y + 1);
+        TurnOn(pos.x + 3, pos.y + 2);
+        TurnOn(pos.x + 3, pos.y + 3);
+        TurnOn(pos.x + 3, pos.y + 4);
+        break;
+    case 2:
+        TurnOn(pos.x, pos.y+1);
+        TurnOn(pos.x + 1, pos.y);
+        TurnOn(pos.x + 2, pos.y);
+        TurnOn(pos.x + 3, pos.y + 1);
+
+        TurnOn(pos.x + 2, pos.y + 2);
+        TurnOn(pos.x + 1, pos.y + 3);
+        TurnOn(pos.x + 3, pos.y + 4);
+
+        TurnOn(pos.x + 2, pos.y + 4);
+        TurnOn(pos.x + 1, pos.y + 4);
+        TurnOn(pos.x, pos.y + 4);
+
+        TurnOn(pos.x, pos.y + 1);
+        break;
+    case 3:
+        TurnOn(pos.x, pos.y);
+        TurnOn(pos.x + 1, pos.y);
+        TurnOn(pos.x + 2, pos.y);
+        TurnOn(pos.x + 3, pos.y);
+
+        TurnOn(pos.x + 3, pos.y + 2);
+        TurnOn(pos.x + 2, pos.y + 2);
+        TurnOn(pos.x + 1, pos.y + 2);
+        TurnOn(pos.x , pos.y + 2);
+
+        TurnOn(pos.x + 3, pos.y + 3);
+        TurnOn(pos.x + 3, pos.y + 4);
+        TurnOn(pos.x + 2, pos.y + 4);
+        TurnOn(pos.x + 1, pos.y + 4);
+        TurnOn(pos.x, pos.y + 4);
+
+        TurnOn(pos.x + 2, pos.y);
+        TurnOn(pos.x + 1, pos.y);
+        TurnOn(pos.x, pos.y);
+
+        TurnOn(pos.x + 3, pos.y + 1);
+        TurnOn(pos.x + 3, pos.y + 2);
+        break;
+    case 4:
+        TurnOn(pos.x, pos.y);
+        TurnOn(pos.x, pos.y + 1);
+        TurnOn(pos.x, pos.y + 2);
+        TurnOn(pos.x + 1, pos.y + 2);
+        TurnOn(pos.x + 2, pos.y + 2);
+        TurnOn(pos.x + 3, pos.y + 2);
+        TurnOn(pos.x + 3, pos.y + 1);
+        TurnOn(pos.x + 3, pos.y);
+
+        TurnOn(pos.x + 3, pos.y);
+        TurnOn(pos.x + 3, pos.y + 3);
+        TurnOn(pos.x + 3, pos.y + 4);
+
+        break;
+    case 5:
+        TurnOn(pos.x, pos.y);
+        TurnOn(pos.x + 1, pos.y);
+        TurnOn(pos.x + 2, pos.y);
+        TurnOn(pos.x + 3, pos.y);
+        TurnOn(pos.x + 1, pos.y + 2);
+        TurnOn(pos.x + 2, pos.y + 2);
+
+
+        TurnOn(pos.x + 3, pos.y + 2);
+        TurnOn(pos.x + 3, pos.y + 3);
+        TurnOn(pos.x + 3, pos.y + 4);
+
+        TurnOn(pos.x + 2, pos.y + 4);
+        TurnOn(pos.x + 1, pos.y + 4);
+        TurnOn(pos.x, pos.y + 4);
+
+        TurnOn(pos.x, pos.y + 2);
+        TurnOn(pos.x, pos.y + 1);
+        break;
+    case 6:
+        TurnOn(pos.x + 3, pos.y);
+        TurnOn(pos.x + 2, pos.y);
+        TurnOn(pos.x + 1, pos.y);
+        TurnOn(pos.x, pos.y);
+
+        TurnOn(pos.x, pos.y + 1);
+        TurnOn(pos.x, pos.y + 2);
+        TurnOn(pos.x, pos.y + 3);
+        TurnOn(pos.x, pos.y + 4);
+
+        TurnOn(pos.x + 1, pos.y + 2);
+        TurnOn(pos.x + 2, pos.y + 2);
+        TurnOn(pos.x + 3, pos.y + 2);
+        TurnOn(pos.x + 3, pos.y + 3);
+        TurnOn(pos.x + 3, pos.y + 4);
+        TurnOn(pos.x + 2, pos.y + 4);
+        TurnOn(pos.x + 1, pos.y + 4);
+        break;
+    case 7:
+        TurnOn(pos.x, pos.y);
+        TurnOn(pos.x + 1, pos.y);
+        TurnOn(pos.x + 2, pos.y);
+        TurnOn(pos.x + 3, pos.y);
+        TurnOn(pos.x + 3, pos.y + 1);
+        TurnOn(pos.x + 3, pos.y + 2);
+        TurnOn(pos.x + 3, pos.y + 3);
+
+
+        TurnOn(pos.x + 3, pos.y + 4);
+        break;
+    case 8:
+        TurnOn(pos.x, pos.y);
+        TurnOn(pos.x + 1, pos.y);
+        TurnOn(pos.x + 2, pos.y);
+        TurnOn(pos.x + 3, pos.y);
+
+        TurnOn(pos.x + 3, pos.y + 1);
+        TurnOn(pos.x + 3, pos.y + 2);
+        TurnOn(pos.x + 2, pos.y + 2);
+        TurnOn(pos.x + 1, pos.y + 2);
+
+        TurnOn(pos.x + 3, pos.y + 3);
+        TurnOn(pos.x + 3, pos.y + 4);
+
+        TurnOn(pos.x + 2, pos.y + 4);
+        TurnOn(pos.x + 1, pos.y + 4);
+        TurnOn(pos.x, pos.y + 4);
+
+        TurnOn(pos.x, pos.y + 1);
+        TurnOn(pos.x, pos.y + 2);
+        TurnOn(pos.x, pos.y + 3);
+        break;
+    case 9:
+        TurnOn(pos.x, pos.y);
+        TurnOn(pos.x + 1, pos.y);
+        TurnOn(pos.x + 2, pos.y);
+        TurnOn(pos.x + 3, pos.y);
+
+        TurnOn(pos.x + 3, pos.y + 1);
+        TurnOn(pos.x + 3, pos.y + 2);
+        TurnOn(pos.x + 3, pos.y + 3);
+        TurnOn(pos.x + 3, pos.y + 4);
+
+        TurnOn(pos.x + 2, pos.y + 2);
+        TurnOn(pos.x + 1, pos.y + 2);
+
+        TurnOn(pos.x, pos.y + 2);
+        TurnOn(pos.x, pos.y + 1);
+        break;
+	}
+}
