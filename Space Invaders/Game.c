@@ -2031,6 +2031,7 @@ void ProcessHP()
 	}
 }
 
+#ifdef RASPI
 void MotherShip()
 {
 	static int isMotherShipSpawned = false;
@@ -2046,7 +2047,7 @@ void MotherShip()
 	}
 	if (isMotherShipSpawned == true)
 	{
-		UpdateEntity(BigUFOent , DeltaTime);
+		UpdateEntity(BigUFOent, DeltaTime);
 		if (BigUFOent->Pos.x > 16)
 		{
 			DestroyEntity(BigUFOent);
@@ -2073,8 +2074,9 @@ void MotherShip()
 				wasMotherShipDestroyed = true;
 
 				BigUFOsDestroyed++;
-				
+
 			}
 		}
 	}
 }
+#endif
