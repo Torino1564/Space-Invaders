@@ -377,3 +377,4 @@ double AlienShootInterval;
 double AlienShotSpeed;
 double Cooldown_c;
 int BigUfo_passing;
+int BigUFOsDestroyed;

@@ -481,12 +481,13 @@ int GameInit()
 	level2Music = al_load_sample(MUSIC_LEVEL2);
 	level3Music = al_load_sample(MUSIC_LEVEL3);
 	level4Music = al_load_sample(MUSIC_LEVEL4);
+	BigUFO_sound = al_load_sample(BIGUFO_MUSIC);
+
 
 	Bullet_sound = al_load_sample(PLAYERSHOTSFX);
 	ShotNotReadySFX = al_load_sample(SHOTNOTREADY);
 	ShipImpactSFX = al_load_sample(PLAYERIMPACTSFX);
 	alien_death_sound = al_load_sample(ALIENDEATHSFX);
-	BigUFO_sound = al_load_sample(BIGUFO_MUSIC);
 
 	ShieldImpact = al_load_sample(SHIELD_IMPACT);
 	ShieldDestroyed = al_load_sample(SHIELD_EXPLOSION);
@@ -564,6 +565,8 @@ int GameInit()
 
 	Once = 0;
 	lives = 3;
+	ALLEGRO_EVENT TempEvent;
+	while (!al_get_next_event(InputEventQueue , &TempEvent));
 
 #endif
 #ifdef RASPI
@@ -624,6 +627,7 @@ int GameInit()
 
 	Level = 0;
 	aliensDestroyed = 0;
+	BigUFOsDestroyed = 0;
 	score = 0;
 
 	GAMESTATE = PLAYING;
@@ -1045,20 +1049,10 @@ void GameLogic()
 			case ALLEGRO_KEY_A:
 				Spaceship->Vel.x += SHIP_SPEED;
 				Gun->Vel.x += SHIP_SPEED;
-//				if (animation_finished || once)
-//				{
-//					Spaceship->data = 1;	//El sp esta parando de atras
-//					once = 0;
-//				}
 				break;
 			case ALLEGRO_KEY_D:
 				Spaceship->Vel.x -= SHIP_SPEED;
 				Gun->Vel.x -= SHIP_SPEED;
-//				if (animation_finished || once)
-//				{
-//					Spaceship->data = 2;	//El sp esta parando de adelante
-//					once = 0;
-//				}
 				break;
 			default:
 				break;
@@ -1071,18 +1065,11 @@ void GameLogic()
 	}
 
 	UpdateMatrixDynamic(AlienGrid, PastFrameTime , PlaySpacePos , PlaySpaceArea);
-	//UpdateMatrix(AlienGrid, PastFrameTime , PlaySpacePos , PlaySpaceArea);
 	AnimateMatrix(AlienGrid, DeltaTime);
 
 	CullBullets();
 	UpdateBullets();
 	UpdateAnimations(DeltaTime);
-
-//	if (animation_finished)
-//	{
-//		DestroyAnimatedEntitySharedSprite(Stop_backwards);
-//		DestroyAnimatedEntitySharedSprite(Stop_forwards);
-//	}
 
 	ComputeAlienShot();
 
@@ -1092,28 +1079,29 @@ void GameLogic()
 	UpdateEntity(BigUFOent, DeltaTime);
 	Animate(BigUFOent, DeltaTime);
 
-//	CollideEntity(BigUFOent, Bullets);
 
-	for (int b = 0; b < 10; b++)
+	for (int i = 0; i < 10; i++)
 	{
-		if (*(Bullets + b) != NULL && BigUFOent != NULL)
+		if (Bullets[i] != NULL && BigUFOent != NULL)
 		{
-			if (AreColiding(BigUFOent, Bullets[b]))
+			if (AreColiding(BigUFOent, Bullets[i]))
 			{
 				CreateNewAnimation(BigUFOent->Pos, NewVec2F(0, 0), 0, BigExplosion, 79, 94);
 
-				DestroyEntityLoadedTexture(Bullets[b]);
-				Bullets[b] = NULL;
+				DestroyEntityLoadedTexture(Bullets[i]);
+				Bullets[i] = NULL;
 				
 				DestroyAnimatedEntitySharedSprite(BigUFOent);
 				BigUFOent = NULL;
+
+				BigUFOsDestroyed++;
 
 				return true;
 			}
 		}
 	}
 
-	score = aliensDestroyed * 10 + (Level - 1) * 100;
+	score = aliensDestroyed * 10 + (Level - 1) * 100 + BigUFOsDestroyed * 100;
 
 	ClipToScreen(Spaceship, ScreenDimensions);
 	ClipToEntity(Gun, Spaceship, 20);
@@ -1439,8 +1427,11 @@ const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\
 	al_draw_text(font, al_map_rgb(254, 254, 254), ( PlaySpacePos.x ) / 2 , 250, ALLEGRO_ALIGN_CENTRE, "TAKEDOWNS:");
 	al_draw_textf(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 300, ALLEGRO_ALIGN_CENTRE, "%d" , aliensDestroyed);
 
-	al_draw_text(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 400, ALLEGRO_ALIGN_CENTRE, "LEVEL:");
-	al_draw_textf(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 450, ALLEGRO_ALIGN_CENTRE, "%d", Level);
+	al_draw_text(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 400, ALLEGRO_ALIGN_CENTRE, "MOTHERSHIPS:");
+	al_draw_textf(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 450, ALLEGRO_ALIGN_CENTRE, "%d", BigUFOsDestroyed);
+
+	al_draw_text(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 550, ALLEGRO_ALIGN_CENTRE, "LEVEL:");
+	al_draw_textf(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 600, ALLEGRO_ALIGN_CENTRE, "%d", Level);
 
 
 	al_flip_display();
@@ -1856,7 +1847,7 @@ int AlienBulletsHit()
 		if (AlienBullets[i] != NULL)
 		{
 #ifndef RASPI
-			if (AreColiding(AlienBullets[i], Spaceship) || AreColiding(AlienBullets[i], Gun))
+			if (AreColiding(AlienBullets[i], Spaceship))
 			{
 				CreateNewAnimation(NewVec2F(AlienBullets[i]->Pos.x + AlienBullets[i]->spriteS->frameWidth / 4 - BulletExplosion->frameWidth / 2,
 					AlienBullets[i]->Pos.y + AlienBullets[i]->spriteS->frameHeight / 5 - BulletExplosion->frameHeight / 2), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
