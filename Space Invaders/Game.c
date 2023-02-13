@@ -897,33 +897,56 @@ void Pause()
 void EndScreen()
 {
 #ifndef RASPI
-	int end = true;
+	int end1 = true;
 	while (GAMESTATE == END)
 	{
-		al_stop_samples();
+		while (end1)
+		{
+			al_stop_samples();
+
+			al_draw_scaled_bitmap(BlackOverlay, 0, 0, al_get_bitmap_width(BlackOverlay), al_get_bitmap_height(BlackOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+			al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1, ALLEGRO_ALIGN_CENTER, "YOU DIED!");
+			al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "YOUR SCORE:");
+			char textscore[25];
+			sprintf_s(textscore, 25, "%d", score * 10);
+			al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 4, ALLEGRO_ALIGN_CENTER, textscore);
+			al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 5, ALLEGRO_ALIGN_CENTER, "Invaders Vanquished:");
+			char textInvadersKilled[25];
+			sprintf_s(textInvadersKilled, 25, "%d", aliensDestroyed);
+			al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 6, ALLEGRO_ALIGN_CENTER, textInvadersKilled);
+			al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 7, ALLEGRO_ALIGN_CENTER, "Level Reached:");
+			char textLevel[25];
+			sprintf_s(textLevel, 25, "%d", Level);
+			al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 8 - 25, ALLEGRO_ALIGN_CENTER, textLevel);
+			al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 8 + 70, ALLEGRO_ALIGN_CENTER, "PRESS SPACE TO CONTINUE");
+
+			al_flip_display();
+
+			if (!al_is_event_queue_empty(InputEventQueue))
+			{
+				al_get_next_event(InputEventQueue, &TempEvent);
+
+
+				switch (TempEvent.type)
+				{
+				case ALLEGRO_EVENT_KEY_DOWN:
+					switch (TempEvent.keyboard.keycode)
+					{
+					case ALLEGRO_KEY_SPACE:
+						end1 = 0;
+					}
+
+				}
+			}
+		}
 
 		al_draw_scaled_bitmap(BlackOverlay, 0, 0, al_get_bitmap_width(BlackOverlay), al_get_bitmap_height(BlackOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
-		al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1, ALLEGRO_ALIGN_CENTER, "YOU DIED!");
-		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "YOUR SCORE:");
-		char textscore[25];
-		sprintf_s(textscore, 25, "%d", score * 10);
-		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 4, ALLEGRO_ALIGN_CENTER, textscore);
-		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 5, ALLEGRO_ALIGN_CENTER, "Invaders Vanquished:");
-		char textInvadersKilled[25];
-		sprintf_s(textInvadersKilled, 25, "%d", aliensDestroyed);
-		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 6, ALLEGRO_ALIGN_CENTER, textInvadersKilled);
-		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 7, ALLEGRO_ALIGN_CENTER, "Level Reached:");
-		char textLevel[25];
-		sprintf_s(textLevel, 25, "%d", Level);
-		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 8 -25, ALLEGRO_ALIGN_CENTER, textLevel);
-		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 8 + 70, ALLEGRO_ALIGN_CENTER, "PRESS SPACE TO CONTINUE");
-
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "PLEASE ENTER YOUR NAME");
 		al_flip_display();
 
 		if (!al_is_event_queue_empty(InputEventQueue))
 		{
 			al_get_next_event(InputEventQueue, &TempEvent);
-
 
 			switch (TempEvent.type)
 			{
@@ -931,11 +954,10 @@ void EndScreen()
 				switch (TempEvent.keyboard.keycode)
 				{
 				case ALLEGRO_KEY_SPACE:
-					end = 0;
 					GAMESTATE = EXIT;
 					ESTADO = MENU;
+					break;
 				}
-
 			}
 		}
 	}
