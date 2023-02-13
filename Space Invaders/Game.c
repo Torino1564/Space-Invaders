@@ -586,7 +586,7 @@ int GameInit()
 
 	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38, 1);
 
-	MiniUFO_Explosion = NewSpriteSheet(EXPLOSION_SPRITE, (float)((float)1 / (float)12), 22, 70, 70, 1);
+	MiniUFO_Explosion = NewSpriteSheet(EXPLOSION_SPRITE, (float)((float)1 / (float)15), 22, 70, 70, 1);
 
 	BigUFO = NewSpriteSheet(BIGUFO1SP, (float)((float)1 / (float)12), 12, 56, 38, 1);
 
@@ -1301,7 +1301,7 @@ void GameLogic()
 
 	UpdateEntity(Spaceship, DeltaTime);
 	UpdateEntity(Gun, DeltaTime);
-
+	aliendeath = CollideGrid(Bullets, AlienGrid, &aliensDestroyed, MiniUFO_Explosion);
 	UpdateEntity(BigUFOent, DeltaTime);
 	Animate(BigUFOent, DeltaTime);
 
@@ -1575,7 +1575,7 @@ void GameRender()
 
 	//Enemies
 
-	aliendeath = CollideGrid(Bullets, AlienGrid, &aliensDestroyed, MiniUFO_Explosion);
+	
 	DrawGrid(AlienGrid);
 
 	for (int i = 0; i < numberOfShields; i++)
@@ -2134,6 +2134,25 @@ void ProcessHP()
 		CreateNewAnimation(Spaceship->Pos, NewVec2F(0, 0), 0, ShieldExplosion, 200, 300);
 #endif
 		GAMESTATE = END;
+	}
+}
+
+int CollidePlayerBulletsWithShields()
+{
+	for (int i = 0; i < MAX_BULLETS; i++)
+	{
+		if (Bullets[i] == NULL)
+		{
+			break;
+		}
+		for (int j = 0; j < numberOfShields; j++)
+		{
+			if (shieldArray[j] == NULL)
+			{
+				break;
+			}
+			if (AreColiding(Bullets[i] , shieldArray[j].))
+		}
 	}
 }
 
