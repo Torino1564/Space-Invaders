@@ -1227,9 +1227,10 @@ void GameLogic()
 	}
 
 	score = aliensDestroyed + (5 * Level);
-
-	if (Level % 3 == 0)
+	static int ReplenishShields = 0;
+	if (Level % 3 == 0 && ReplenishShields)
 	{
+		ReplenishShields = 0;
 		char shieldShape[] = { 1,1,1,1
 							  ,1,0,0,1 };
 		Vec2 shieldDimensions = NewVec2(4, 2);
@@ -1242,6 +1243,10 @@ void GameLogic()
 				shieldArray[i] = CreateNewEntity(NewVec2(1 + i * (shieldDimensions.x + 1), 10), NewVec2(0, 0), 1, shieldShape, shieldDimensions);
 			}
 		}
+	}
+	else if (Level % 3 != 0)
+	{
+		ReplenishShields = 1;
 	}
 
 #endif
