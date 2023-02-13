@@ -898,6 +898,11 @@ void EndScreen()
 {
 #ifndef RASPI
 	int end1 = true;
+	int finished;
+	int index;
+	char a1[2] = {NULL, '\0'};
+	char a2[2] = {NULL, '\0'};
+	char a3[2] = {NULL, '\0'};
 	while (GAMESTATE == END)
 	{
 		while (end1)
@@ -934,15 +939,13 @@ void EndScreen()
 					{
 					case ALLEGRO_KEY_SPACE:
 						end1 = 0;
+						index = 0;
+						finished = 0;
 					}
 
 				}
 			}
 		}
-
-		al_draw_scaled_bitmap(BlackOverlay, 0, 0, al_get_bitmap_width(BlackOverlay), al_get_bitmap_height(BlackOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
-		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "PLEASE ENTER YOUR NAME");
-		al_flip_display();
 
 		if (!al_is_event_queue_empty(InputEventQueue))
 		{
@@ -957,9 +960,41 @@ void EndScreen()
 					GAMESTATE = EXIT;
 					ESTADO = MENU;
 					break;
+				case ALLEGRO_KEY_ENTER:
+					finished = 1;
 				}
 			}
+			if (!finished && (TempEvent.type != ALLEGRO_EVENT_MOUSE_AXES) && (TempEvent.type != ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY) && (TempEvent.type != ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) && (TempEvent.type != ALLEGRO_EVENT_KEY_UP))
+			{
+				switch (index % 3)
+				{
+				case 0:
+					a1[0] = TempEvent.keyboard.keycode + 64;
+					break;
+				case 1:
+					a2[0] = TempEvent.keyboard.keycode + 64;
+					break;
+				case 2:
+					a3[0] = TempEvent.keyboard.keycode + 64;
+					break;
+				}
+			}
+			if ((TempEvent.type == ALLEGRO_EVENT_KEY_UP) && (TempEvent.keyboard.keycode != ALLEGRO_KEY_SPACE))
+			{
+				index++;
+			}
+			
 		}
+
+		al_draw_scaled_bitmap(BlackOverlay, 0, 0, al_get_bitmap_width(BlackOverlay), al_get_bitmap_height(BlackOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "PLEASE ENTER YOUR NAME");
+		al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2 - 150, ScreenDimensions.y * 0.1 * 3 + 180, ALLEGRO_ALIGN_CENTER, a1);
+		al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3 + 180, ALLEGRO_ALIGN_CENTER, a2);
+		al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2 + 150, ScreenDimensions.y * 0.1 * 3 + 180, ALLEGRO_ALIGN_CENTER, a3);
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3 +340, ALLEGRO_ALIGN_CENTER, "PRESS ENTER");
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3 + 420, ALLEGRO_ALIGN_CENTER, "WHEN YOU ARE DONE");
+		al_flip_display();
+
 	}
 
 #endif
