@@ -79,6 +79,8 @@ void MotherShip();
 
 
 #define PAUSE_BG "Resources/Backgrounds/pause.png"
+#define PREADY "Resources/Backgrounds/pready.png"
+#define PMENU "Resources/Backgrounds/pmenu.png"
 #define LIGHTGRAYOVERLAY "Resources/Backgrounds/LightGrayOverlay.png"
 #define BLACKOVERLAY "Resources/Backgrounds/BlackOverlay.png"
 
@@ -151,6 +153,8 @@ ALLEGRO_BITMAP* background2;
 ALLEGRO_BITMAP* background3;
 ALLEGRO_BITMAP* background4;
 ALLEGRO_BITMAP* backgroundpause;
+ALLEGRO_BITMAP* pready;
+ALLEGRO_BITMAP* pmenu;
 ALLEGRO_BITMAP* LightGrayOverlay;
 ALLEGRO_BITMAP* BlackOverlay;
 

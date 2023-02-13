@@ -514,6 +514,8 @@ int GameInit()
 	background3 = al_load_bitmap(LVL3_BG);
 	background4 = al_load_bitmap(LVL4_BG);
 	backgroundpause = al_load_bitmap(PAUSE_BG);
+	pready = al_load_bitmap(PREADY);
+	pmenu = al_load_bitmap(PMENU);
 
 	if (background1 == NULL)
 	{
@@ -757,6 +759,8 @@ void GameDestroy()
 	al_destroy_bitmap(background3);
 	al_destroy_bitmap(background4);
 	al_destroy_bitmap(backgroundpause);
+	al_destroy_bitmap(pready);
+	al_destroy_bitmap(pmenu);
 
 	al_destroy_sample(level1Music);
 	al_destroy_sample(level2Music);
@@ -828,7 +832,10 @@ void GameLoop()
 void Pause()
 {
 #ifndef RASPI
+	int scale = 3;
 	al_draw_scaled_bitmap(backgroundpause, 0, 0, al_get_bitmap_width(backgroundpause), al_get_bitmap_height(backgroundpause), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+	al_draw_scaled_bitmap(pready, 0, 0, al_get_bitmap_width(pready), al_get_bitmap_height(pready), (ScreenDimensions.x-(scale*al_get_bitmap_width(pready)))/2 + 40, (ScreenDimensions.y - (scale*al_get_bitmap_height(pready)))/ 2 - 150, scale*al_get_bitmap_width(pready), scale*al_get_bitmap_height(pready), NULL);
+	al_draw_scaled_bitmap(pmenu, 0, 0, al_get_bitmap_width(pmenu), al_get_bitmap_height(pmenu), (ScreenDimensions.x - (scale * al_get_bitmap_width(pmenu))) / 2, (ScreenDimensions.y - (scale * al_get_bitmap_height(pmenu))) / 2 + 150, scale*al_get_bitmap_width(pmenu), scale*al_get_bitmap_height(pmenu), NULL);
 	al_flip_display();
 	int pause = true;
 	while (pause)
@@ -846,8 +853,20 @@ void Pause()
 				case ALLEGRO_KEY_ESCAPE:
 					pause = 0;
 					GAMESTATE = PLAYING_STATE;
+					break;
 				}
-
+			case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+				if ((TempEvent.mouse.x < ((ScreenDimensions.x + (scale * al_get_bitmap_width(pready))) / 2 + 40 )) && (TempEvent.mouse.x > ((ScreenDimensions.x - (scale * al_get_bitmap_width(pready))) / 2 + 40)) && (TempEvent.mouse.y < (ScreenDimensions.y + (scale * al_get_bitmap_height(pready))) / 2 - 150) && (TempEvent.mouse.y > (ScreenDimensions.y - (scale * al_get_bitmap_height(pready))) / 2 - 150))
+				{
+					 pause = 0;
+					 GAMESTATE = PLAYING_STATE;
+				}
+				if ((TempEvent.mouse.x < ((ScreenDimensions.x + (scale * al_get_bitmap_width(pmenu))) / 2)) && (TempEvent.mouse.x > ((ScreenDimensions.x - (scale * al_get_bitmap_width(pmenu))) / 2 + 40)) && (TempEvent.mouse.y < (ScreenDimensions.y + (scale * al_get_bitmap_height(pmenu))) / 2 + 150) && (TempEvent.mouse.y > (ScreenDimensions.y - (scale * al_get_bitmap_height(pmenu))) / 2 + 150))
+				{
+					pause = 0;
+					GAMESTATE = EXIT;
+					ESTADO = MENU;
+				}
 			}
 		}
 	}
@@ -1251,13 +1270,13 @@ void GameLogic()
 					{
 						if (i == 9)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y - 2), NewVec2F(0, -900), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
 
 						if (Bullets[i] == NULL)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y - 2), NewVec2F(0, -600), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y - 2), NewVec2F(0, -900), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
 
