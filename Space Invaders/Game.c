@@ -153,7 +153,6 @@ int Menu()
 		float height = al_get_bitmap_height(start);
 		al_draw_scaled_rotated_bitmap(start, width, height, ScreenDimensions.x/3 - margin, ScreenDimensions.y -50, 1, 1, 0, NULL);
 
-
 		if (!al_is_event_queue_empty(InputEventQueue))
 		{
 			al_get_next_event(InputEventQueue, &MenuEvent);
@@ -162,11 +161,10 @@ int Menu()
 			{
 			case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
 				if ((MenuEvent.mouse.x < ScreenDimensions.x / 3 - margin) && (MenuEvent.mouse.x > (ScreenDimensions.x / 3 - margin -width)
-					&& (MenuEvent.mouse.y < (ScreenDimensions.y - 50)) && (MenuEvent.mouse.y > (ScreenDimensions.y - 50 - height)))
-					)
-					{
+					&& (MenuEvent.mouse.y < (ScreenDimensions.y - 50)) && (MenuEvent.mouse.y > (ScreenDimensions.y - 50 - height))))
+				{
 						ready = 1;
-					}
+				}
 			}			
 
 		}
@@ -539,6 +537,7 @@ int GameInit()
 	level3Music = al_load_sample(MUSIC_LEVEL3);
 	level4Music = al_load_sample(MUSIC_LEVEL4);
 	BigUFO_sound = al_load_sample(BIGUFO_MUSIC);
+	ok_sound = al_load_sample(OK_MUSIC);
 
 
 	Bullet_sound = al_load_sample(PLAYERSHOTSFX);
@@ -773,6 +772,7 @@ void GameDestroy()
 	al_destroy_sample(ShipImpactSFX);
 	al_destroy_sample(alien_death_sound);
 	al_destroy_sample(BigUFO_sound);
+	al_destroy_sample(ok_sound);
 
 	al_destroy_sample(ShieldImpact);
 	al_destroy_sample(ShieldDestroyed);
@@ -983,12 +983,13 @@ void EndScreen()
 	char a1[2] = {NULL, '\0'};
 	char a2[2] = {NULL, '\0'};
 	char a3[2] = {NULL, '\0'};
+
+	al_stop_samples();
+
 	while (GAMESTATE == END)
 	{
 		while (end1)
 		{
-			al_stop_samples();
-
 			al_draw_scaled_bitmap(BlackOverlay, 0, 0, al_get_bitmap_width(BlackOverlay), al_get_bitmap_height(BlackOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
 			al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1, ALLEGRO_ALIGN_CENTER, "YOU DIED!");
 			al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "YOUR SCORE:");
@@ -1042,6 +1043,7 @@ void EndScreen()
 					break;
 				case ALLEGRO_KEY_ENTER:
 					finished = 1;
+					al_play_sample(ok_sound, 0.5, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 				}
 			}
 			if (!finished && (TempEvent.type != ALLEGRO_EVENT_MOUSE_AXES) && (TempEvent.type != ALLEGRO_EVENT_MOUSE_LEAVE_DISPLAY) && (TempEvent.type != ALLEGRO_EVENT_MOUSE_ENTER_DISPLAY) && (TempEvent.type != ALLEGRO_EVENT_KEY_UP))
@@ -1073,6 +1075,7 @@ void EndScreen()
 		al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2 + 150, ScreenDimensions.y * 0.1 * 3 + 180, ALLEGRO_ALIGN_CENTER, a3);
 		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3 +340, ALLEGRO_ALIGN_CENTER, "PRESS ENTER");
 		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3 + 420, ALLEGRO_ALIGN_CENTER, "WHEN YOU ARE DONE");
+		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 8 + 50, ALLEGRO_ALIGN_CENTER, "PRESS SPACE TO CONTINUE");
 		al_flip_display();
 
 	}
@@ -1213,13 +1216,13 @@ void GameLogic()
 		break;
 	}
 
-	if ((t / CLOCKS_PER_SEC) > Cooldown)
+	if ((clock()/ CLOCKS_PER_SEC) > Cooldown)
 	{
 		fire_ready = 1;
 	}
-	if ((t / CLOCKS_PER_SEC) > Mothership_time)
+	if ((clock() / CLOCKS_PER_SEC) > Mothership_time)
 	{
-		Mothership_time = (t / CLOCKS_PER_SEC) + MotherShip_cooldown;
+		Mothership_time = (clock() / CLOCKS_PER_SEC) + MotherShip_cooldown;
 		BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(430, 50), NewVec2F(200, 0), BigUFO, 56, 38);
 		BigUfo_passing = 1;
 //		i = CreateNewAnimation(NewVec2F(500, 500), NewVec2F(100, 0), 10, BigUFO, 56, 38);
@@ -1263,7 +1266,7 @@ void GameLogic()
 
 				if (fire_ready)
 				{
-					Cooldown = t / CLOCKS_PER_SEC + Cooldown_c;
+					Cooldown = clock() / CLOCKS_PER_SEC + Cooldown_c;
 					fire_ready = 0;
 					shot = true;
 					for (int i = 0; i < 10; i++)

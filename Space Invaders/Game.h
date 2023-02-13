@@ -308,6 +308,7 @@ int YAliens;
 #define SHIELD_IMPACT "Resources/Audio/shieldImpact.wav"
 #define SHIELD_EXPLOSION "Resources/Audio/ShieldExplosion.wav"
 #define BIGUFO_MUSIC "Resources/Audio/ufo_lowpitch.wav"
+#define OK_MUSIC "Resources/Audio/ok-metal-slug-sound.mp3"
 
 ALLEGRO_MIXER* Mixer;
 
@@ -340,6 +341,7 @@ ALLEGRO_SAMPLE* level4Music;
 ALLEGRO_SAMPLE* Bullet_sound;
 ALLEGRO_SAMPLE* alien_death_sound;
 ALLEGRO_SAMPLE* BigUFO_sound;
+ALLEGRO_SAMPLE* ok_sound;
 
 ALLEGRO_SAMPLE_ID* BigUFO_sound_id;
 
