@@ -289,6 +289,7 @@ int YAliens;
 #define BACKGROUNDMUSIC2 NULL
 
 #define ALIENDEATHSFX "Resources/Audio/AlienExplosion2.wav"
+#define ALIEN_DYING "Resources/Audio/aliendeathsound.mp3"
 #define ALIEN1SFX	"Resources/Audio/fastinvader1.wav"
 #define ALIEN2SFX	"Resources/Audio/fastinvader2.wav"
 #define ALIEN3SFX	"Resources/Audio/fastinvader3.wav"

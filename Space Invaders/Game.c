@@ -56,6 +56,7 @@ int SystemInit()
 
 	ScreenDimensions = NewVec2(1920, 1080);
 
+	al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW);
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
 	if (DISPLAY == NULL)
 	{
