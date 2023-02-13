@@ -277,6 +277,7 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="Math.c" />
     <ClCompile Include="Shield.c" />
+    <ClCompile Include="Sound.c" />
     <ClCompile Include="SpriteSheet.c" />
     <ClCompile Include="Vec2.c" />
     <ClCompile Include="Vec2_F.c" />
@@ -293,6 +294,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Shield.h" />
+    <ClInclude Include="Sound.h" />
     <ClInclude Include="SpriteSheet.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Vec2_F.h" />

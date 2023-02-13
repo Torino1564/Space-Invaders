@@ -104,6 +104,8 @@ int SystemInit()
 #ifdef RASPI
 	InitGraphics();
 	initInput();
+	InitAudio();
+
 
 	pickcooldown = 0.5 * TIME_MULTIPLIER;
 	HasMovedAlready = 0;
@@ -185,13 +187,22 @@ int Menu()
 							   0,0,0,0 };
 	PlayButton = CreateNewEntity(NewVec2(7, 1), NewVec2(0, 0), 2000, PlayButtonShape, NewVec2(4, 7));
 
+	char ExitButtonShape[] = { 0,0,0,0,
+							   1,0,0,1,
+							   1,1,1,1,
+							   0,1,1,0,
+							   1,1,1,1,
+							   1,0,0,1,
+							   0,0,0,0 };
+	ExitButton = CreateNewEntity(NewVec2(6, 8), NewVec2(0, 0), 2000, ExitButtonShape, NewVec2(4, 7));
+
 	char PickCircleShape[] = {1,1,1,1,1,1,1,
-							 1,0,0,0,0,0,1,
-							 1,0,0,0,0,0,1,
-							 1,0,0,0,0,0,1,
-							 1,0,0,0,0,0,1,
-							 1,0,0,0,0,0,1,
-							 1,1,1,1,1,1,1 };
+							  1,0,0,0,0,0,1,
+							  1,0,0,0,0,0,1,
+							  1,0,0,0,0,0,1,
+							  1,0,0,0,0,0,1,
+							  1,0,0,0,0,0,1,
+							  1,1,1,1,1,1,1 };
 	PickCircle = CreateNewEntity(NewVec2(5, 1), NewVec2(0, 0), 2000, PickCircleShape, NewVec2(7, 7));
 
 	char SmallPickCircleShape[] = { 1,1,1,1,1,1,
@@ -204,7 +215,7 @@ int Menu()
 	FacePickCircle = CreateNewEntity(NewVec2(5, 1), NewVec2(0, 0), 2000, SmallPickCircleShape, NewVec2(6, 6));
 
 	int MENU_STATE;
-	enum MENU_STATE { MAIN_MENU , DIFFICULTY_MENU };
+	enum MENU_STATE { MAIN_MENU , DIFFICULTY_MENU , EXIT_GAME};
 
 	MENU_STATE = MAIN_MENU;
 
@@ -262,11 +273,53 @@ int Menu()
 			{
 				lastMovement = 0;
 				switch (PICKER_STATE)
-					case PLAY:
-						MENU_STATE = DIFFICULTY_MENU;
-						PICKER_STATE = EASY;
-						lastMovement = 0;
-						break;
+				{
+				case PLAY:
+					MENU_STATE = DIFFICULTY_MENU;
+					PICKER_STATE = EASY;
+					lastMovement = 0;
+					break;
+				case EXIT_MENU:
+					MENU_STATE = EXIT_GAME;
+					ESTADO = STOP;
+					break;
+				}
+
+				PlayAudio(SHIELD_HIT_t);
+					
+
+			}
+			
+			if (isPressingKey(DOWN))
+			{
+				switch (PICKER_STATE)
+				{
+				case PLAY:
+					PICKER_STATE = EXIT_MENU;
+					break;
+				case EXIT_MENU:
+					break;
+				}
+			}
+			if (isPressingKey(UP))
+			{
+				switch (PICKER_STATE)
+				{
+				case PLAY:
+					break;
+				case EXIT_MENU:
+					PICKER_STATE = PLAY;
+					break;
+				}
+			}
+
+			switch (PICKER_STATE)
+			{
+			case PLAY:
+				PickCircle->Pos = (Vec2){ 5, 1 };
+				break;
+			case EXIT_MENU:
+				PickCircle->Pos = (Vec2){ 5,8 };
 			}
 
 			twinkleBuffer += DeltaTime;
@@ -280,6 +333,7 @@ int Menu()
 				DrawEntity(PickCircle);
 			}
 			DrawEntity(PlayButton);
+			DrawEntity(ExitButton);
 			PrintGrid();
 			t = clock() - t;
 			DeltaTime = (double)(t) / (CLOCKS_PER_SEC);
@@ -385,6 +439,7 @@ int Menu()
 				difficulty = PICKER_STATE;
 				ESTADO = GAME;
 				lastMovement = 0;
+				PlayAudio(SHIELD_HIT_t);
 			}
 
 
@@ -412,8 +467,10 @@ int Menu()
 	DestroyEntity(HardFace);
 	DestroyEntity(HardcoreFace);
 #endif
-	ESTADO = GAME;
-
+	if (ESTADO != STOP)
+	{
+		ESTADO = GAME;
+	}
 }
 
 int GameInit()
@@ -580,6 +637,8 @@ int GameInit()
 						1 , 1 , 1 };
 	Spaceship = CreateNewEntity(NewVec2(6, 13), NewVec2(0, 0), 0.1 * TIME_MULTIPLIER , PlayerShape, NewVec2(3, 2));
 
+	BigUFOent = NULL;
+
 	BulletShape[0] = ( 1 );
 
 	for (int i = 0; i < MAX_BULLETS; i++)
@@ -630,7 +689,7 @@ int GameInit()
 	BigUFOsDestroyed = 0;
 	score = 0;
 
-	GAMESTATE = PLAYING;
+	GAMESTATE = PLAYING_STATE;
 	return 0;
 }
 
@@ -738,6 +797,9 @@ void SystemDestroy()
 	al_uninstall_mouse();
 	al_shutdown_image_addon();
 #endif
+#ifdef RASPI
+	DestroyAudio();
+#endif
 
 	return;
 }
@@ -748,7 +810,7 @@ void GameLoop()
 	{
 		switch (GAMESTATE)
 		{
-			case PLAYING:
+			case PLAYING_STATE:
 				Preframe();
 				GameLogic();
 				GameRender();
@@ -785,7 +847,7 @@ void Pause()
 				{
 				case ALLEGRO_KEY_ESCAPE:
 					pause = 0;
-					GAMESTATE = PLAYING;
+					GAMESTATE = PLAYING_STATE;
 				}
 
 			}
@@ -852,13 +914,14 @@ void Pause()
 			switch (PICKER_STATE)
 			{
 			case RESUME:
-				GAMESTATE = PLAYING;
+				GAMESTATE = PLAYING_STATE;
 				break;
 			case LEAVE:
 				GAMESTATE = EXIT;
 				ESTADO = MENU;
 				lastMovement = 0;
 			}
+			PlayAudio(SHIELD_HIT_t);
 		}
 
 		switch (PICKER_STATE)
@@ -1183,6 +1246,8 @@ void GameLogic()
 				{
 					Bullets[i] = CreateNewEntity(NewVec2(Spaceship->Pos.x + Spaceship->dimensions.x / 2, Spaceship->Pos.y), NewVec2(0, -1), 0.1  * TIME_MULTIPLIER , BulletShape, NewVec2(1, 1));
 					i = MAX_BULLETS;
+
+					PlayAudio(SHOOT_t);
 				}
 			}
 		}
@@ -1195,13 +1260,22 @@ void GameLogic()
 	}
 	UpdateBullets();
 	CullBullets();
-	CollideGrid(Bullets, AlienGrid, &aliensDestroyed);
+	if (CollideGrid(Bullets, AlienGrid, &aliensDestroyed))
+	{
+		PlayAudio(INVADER_DEATH_t);
+	}
 	ClamToScreen(Spaceship);
-
+	MotherShip();
 	ComputeAlienShot();
-	AlienBulletsHit();
+	if (AlienBulletsHit())
+	{
+		PlayAudio(PLAYER_HIT_t);
+	}
 	ProcessHP();
-	ColideAlienBullets();
+	if (ColideAlienBullets())
+	{
+		PlayAudio(SHIELD_HIT_t);
+	}
 
 	if (AlienGrid->AlienCount <= 0)
 	{
@@ -1226,7 +1300,7 @@ void GameLogic()
 		FillMatrix(AlienGrid);
 	}
 
-	score = aliensDestroyed + (5 * Level);
+	score = aliensDestroyed + (5 * Level) + (5 * BigUFOsDestroyed);
 	static int ReplenishShields = 0;
 	if (Level % 3 == 0 && ReplenishShields)
 	{
@@ -1446,7 +1520,10 @@ const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\
 	
 	DrawGrid(AlienGrid);
 	DrawEntity(Spaceship);
-
+	if (BigUFOent != NULL)
+	{
+		DrawEntity(BigUFOent);
+	}
 	DrawBullets();
 	for (int i = 0; i < numberOfShields; i++)
 	{
@@ -1742,7 +1819,7 @@ void ComputeAlienShot()
 
 }
 
-void ColideAlienBullets()
+int ColideAlienBullets()
 {
 	for (int i = 0; i < MAX_ALIEN_BULLETS; i++)
 	{
@@ -1757,11 +1834,14 @@ void ColideAlienBullets()
 						DestroyEntity(AlienBullets[i]);
 						AlienBullets[i] = NULL;
 
+						return true;
+
 					}
 				}
 			}
 		}
 	}
+	return false;
 }
 #endif
 
@@ -1897,9 +1977,47 @@ void ProcessHP()
 void MotherShip()
 {
 	static int isMotherShipSpawned = false;
-	if (Level % 3 == 0 && isMotherShipSpawned == false)
+	if (Level != 0 && Level % 3 == 0 && isMotherShipSpawned == false && AlienGrid->Pos.y > 1 && wasMotherShipDestroyed == false)
 	{
+		char MotherShipShape[] = {
+								  1,1,1,
+								  1,0,1 };
 		isMotherShipSpawned = true;
+		BigUFOent = CreateNewEntity((Vec2) { 0, 0 }, (Vec2) { 1, 0 }, 0.2, MotherShipShape, (Vec2) { 3, 2 });
+		PlayAudio(MOTHERSHIP_SFX_t);
 
+	}
+	if (isMotherShipSpawned == true)
+	{
+		UpdateEntity(BigUFOent , DeltaTime);
+		if (BigUFOent->Pos.x > 16)
+		{
+			DestroyEntity(BigUFOent);
+			BigUFOent = NULL;
+			isMotherShipSpawned = false;
+			wasMotherShipDestroyed = true;
+		}
+	}
+
+	if (Level != 0 && Level % 3 != 0)
+	{
+		wasMotherShipDestroyed = false;
+	}
+
+	if (BigUFOent != NULL)
+	{
+		for (int i = 0; i < MAX_BULLETS; i++)
+		{
+			if (AreColiding(Bullets[i], BigUFOent))
+			{
+				DestroyEntity(BigUFOent);
+				BigUFOent = NULL;
+				isMotherShipSpawned = false;
+				wasMotherShipDestroyed = true;
+
+				BigUFOsDestroyed++;
+				
+			}
+		}
 	}
 }

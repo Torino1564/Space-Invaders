@@ -54,6 +54,9 @@
     <ClCompile Include="Input.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sound.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -92,14 +95,8 @@
     <ClInclude Include="Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Resources\libs\joydisp\disdrv.h">
-      <Filter>Raspi</Filter>
-    </ClInclude>
-    <ClInclude Include="Resources\libs\joydisp\joydrv.h">
-      <Filter>Raspi</Filter>
-    </ClInclude>
-    <ClInclude Include="Resources\libs\joydisp\termlib.h">
-      <Filter>Raspi</Filter>
+    <ClInclude Include="Sound.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

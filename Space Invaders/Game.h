@@ -11,16 +11,17 @@
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_primitives.h>
 #endif
-
 #include <stdio.h>
 #include "Entity.h"
 #include "Vec2.h"
-
 #include <time.h>
 #include "AlienMatrix.h"
-
 #include "Math.h"
+
 #ifdef RASPI
+void MotherShip();
+#include "Graphics.h"
+#include "Sound.h"
 #include "Input.h"
 #endif
 
@@ -88,10 +89,6 @@
  ==================================== */
 
 #endif
-#ifdef RASPI
-
-#include "Graphics.h"
-#endif
 /* ===================================
 	
 		Functions
@@ -121,7 +118,7 @@ void AnimateBullets();
 void CollideAlienBullets();
 #endif
 #ifdef RASPI
-void ColideAlienBullets();
+int ColideAlienBullets();
 
 
 #endif
@@ -201,6 +198,7 @@ ALLEGRO_FONT* BigFont;
 #ifdef RASPI
 
 Entity* PlayButton;
+Entity* ExitButton;
 Entity* StopButton;
 Entity* PickCircle;
 Entity* FacePickCircle;
@@ -352,7 +350,7 @@ enum { MENU, GAME , STOP };
 
 int GAMESTATE;
 
-enum GAMESTATE {PLAYING , PAUSE, END , EXIT};
+enum GAMESTATE {PLAYING_STATE , PAUSE, END , EXIT};
 
 
 /* =============================
@@ -372,9 +370,10 @@ int difficulty;
 int animation_finished;
 double Cooldown;
 double Cooldown_c;
-enum PICKER_STATE { PLAY, EASY, NORMAL, HARD, HARDCORE, BACK };
+enum PICKER_STATE { PLAY, EXIT_MENU, EASY, NORMAL, HARD, HARDCORE, BACK };
 double AlienShootInterval;
 double AlienShotSpeed;
 double Cooldown_c;
 int BigUfo_passing;
 int BigUFOsDestroyed;
+int wasMotherShipDestroyed;
