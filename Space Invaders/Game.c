@@ -187,14 +187,12 @@ int Menu()
 							   0,0,0,0 };
 	PlayButton = CreateNewEntity(NewVec2(7, 1), NewVec2(0, 0), 2000, PlayButtonShape, NewVec2(4, 7));
 
-	char ExitButtonShape[] = { 0,0,0,0,
-							   1,0,0,1,
-							   1,1,1,1,
-							   0,1,1,0,
-							   1,1,1,1,
-							   1,0,0,1,
-							   0,0,0,0 };
-	ExitButton = CreateNewEntity(NewVec2(6, 8), NewVec2(0, 0), 2000, ExitButtonShape, NewVec2(4, 7));
+	char ExitButtonShape[] = { 1,0,0,0,1,
+							   0,1,0,1,0,
+							   0,0,1,0,0,
+							   0,1,0,1,0,
+							   1,0,0,0,1 };
+	ExitButton = CreateNewEntity(NewVec2(6, 9), NewVec2(0, 0), 2000, ExitButtonShape, NewVec2(5, 5));
 
 	char PickCircleShape[] = {1,1,1,1,1,1,1,
 							  1,0,0,0,0,0,1,
@@ -229,7 +227,7 @@ int Menu()
 						 0,1,0,0,1,0,
 						 0,0,0,0,0,0,
 						 0,1,0,0,1,0,
-						 0,1,1,1,1,0,
+						 0,0,1,1,0,0,
 						 0,0,0,0,0,0 };
 
 	char NormalShape[] = { 0,0,0,0,0,0,
@@ -242,7 +240,7 @@ int Menu()
 	char HardShape[] = { 0,0,0,0,0,0,
 						 0,1,0,0,1,0,
 						 0,0,0,0,0,0,
-						 0,1,1,1,1,0,
+						 0,0,1,1,0,0,
 						 0,1,0,0,1,0,
 						 0,0,0,0,0,0 };
 
@@ -1061,6 +1059,114 @@ void EndScreen()
 	}
 
 #endif
+
+#ifdef RASPI
+	enum PICKER_STATE { RETURN_MENU, LEAVE_GAME};
+	int PICKER_STATE = RETURN_MENU;
+
+	char PickCircleShape[] = { 1,1,1,1,1,1,1,
+							   1,0,0,0,0,0,1,
+							   1,0,0,0,0,0,1,
+							   1,0,0,0,0,0,1,
+							   1,0,0,0,0,0,1,
+							   1,0,0,0,0,0,1,
+							   1,1,1,1,1,1,1 };
+	PickCircle = CreateNewEntity(NewVec2(0, 0), NewVec2(0, 0), 2000, PickCircleShape, NewVec2(7, 7));
+
+	char ResumeShape[] = { 0,0,1,0,
+						   0,1,1,0,
+						   1,1,1,0,
+						   0,1,1,0,
+						   0,0,1,0 };
+	PlayButton = CreateNewEntity(NewVec2(3, 10), NewVec2(0, 0), 2000, ResumeShape, NewVec2(4, 5));
+
+	char StopShape[] = { 0,0,0,0,0,
+						 0,1,0,1,0,
+						 0,0,1,0,0,
+						 0,1,0,1,0,
+						 0,0,0,0,0 };
+	StopButton = CreateNewEntity(NewVec2(9, 10), NewVec2(0, 0), 2000, StopShape, NewVec2(5, 5));
+
+	char KOShape[] = { 0,1,0,1,0,1,1,1,0,1,
+					   0,1,1,0,0,1,0,1,0,1,
+					   0,1,0,1,0,1,1,1,0,0,
+					   0,0,0,0,0,0,0,0,0,1};
+
+	KOText = CreateNewEntity((Vec2) { 4, 0 }, (Vec2) { 0, 0 }, 2000, KOShape, (Vec2) { 10, 4 });
+
+	while (GAMESTATE == END)
+	{
+		ClearGrid();
+
+		if (isPressingKey(RIGHT))
+		{
+			switch (PICKER_STATE)
+			{
+			case RETURN_MENU:
+				PICKER_STATE = LEAVE_GAME;
+				break;
+			case LEAVE_GAME:
+				break;
+			}
+		}
+		if (isPressingKey(LEFT))
+		{
+			switch (PICKER_STATE)
+			{
+			case RETURN_MENU:
+				break;
+			case LEAVE_GAME:
+				PICKER_STATE = RETURN_MENU;
+				break;
+			}
+		}
+
+		if (isPressingKey(SHOOT))
+		{
+			switch (PICKER_STATE)
+			{
+			case RETURN_MENU:
+				GAMESTATE = EXIT;
+				ESTADO = MENU;
+				break;
+			case LEAVE_GAME:
+				GAMESTATE = EXIT;
+				ESTADO = STOP;
+				lastMovement = 0;
+			}
+			PlayAudio(SHIELD_HIT_t);
+		}
+
+		switch (PICKER_STATE)
+		{
+		case RETURN_MENU:
+			PickCircle->Pos = (Vec2){ 1,9 };
+			break;
+		case LEAVE_GAME:
+			PickCircle->Pos = (Vec2){ 8,9 };
+			break;
+		}
+
+		DrawEntity(PlayButton);
+		DrawEntity(StopButton);
+		DrawEntity(PickCircle);
+		DrawEntity(KOText);
+
+		
+		{
+			int FirstDigit = score / 100;
+			int SecondDigit = (score - FirstDigit * 100) / 10;
+			int ThirdDigit = score - FirstDigit * 100 - SecondDigit * 10;
+			PrintNumber(FirstDigit, (Vec2) { 1, 4 });
+			PrintNumber(SecondDigit, (Vec2) { 6, 4 });
+			PrintNumber(ThirdDigit, (Vec2) { 11, 4 });
+
+		}
+
+		PrintGrid();
+	}
+#endif
+
 }
 
 void GameLogic()

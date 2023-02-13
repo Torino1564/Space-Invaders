@@ -200,6 +200,7 @@ ALLEGRO_FONT* BigFont;
 Entity* PlayButton;
 Entity* ExitButton;
 Entity* StopButton;
+Entity* KOText;
 Entity* PickCircle;
 Entity* FacePickCircle;
 Entity* EasyFace;
