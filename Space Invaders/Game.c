@@ -633,6 +633,16 @@ int GameInit()
 void GameDestroy()
 {
 #ifndef RASPI
+
+	for (int i = 0; i < MAX_ANIMATION_BUFFER_SIZE; i++)
+	{
+		if ((*AnimationBuffer)[i] != NULL)
+		{
+			DestroyAnimation((*AnimationBuffer)[i]);
+			(*AnimationBuffer)[i] = NULL;
+		}
+	}
+
 	for (int i = 0; i < numberOfShields; i++)
 	{
 		if (shieldArray[i] != NULL)
@@ -651,7 +661,6 @@ void GameDestroy()
 	al_destroy_bitmap(DeathTexture);
 	DeleteSpriteSheet(MiniUFO_Explosion);
 	DeleteSpriteSheet(ShieldExplosion);
-	DeleteSpriteSheet(BigUFO);
 
 	DestroyEntity(Gun);
 	DeleteSpriteSheet(MiniUFO);
@@ -885,7 +894,7 @@ void EndScreen()
 {
 #ifndef RASPI
 	int end = true;
-	while (end)
+	while (GAMESTATE == END)
 	{
 		al_stop_samples();
 
@@ -919,7 +928,8 @@ void EndScreen()
 				{
 				case ALLEGRO_KEY_SPACE:
 					end = 0;
-					GAMESTATE = MENU;
+					GAMESTATE = EXIT;
+					ESTADO = MENU;
 				}
 
 			}
@@ -1103,6 +1113,7 @@ void GameLogic()
 		}
 	}
 
+	score = aliensDestroyed * 10 + (Level - 1) * 100;
 
 	ClipToScreen(Spaceship, ScreenDimensions);
 	ClipToEntity(Gun, Spaceship, 20);
@@ -1335,7 +1346,6 @@ void GameRender()
 	//Enemies
 
 	aliendeath = CollideGrid(Bullets, AlienGrid, &aliensDestroyed, MiniUFO_Explosion);
-	score += aliendeath;
 	DrawGrid(AlienGrid);
 
 	for (int i = 0; i < numberOfShields; i++)
@@ -1425,6 +1435,13 @@ const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\
 	al_draw_text(font, al_map_rgb(254, 254, 254), 210, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/1000) % 10]);
 	al_draw_text(font, al_map_rgb(254, 254, 254), 170, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/10000) % 10]);
 	al_draw_text(font, al_map_rgb(254, 254, 254), 130, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/100000) % 10]);
+
+	al_draw_text(font, al_map_rgb(254, 254, 254), ( PlaySpacePos.x ) / 2 , 250, ALLEGRO_ALIGN_CENTRE, "TAKEDOWNS:");
+	al_draw_textf(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 300, ALLEGRO_ALIGN_CENTRE, "%d" , aliensDestroyed);
+
+	al_draw_text(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 400, ALLEGRO_ALIGN_CENTRE, "LEVEL:");
+	al_draw_textf(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 450, ALLEGRO_ALIGN_CENTRE, "%d", Level);
+
 
 	al_flip_display();
 #endif

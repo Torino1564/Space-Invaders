@@ -92,9 +92,9 @@ int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix, int * aliensDestroyed, Sp
 						DestroyEntityLoadedTexture((Matrix->matrix)[i][j]);
 						(Matrix->matrix)[i][j] = NULL;
 						
-
 						Matrix->AlienCount--;
-						//(* aliensDestroyed)++;
+
+						(*aliensDestroyed)++;
 						
 						return true;
 					}
