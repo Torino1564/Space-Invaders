@@ -66,7 +66,6 @@ void FillShieldParticles(shield* shield)
 	shield->particleSize.x = OXDelta * shield->Factors.x;
 	shield->particleSize.y = OYDelta * shield->Factors.y;
 
-	shield->Particles[0][0] = calloc(XDivisions * YDivisions, sizeof(uint8_t));
 	for (int i = 0; i < XDivisions; i++)
 	{
 		for (int j = 0; j < YDivisions; j++)

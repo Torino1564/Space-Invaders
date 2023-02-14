@@ -98,8 +98,8 @@ int SystemInit()
 
 	al_reserve_samples(SAMPLE_COUNT);
 
-	font = al_load_ttf_font(FONT, 36, NULL);
-	BigFont = al_load_ttf_font(FONT, 80, NULL);
+	font = al_load_ttf_font(FONT, 36, 0);
+	BigFont = al_load_ttf_font(FONT, 80, 0);
 #endif
 #ifdef RASPI
 	InitGraphics();
@@ -146,7 +146,7 @@ int Menu()
 	while (ESTADO == MENU)
 	{
 		int margin = 40;
-		al_draw_scaled_rotated_bitmap(menu, width, height, ScreenDimensions.x, ScreenDimensions.y, ScreenDimensions.x/width, ScreenDimensions.y/height, 0, NULL);
+		al_draw_scaled_rotated_bitmap(menu, width, height, ScreenDimensions.x, ScreenDimensions.y, ScreenDimensions.x/width, ScreenDimensions.y/height, 0, 0);
 		
 
 		al_draw_filled_rounded_rectangle(StartPos.x , StartPos.y,
@@ -191,23 +191,23 @@ int Menu()
 		if ((MenuEvent.mouse.x > StartPos.x && MenuEvent.mouse.x < StartPos.x + StartDimensions.x &&
 			MenuEvent.mouse.y > StartPos.y && MenuEvent.mouse.y < StartPos.y + StartDimensions.y))
 		{
-			al_draw_scaled_bitmap(Start2, 0, 0, al_get_bitmap_width(Start2), al_get_bitmap_height(Start2), StartPos.x + 40, StartPos.y + 60, 430, 85, NULL);
+			al_draw_scaled_bitmap(Start2, 0, 0, al_get_bitmap_width(Start2), al_get_bitmap_height(Start2), StartPos.x + 40, StartPos.y + 60, 430, 85, 0);
 
 		}
 		else
 		{
-			al_draw_scaled_bitmap(Start1, 0, 0, al_get_bitmap_width(Start1), al_get_bitmap_height(Start1), StartPos.x + 40, StartPos.y + 60, 430, 85, NULL);
+			al_draw_scaled_bitmap(Start1, 0, 0, al_get_bitmap_width(Start1), al_get_bitmap_height(Start1), StartPos.x + 40, StartPos.y + 60, 430, 85, 0);
 
 		}
 		if ((MenuEvent.mouse.x > LeavePos.x && MenuEvent.mouse.x < LeavePos.x + LeaveDimensions.x &&
 			MenuEvent.mouse.y > LeavePos.y && MenuEvent.mouse.y < LeavePos.y + LeaveDimensions.y))
 		{
-			al_draw_scaled_bitmap(Exit2, 0, 0, al_get_bitmap_width(Exit2), al_get_bitmap_height(Exit2), LeavePos.x + 40, LeavePos.y + 60, 430, 85, NULL);
+			al_draw_scaled_bitmap(Exit2, 0, 0, al_get_bitmap_width(Exit2), al_get_bitmap_height(Exit2), LeavePos.x + 40, LeavePos.y + 60, 430, 85, 0);
 
 		}
 		else
 		{
-			al_draw_scaled_bitmap(Exit1, 0, 0, al_get_bitmap_width(Exit1), al_get_bitmap_height(Exit1), LeavePos.x + 40, LeavePos.y + 60, 430, 85, NULL);
+			al_draw_scaled_bitmap(Exit1, 0, 0, al_get_bitmap_width(Exit1), al_get_bitmap_height(Exit1), LeavePos.x + 40, LeavePos.y + 60, 430, 85, 0);
 
 		}
 
@@ -607,16 +607,12 @@ int GameInit()
 
 	BigExplosion = NewSpriteSheet(BIG_EXPLOSION, (float)((float)1 / (float)20), 28, 81, 94, 1);
 
-	instance1 = al_create_sample_instance(PLAYERSHOTSFX);
-
 	// Characters Init
 	Slug = NewSpriteSheet(SLUG, (float)((float)1 / (float)20), 20, 66, 38, 1);
 	Stp_b = NewSpriteSheet(STOP_BACKWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
 	Stp_f = NewSpriteSheet(STOP_FORWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
 
 	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x / 2 - SpaceshipWidth / 2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
-	Spaceship->data = 0; //El Spaceship esta quieto esperando movimiento
-
 	if (Spaceship == NULL)
 	{
 		printf("There has been an error creating the player spaceship");
@@ -658,7 +654,11 @@ int GameInit()
 	numberOfShields = 3;
 	shieldSize = NewVec2F(150, 150);
 	shieldPadding = (PlaySpaceArea.x - shieldSize.x * numberOfShields) / (numberOfShields + 1);
-	float shieldYpos = Spaceship->Pos.y - PlaySpaceArea.y * 0.2;
+	float shieldYpos = 0;
+	if (Spaceship != NULL)
+	{
+		shieldYpos = Spaceship->Pos.y - PlaySpaceArea.y * 0.2;
+	}
 
 	shieldArray[0] = calloc(numberOfShields, sizeof(shield));
 
@@ -842,9 +842,6 @@ void GameDestroy()
 	al_destroy_sample(ShieldImpact);
 	al_destroy_sample(ShieldDestroyed);
 
-
-
-	al_destroy_sample_instance(instance1);
 #endif
 	return;
 }
@@ -897,9 +894,9 @@ void Pause()
 {
 #ifndef RASPI
 	int scale = 3;
-	al_draw_scaled_bitmap(backgroundpause, 0, 0, al_get_bitmap_width(backgroundpause), al_get_bitmap_height(backgroundpause), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
-	al_draw_scaled_bitmap(pready, 0, 0, al_get_bitmap_width(pready), al_get_bitmap_height(pready), (ScreenDimensions.x-(scale*al_get_bitmap_width(pready)))/2 + 40, (ScreenDimensions.y - (scale*al_get_bitmap_height(pready)))/ 2 - 150, scale*al_get_bitmap_width(pready), scale*al_get_bitmap_height(pready), NULL);
-	al_draw_scaled_bitmap(pmenu, 0, 0, al_get_bitmap_width(pmenu), al_get_bitmap_height(pmenu), (ScreenDimensions.x - (scale * al_get_bitmap_width(pmenu))) / 2, (ScreenDimensions.y - (scale * al_get_bitmap_height(pmenu))) / 2 + 150, scale*al_get_bitmap_width(pmenu), scale*al_get_bitmap_height(pmenu), NULL);
+	al_draw_scaled_bitmap(backgroundpause, 0, 0, al_get_bitmap_width(backgroundpause), al_get_bitmap_height(backgroundpause), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, 0);
+	al_draw_scaled_bitmap(pready, 0, 0, al_get_bitmap_width(pready), al_get_bitmap_height(pready), (ScreenDimensions.x-(scale*al_get_bitmap_width(pready)))/2 + 40, (ScreenDimensions.y - (scale*al_get_bitmap_height(pready)))/ 2 - 150, scale*al_get_bitmap_width(pready), scale*al_get_bitmap_height(pready), 0);
+	al_draw_scaled_bitmap(pmenu, 0, 0, al_get_bitmap_width(pmenu), al_get_bitmap_height(pmenu), (ScreenDimensions.x - (scale * al_get_bitmap_width(pmenu))) / 2, (ScreenDimensions.y - (scale * al_get_bitmap_height(pmenu))) / 2 + 150, scale*al_get_bitmap_width(pmenu), scale*al_get_bitmap_height(pmenu), 0);
 	al_flip_display();
 	int pause = true;
 	while (pause)
@@ -1044,9 +1041,9 @@ void EndScreen()
 	int end1 = true;
 	int finished;
 	int index;
-	char a1[2] = {NULL, '\0'};
-	char a2[2] = {NULL, '\0'};
-	char a3[2] = {NULL, '\0'};
+	char a1[2] = {0, '\0'};
+	char a2[2] = {0, '\0'};
+	char a3[2] = {0, '\0'};
 
 	al_stop_samples();
 
@@ -1054,7 +1051,7 @@ void EndScreen()
 	{
 		while (end1)
 		{
-			al_draw_scaled_bitmap(BlackOverlay, 0, 0, al_get_bitmap_width(BlackOverlay), al_get_bitmap_height(BlackOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+			al_draw_scaled_bitmap(BlackOverlay, 0, 0, al_get_bitmap_width(BlackOverlay), al_get_bitmap_height(BlackOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, 0);
 			al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1, ALLEGRO_ALIGN_CENTER, "YOU DIED!");
 			al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "YOUR SCORE:");
 			char textscore[25];
@@ -1134,7 +1131,7 @@ void EndScreen()
 			
 		}
 
-		al_draw_scaled_bitmap(BlackOverlay, 0, 0, al_get_bitmap_width(BlackOverlay), al_get_bitmap_height(BlackOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+		al_draw_scaled_bitmap(BlackOverlay, 0, 0, al_get_bitmap_width(BlackOverlay), al_get_bitmap_height(BlackOverlay), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, 0);
 		al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3, ALLEGRO_ALIGN_CENTER, "PLEASE ENTER YOUR NAME");
 		al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2 - 150, ScreenDimensions.y * 0.1 * 3 + 180, ALLEGRO_ALIGN_CENTER, a1);
 		al_draw_text(BigFont, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y * 0.1 * 3 + 180, ALLEGRO_ALIGN_CENTER, a2);
@@ -1259,7 +1256,6 @@ void EndScreen()
 
 void GameLogic()
 {
-	double shootCooldown;
 	double MotherShip_cooldown = 40;
 	static double shootElapsedTime = 0;
 #ifndef RASPI
@@ -1429,8 +1425,7 @@ void GameLogic()
 
 					BigUFOsDestroyed++;
 
-					BigUFOalive = 1;;
-					return true;
+					BigUFOalive = 1;
 				}
 			}
 		}
@@ -1615,16 +1610,16 @@ void GameRender()
 	switch ((Level - 1) % 4)
 	{
 	case 0:
-		al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+		al_draw_scaled_bitmap(background1, 0, 0, al_get_bitmap_width(background1), al_get_bitmap_height(background1), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, 0);
 		break;
 	case 1:
-		al_draw_scaled_bitmap(background2, 0, 0, al_get_bitmap_width(background2), al_get_bitmap_height(background2), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+		al_draw_scaled_bitmap(background2, 0, 0, al_get_bitmap_width(background2), al_get_bitmap_height(background2), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, 0);
 		break;
 	case 2:
-		al_draw_scaled_bitmap(background3, 0, 0, al_get_bitmap_width(background3), al_get_bitmap_height(background3), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+		al_draw_scaled_bitmap(background3, 0, 0, al_get_bitmap_width(background3), al_get_bitmap_height(background3), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, 0);
 		break;
 	case 3:
-		al_draw_scaled_bitmap(background4, 0, 0, al_get_bitmap_width(background4), al_get_bitmap_height(background4), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, NULL);
+		al_draw_scaled_bitmap(background4, 0, 0, al_get_bitmap_width(background4), al_get_bitmap_height(background4), PlaySpacePos.x, PlaySpacePos.y, PlaySpaceArea.x, PlaySpaceArea.y, 0);
 		break;
 	}
 
@@ -1683,7 +1678,7 @@ void GameRender()
 	if (BigUfo_passing)
 	{
 		BigUfo_passing = 0;
-		al_play_sample(BigUFO_sound, 0.2, 0, 1.0, ALLEGRO_PLAYMODE_ONCE, &BigUFO_sound_id);
+		al_play_sample(BigUFO_sound, 0.2, 0, 1.0, ALLEGRO_PLAYMODE_ONCE, BigUFO_sound_id);
 	}
 
 	//player
@@ -1753,27 +1748,27 @@ const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\
 	
 	if (lives > 0)
 	{
-		al_draw_scaled_bitmap(heart, 0, 0, al_get_bitmap_width(heart), al_get_bitmap_height(heart), 1690, 57, 55, 55, NULL);
+		al_draw_scaled_bitmap(heart, 0, 0, al_get_bitmap_width(heart), al_get_bitmap_height(heart), 1690, 57, 55, 55, 0);
 	}
 	else
 	{
-		al_draw_scaled_bitmap(deadheart, 0, 0, al_get_bitmap_width(deadheart), al_get_bitmap_height(deadheart), 1690, 57, 55, 55, NULL);
+		al_draw_scaled_bitmap(deadheart, 0, 0, al_get_bitmap_width(deadheart), al_get_bitmap_height(deadheart), 1690, 57, 55, 55, 0);
 	}
 	if (lives > 1)
 	{
-		al_draw_scaled_bitmap(heart, 0, 0, al_get_bitmap_width(heart), al_get_bitmap_height(heart), 1760, 57, 55, 55, NULL);
+		al_draw_scaled_bitmap(heart, 0, 0, al_get_bitmap_width(heart), al_get_bitmap_height(heart), 1760, 57, 55, 55, 0);
 	}
 	else
 	{
-		al_draw_scaled_bitmap(deadheart, 0, 0, al_get_bitmap_width(deadheart), al_get_bitmap_height(deadheart), 1760, 57, 55, 55, NULL);
+		al_draw_scaled_bitmap(deadheart, 0, 0, al_get_bitmap_width(deadheart), al_get_bitmap_height(deadheart), 1760, 57, 55, 55, 0);
 	}
 	if (lives > 2)
 	{
-		al_draw_scaled_bitmap(heart, 0, 0, al_get_bitmap_width(heart), al_get_bitmap_height(heart), 1830, 57, 55, 55, NULL);
+		al_draw_scaled_bitmap(heart, 0, 0, al_get_bitmap_width(heart), al_get_bitmap_height(heart), 1830, 57, 55, 55, 0);
 	}
 	else
 	{
-		al_draw_scaled_bitmap(deadheart, 0, 0, al_get_bitmap_width(deadheart), al_get_bitmap_height(deadheart), 1830, 57, 55, 55, NULL);
+		al_draw_scaled_bitmap(deadheart, 0, 0, al_get_bitmap_width(deadheart), al_get_bitmap_height(deadheart), 1830, 57, 55, 55, 0);
 	}
 
 
@@ -1923,7 +1918,6 @@ void AnimateBullets()
 
 void CollideAlienBullets()
 {
-	int shieldCollidedWith;
 	for (int i = 1; i < 15; i++)
 	{
 		if (AlienBullets[i] != NULL)
@@ -1965,7 +1959,7 @@ void CollideAlienBullets()
 								{
 									for (int l = 0; l < shieldArray[AlienBullets[i]->data - 1]->Ydivisions; l++)
 									{
-										if (shieldArray[AlienBullets[i]->data - 1]->Particles[k][l] == true)
+										if (shieldArray[AlienBullets[i]->data - 1]->Particles[k][l] == 1)
 										{
 											aliveParticleCount++;
 										}

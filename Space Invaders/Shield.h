@@ -34,7 +34,7 @@ struct shield_t
 	char destroyed;
 	int originalSize;
 
-	uint8_t * Particles[XDivisions][YDivisions];
+	uint8_t Particles[XDivisions][YDivisions];
 };
 
 typedef struct shield_t shield;

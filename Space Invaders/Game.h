@@ -351,8 +351,6 @@ ALLEGRO_SAMPLE* ok_sound;
 ALLEGRO_SAMPLE* letter_sound;
 
 ALLEGRO_SAMPLE_ID* BigUFO_sound_id;
-
-ALLEGRO_SAMPLE_INSTANCE* instance1;
 #endif
 
 /* =============================
