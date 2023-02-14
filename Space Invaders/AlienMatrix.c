@@ -85,8 +85,8 @@ int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix, int * aliensDestroyed, Sp
 						DestroyEntityLoadedTexture(Bullet[b]);
 						Bullet[b] = NULL;
 
-						CreateNewAnimation( NewVec2F((Matrix->matrix)[i][j]->Pos.x + Matrix->AlienWidth/2 - ExplosionSpritesheet->frameWidth * 3 / 4,
-							(Matrix->matrix)[i][j]->Pos.y + Matrix->AlienHeight/2 - ExplosionSpritesheet->frameHeight * 3/4)
+						CreateNewAnimation( NewVec2F((Matrix->matrix)[i][j]->Pos.x + (float)Matrix->AlienWidth/2.0 - ExplosionSpritesheet->frameWidth * (3.0 / 4.0),
+							(Matrix->matrix)[i][j]->Pos.y + (float)Matrix->AlienHeight/2.0 - ExplosionSpritesheet->frameHeight * (3.0/4.0))
 							, NewVec2F(0, 5), 0, ExplosionSpritesheet, Matrix->AlienWidth * 1.9, Matrix->AlienHeight * 1.9);
 
 						DestroyEntityLoadedTexture((Matrix->matrix)[i][j]);
@@ -116,9 +116,6 @@ int CollideEntity(Entity* BigUFOent, Entity* Bullets[])
 				DestroyEntityLoadedTexture(Bullets[b]);
 				Bullets[b] = NULL;
 
-				//				CreateNewAnimation(NewVec2F((Matrix->matrix)[i][j]->Pos.x + Matrix->AlienWidth / 2 - ExplosionSpritesheet->frameWidth / 2,
-				//					(Matrix->matrix)[i][j]->Pos.y + Matrix->AlienHeight / 2 - ExplosionSpritesheet->frameHeight / 2)
-				//					, NewVec2F(0, 10), 0, ExplosionSpritesheet, Matrix->AlienWidth * 1.9, Matrix->AlienHeight * 1.9);
 
 				DestroyAnimatedEntitySharedSprite(BigUFOent);
 				BigUFOent = NULL;
@@ -127,6 +124,7 @@ int CollideEntity(Entity* BigUFOent, Entity* Bullets[])
 			}
 		}
 	}
+	return false;
 }
 
 void DeathAnimation(int i, int j)
@@ -171,8 +169,8 @@ void UpdateMatrix(AlienMatrix* Matrix, double dt , Vec2 PlayAreaPos , Vec2 PlayA
 				{
 					(Matrix->matrix)[i][j]->Pos.x += Matrix->HorizontalSpeed;
 
-					if ((Matrix->matrix)[i][j]->Pos.x - (Matrix->AlienWidth/2) <= PlayAreaPos.x ||
-						((Matrix->matrix)[i][j]->Pos.x + ( 1.5 * Matrix->AlienWidth) >= PlayAreaPos.x + PlayAreaDim.x))
+					if ((Matrix->matrix)[i][j]->Pos.x - ((float)Matrix->AlienWidth/2.0) <= PlayAreaPos.x ||
+						((Matrix->matrix)[i][j]->Pos.x + ( 1.5 * (float)Matrix->AlienWidth) >= PlayAreaPos.x + PlayAreaDim.x))
 					{
 						bounce = true;
 						
@@ -188,9 +186,9 @@ void UpdateMatrix(AlienMatrix* Matrix, double dt , Vec2 PlayAreaPos , Vec2 PlayA
 
 
 
-Vec2F GetCentredPosition(AlienMatrix* Matrix, Vec2 ScreenDimension)
+Vec2F GetCentredPosition(AlienMatrix* Matrix, Vec2F ScreenDimension)
 {
-	return NewVec2F( ScreenDimension.x/2 - Matrix->width/2 , 50 );
+	return NewVec2F( ScreenDimension.x/2 - (float)Matrix->width/2.0 , 50 );
 }
 
 void AnimateMatrix( AlienMatrix* Matrix , float dt )
@@ -431,7 +429,7 @@ int UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 P
 			{
 				Matrix->matrix[Xcoord][Ycoord]->Pos.x += Matrix->HorizontalSpeed;
 #ifndef RASPI
-				if ((Matrix->matrix)[Xcoord][Ycoord]->Pos.x - (Matrix->AlienWidth / 2) <= PlayAreaPos.x ||
+				if ((Matrix->matrix)[Xcoord][Ycoord]->Pos.x - ((float)Matrix->AlienWidth / 2.0) <= PlayAreaPos.x ||
 					((Matrix->matrix)[Xcoord][Ycoord]->Pos.x + (1.5 * Matrix->AlienWidth) >= PlayAreaPos.x + PlayAreaDim.x))
 				{
 					bounce = true;

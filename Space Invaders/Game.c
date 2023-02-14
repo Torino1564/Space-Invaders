@@ -54,7 +54,7 @@ int SystemInit()
 
 	InitAnimations();
 
-	ScreenDimensions = NewVec2(1920, 1080);
+	ScreenDimensions = NewVec2F(1920, 1080);
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
 	if (DISPLAY == NULL)
 	{
@@ -111,6 +111,7 @@ int SystemInit()
 	HasMovedAlready = 0;
 #endif
 	ESTADO = MENU;
+	return 1;
 }
 
 int Menu()
@@ -130,7 +131,7 @@ int Menu()
 	ALLEGRO_BITMAP* Exit2 = al_load_bitmap(EXIT2);
 
 
-	Vec2 TempMousePos;
+	Vec2 TempMousePos = (Vec2){0,0};
 	Vec2 StartPos = (Vec2){ ScreenDimensions.x * 3.2 / 5 , ScreenDimensions.y * 0.2 };
 	Vec2 LeavePos = (Vec2){ ScreenDimensions.x * 3.2 / 5 , ScreenDimensions.y * 0.6 };
 	Vec2 StartDimensions = (Vec2){ ScreenDimensions.x * 4.5 / 5 - ScreenDimensions.x * 3.2 / 5 , ScreenDimensions.y * 0.2 };
@@ -518,6 +519,7 @@ int Menu()
 	{
 		ESTADO = GAME;
 	}
+	return 1;
 }
 
 int GameInit()
@@ -525,7 +527,7 @@ int GameInit()
 #ifndef RASPI
 
 	al_clear_to_color(al_map_rgb(0, 0, 0));
-	al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y / 2, ALLEGRO_ALIGN_CENTER, "LOADING . . .");
+	al_draw_text(font, al_map_rgb(255, 255, 255), (float)ScreenDimensions.x / (float)2, (float)ScreenDimensions.y / (float)2, ALLEGRO_ALIGN_CENTER, "LOADING . . .");
 	al_flip_display();
 
 	int error = 0;
@@ -545,7 +547,7 @@ int GameInit()
 	int GunYcoord = 880;
 
 	PlaySpaceArea = (Vec2){ 1000, ScreenDimensions.y };
-	PlaySpacePos = NewVec2(ScreenDimensions.x / 2 - PlaySpaceArea.x / 2, 0);
+	PlaySpacePos = NewVec2(ScreenDimensions.x / 2.0 - PlaySpaceArea.x / 2.0, 0);
 	GUIColor = al_map_rgb(40, 60, 20);
 
 	AlienTexture = al_load_bitmap(ALIEN_TEXTURE1);
@@ -612,7 +614,7 @@ int GameInit()
 	Stp_b = NewSpriteSheet(STOP_BACKWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
 	Stp_f = NewSpriteSheet(STOP_FORWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
 
-	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x / 2 - SpaceshipWidth / 2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
+	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F((float)ScreenDimensions.x / (float)2 - (float)SpaceshipWidth / 2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
 	if (Spaceship == NULL)
 	{
 		printf("There has been an error creating the player spaceship");
@@ -1287,16 +1289,16 @@ void GameLogic()
 		break;
 	}*/
 
-	Cooldown_c = 0.2;
+	Cooldown_c = 1;
 
-	if ((clock()/ CLOCKS_PER_SEC) > Cooldown)
+	if (((float)(clock()) / CLOCKS_PER_SEC) > Cooldown)
 	{
 		fire_ready = 1;
 	}
 	//fire_ready = 1;
-	if ((clock() / CLOCKS_PER_SEC) > Mothership_time && AlienGrid->AlienCount <= AlienGrid->XAliens * AlienGrid->YAliens * 0.6 && AlienGrid->AlienCount > 0)
+	if (((float)(clock()) / CLOCKS_PER_SEC) > Mothership_time && AlienGrid->AlienCount <= AlienGrid->XAliens * AlienGrid->YAliens * 0.6 && AlienGrid->AlienCount > 0)
 	{
-		Mothership_time = (clock() / CLOCKS_PER_SEC) + MotherShip_cooldown;
+		Mothership_time = ((float)(clock()) / CLOCKS_PER_SEC) + MotherShip_cooldown;
 		BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(430, 50), NewVec2F(200, 0), BigUFO, 120, 80);
 		BigUfo_passing = 1;
 		BigUFOalive = 1;
@@ -1340,24 +1342,28 @@ void GameLogic()
 
 				if (fire_ready)
 				{
-					Cooldown = clock() / CLOCKS_PER_SEC + Cooldown_c;
+					Cooldown = (float)(clock()) / CLOCKS_PER_SEC + Cooldown_c;
 					fire_ready = 0;
 					shot = true;
 					for (int i = 1; i < MAX_BULLETS; i++)
 					{
 						if (i == 9)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y + 5), NewVec2F(0, -900), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((float)(Spaceship->Pos.x) + Spaceship->width / 2.0 - 24.0 / 2.0, Gun->Pos.y + 5), NewVec2F(0, -900), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
 
 						if (Bullets[i] == NULL)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y + 5), NewVec2F(0, -900), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((float)(Spaceship->Pos.x) + (float)Spaceship->width / 2.0 - 24.0 / 2.0, Gun->Pos.y + 5), NewVec2F(0, -900), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
 
 					}
+				}
+				else
+				{
+					al_play_sample(ShotNotReadySFX, 0.5, 0, 1, ALLEGRO_PLAYMODE_ONCE, 0);
 				}
 					break;
 				default:
@@ -1450,7 +1456,7 @@ void GameLogic()
 	if (AlienGrid->AlienCount == 0)
 	{
 		Level += 1;	//Pasa al siguiente nivel
-		Mothership_time = (t / CLOCKS_PER_SEC) + MotherShip_cooldown;
+		Mothership_time = ((float)(t) / CLOCKS_PER_SEC) + MotherShip_cooldown;
 		Once = 0;	//Resetea para el sonido
 
 		for (int i = 0; i < 10; i++) //Limpia las balas que quedan volando cuando se quedan sin aliens
@@ -1783,14 +1789,14 @@ const char Sarray[10][3] = {"0\0", "1\0", "2\0", "3\0", "4\0", "5\0", "6\0", "7\
 	al_draw_text(font, al_map_rgb(254, 254, 254), 170, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/10000) % 10]);
 	al_draw_text(font, al_map_rgb(254, 254, 254), 130, 115, ALLEGRO_ALIGN_RIGHT, Sarray[(score/100000) % 10]);
 
-	al_draw_text(font, al_map_rgb(254, 254, 254), ( PlaySpacePos.x ) / 2 , 250, ALLEGRO_ALIGN_CENTRE, "TAKEDOWNS:");
-	al_draw_textf(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 300, ALLEGRO_ALIGN_CENTRE, "%d" , aliensDestroyed);
+	al_draw_text(font, al_map_rgb(254, 254, 254), (float)( PlaySpacePos.x ) / 2.0 , 250, ALLEGRO_ALIGN_CENTRE, "TAKEDOWNS:");
+	al_draw_textf(font, al_map_rgb(254, 254, 254), (float)(PlaySpacePos.x) / 2.0, 300, ALLEGRO_ALIGN_CENTRE, "%d" , aliensDestroyed);
 
-	al_draw_text(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 400, ALLEGRO_ALIGN_CENTRE, "MOTHERSHIPS:");
-	al_draw_textf(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 450, ALLEGRO_ALIGN_CENTRE, "%d", BigUFOsDestroyed);
+	al_draw_text(font, al_map_rgb(254, 254, 254), (float)(PlaySpacePos.x) / 2.0, 400, ALLEGRO_ALIGN_CENTRE, "MOTHERSHIPS:");
+	al_draw_textf(font, al_map_rgb(254, 254, 254), (float)(PlaySpacePos.x) / 2.0, 450, ALLEGRO_ALIGN_CENTRE, "%d", BigUFOsDestroyed);
 
-	al_draw_text(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 550, ALLEGRO_ALIGN_CENTRE, "LEVEL:");
-	al_draw_textf(font, al_map_rgb(254, 254, 254), (PlaySpacePos.x) / 2, 600, ALLEGRO_ALIGN_CENTRE, "%d", Level);
+	al_draw_text(font, al_map_rgb(254, 254, 254), (float)(PlaySpacePos.x) / 2.0, 550, ALLEGRO_ALIGN_CENTRE, "LEVEL:");
+	al_draw_textf(font, al_map_rgb(254, 254, 254), (float)(PlaySpacePos.x) / 2.0, 600, ALLEGRO_ALIGN_CENTRE, "%d", Level);
 
 
 	al_flip_display();
@@ -1875,7 +1881,7 @@ void ComputeAlienShot()
 			{
 				if (AlienGrid->matrix[i][j] != NULL)
 				{
-					TempDistanceToPlayer = AbsoluteValue(AlienGrid->matrix[i][j]->Pos.x + (AlienGrid->matrix[i][j]->width / 2) - (Spaceship->Pos.x + (Spaceship->width / 2)));
+					TempDistanceToPlayer = AbsoluteValue(AlienGrid->matrix[i][j]->Pos.x + (float)(AlienGrid->matrix[i][j]->width / 2.0) - (Spaceship->Pos.x + ((float)Spaceship->width / 2.0)));
 
 					if (TempDistanceToPlayer < minimumDistanceToPlayer)
 					{
@@ -1894,7 +1900,7 @@ void ComputeAlienShot()
 			{
 				if (AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow] != NULL)
 				{
-					AlienBullets[i] = CreateNewAnimatedEntityLoadedTexture(NewVec2F(AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.x + AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->width/2 , AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.y + AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->height)
+					AlienBullets[i] = CreateNewAnimatedEntityLoadedTexture(NewVec2F(AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.x + (float)AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->width/2.0 , AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->Pos.y + AlienGrid->matrix[closestAlienColumnToPlayer][lastAlienRow]->height)
 						, NewVec2F(0, 400), AlienBullet, 5, 32);
 					break;
 				}
@@ -1969,15 +1975,15 @@ void CollideAlienBullets()
 								if (aliveParticleCount <= (shieldArray[AlienBullets[i]->data - 1]->originalSize) * 0.4)
 								{
 									shieldArray[AlienBullets[i]->data - 1]->destroyed = true;
-									CreateNewAnimation(NewVec2F(shieldArray[AlienBullets[i]->data - 1]->pos.x - shieldArray[AlienBullets[i]->data - 1]->dimensions.x / 2 + ShieldExplosion->frameWidth / 2,
-										shieldArray[AlienBullets[i]->data - 1]->pos.y - shieldArray[AlienBullets[i]->data - 1]->dimensions.y + ShieldExplosion->frameHeight / 3 ),
+									CreateNewAnimation(NewVec2F(shieldArray[AlienBullets[i]->data - 1]->pos.x - shieldArray[AlienBullets[i]->data - 1]->dimensions.x / 2 + (float)ShieldExplosion->frameWidth / 2.0,
+										shieldArray[AlienBullets[i]->data - 1]->pos.y - shieldArray[AlienBullets[i]->data - 1]->dimensions.y + ShieldExplosion->frameHeight / 3.0 ),
 										NewVec2F(0, 0), 0, ShieldExplosion, shieldArray[AlienBullets[i]->data - 1]->dimensions.x * 1.4, shieldArray[AlienBullets[i]->data - 1]->dimensions.y * 2);
 									
 									al_play_sample(ShieldDestroyed, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 								}
 
-								CreateNewAnimation(NewVec2F(AlienBullets[i]->Pos.x + AlienBullets[i]->spriteS->frameWidth /4 - BulletExplosion->frameWidth / 2,
-									AlienBullets[i]->Pos.y + AlienBullets[i]->height / 2 - BulletExplosion->frameHeight / 2), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
+								CreateNewAnimation(NewVec2F(AlienBullets[i]->Pos.x + AlienBullets[i]->spriteS->frameWidth /4.0 - BulletExplosion->frameWidth / 2.0,
+									AlienBullets[i]->Pos.y + AlienBullets[i]->height / 2.0 - BulletExplosion->frameHeight / 2.0), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
 
 								al_play_sample(ShieldImpact, 0.3, 0, 0.8, ALLEGRO_PLAYMODE_ONCE, NULL);
 
@@ -2180,8 +2186,8 @@ int AlienBulletsHit()
 #ifndef RASPI
 			if (AreColiding(AlienBullets[i], Spaceship))
 			{
-				CreateNewAnimation(NewVec2F(AlienBullets[i]->Pos.x + AlienBullets[i]->spriteS->frameWidth / 4 - BulletExplosion->frameWidth / 2,
-					AlienBullets[i]->Pos.y + AlienBullets[i]->spriteS->frameHeight / 5 - BulletExplosion->frameHeight / 2), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
+				CreateNewAnimation(NewVec2F(AlienBullets[i]->Pos.x + (float)AlienBullets[i]->spriteS->frameWidth / 4.0 - (float)BulletExplosion->frameWidth / 2.0,
+					AlienBullets[i]->Pos.y + (float)AlienBullets[i]->spriteS->frameHeight / 5.0 - (float)BulletExplosion->frameHeight / 2.0), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
 
 				al_play_sample(ShieldImpact, 0.3, 0, 0.8, ALLEGRO_PLAYMODE_ONCE, NULL);
 
@@ -2246,7 +2252,7 @@ int CollidePlayerBulletsWithShields()
 						Bullets[i]->Pos.y <= bottom1)
 					{
 
-						float hitShieldAt = (Bullets[i]->Pos.x + Bullets[i]->width / 2) - shieldArray[j]->pos.x;
+						float hitShieldAt = (Bullets[i]->Pos.x + Bullets[i]->width / 2.0) - shieldArray[j]->pos.x;
 						int divisionNumer = IMaxClampTo((hitShieldAt / shieldArray[j]->Factors.x) / shieldArray[j]->OXdelta, shieldArray[j]->Xdivisions - 1);
 
 						float hitShieldAtY = (Bullets[i]->Pos.y) - shieldArray[j]->pos.y;
@@ -2257,7 +2263,7 @@ int CollidePlayerBulletsWithShields()
 						{
 
 
-							DestroyRadiusAround(3, shieldArray[j], (Vec2) { divisionNumer, YdivisionNumber });
+							DestroyRadiusAround(4, shieldArray[j], (Vec2) { divisionNumer, YdivisionNumber });
 
 
 							int aliveParticleCount = 0;
@@ -2275,16 +2281,16 @@ int CollidePlayerBulletsWithShields()
 							if (aliveParticleCount <= (shieldArray[j]->originalSize) * 0.4)
 							{
 								shieldArray[j]->destroyed = true;
-								CreateNewAnimation(NewVec2F(shieldArray[j]->pos.x - shieldArray[j]->dimensions.x / 2 + ShieldExplosion->frameWidth / 2,
-									shieldArray[j]->pos.y - shieldArray[j]->dimensions.y + ShieldExplosion->frameHeight / 3),
+								CreateNewAnimation(NewVec2F(shieldArray[j]->pos.x - shieldArray[j]->dimensions.x / 2.0 + ShieldExplosion->frameWidth / 2.0,
+									shieldArray[j]->pos.y - shieldArray[j]->dimensions.y + ShieldExplosion->frameHeight / 3.0),
 									NewVec2F(0, 0), 0, ShieldExplosion, shieldArray[j]->dimensions.x * 1.4, shieldArray[j]->dimensions.y * 2);
 
 								al_play_sample(ShieldDestroyed, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 							}
 							else
 							{
-								CreateNewAnimation(NewVec2F(Bullets[i]->Pos.x - BulletExplosion->frameWidth / 2,
-									Bullets[i]->Pos.y - Bullets[i]->height / 2 - BulletExplosion->frameHeight / 2), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
+								CreateNewAnimation(NewVec2F(Bullets[i]->Pos.x - (float)BulletExplosion->frameWidth / 2.0,
+									Bullets[i]->Pos.y - (float)Bullets[i]->height / 2.0 - (float)BulletExplosion->frameHeight / 2.0), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
 
 								al_play_sample(ShieldImpact, 0.3, 0, 0.8, ALLEGRO_PLAYMODE_ONCE, NULL);
 							}

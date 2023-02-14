@@ -13,7 +13,7 @@ void DrawEntity(Entity* Entity)
 				if (Entity->spriteS->Texture != NULL && Entity->spriteS->animationNumber < Entity->spriteS->maxAnimationNumber)
 				{
 					al_draw_scaled_bitmap(Entity->spriteS->Texture, Entity->frameCount * Entity->spriteS->frameWidth, Entity->spriteS->frameHeight * Entity->spriteS->animationNumber, Entity->spriteS->frameWidth, Entity->spriteS->frameHeight,
-						Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
+						Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, 0);
 				}
 
 			}
@@ -21,7 +21,7 @@ void DrawEntity(Entity* Entity)
 			{
 				al_draw_scaled_bitmap(Entity->Texture, 0, 0,
 					al_get_bitmap_width(Entity->Texture), al_get_bitmap_height(Entity->Texture),
-					Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, NULL);
+					Entity->Pos.x, Entity->Pos.y, Entity->width, Entity->height, 0);
 			}
 		}
 
@@ -40,7 +40,7 @@ void UpdateEntity(Entity* Entity , double dt)
 	return;
 }
 
-void ClipToScreen(Entity* Entity, Vec2 Screen)
+void ClipToScreen(Entity* Entity, Vec2F Screen)
 {
 	if (Entity != NULL)
 	{

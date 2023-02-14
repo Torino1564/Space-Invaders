@@ -28,7 +28,7 @@ struct Entity_t
 	unsigned int height;
 
 	char animated;
-	unsigned int frameCount;
+	int frameCount;
 	float deltaFrame;
 
 	char data;
@@ -40,7 +40,7 @@ typedef struct Entity_t Entity;
 void DrawEntity(Entity* Entity);
 
 void UpdateEntity(Entity* Entity , double dt );
-void ClipToScreen(Entity* Entity, Vec2 Screen);
+void ClipToScreen(Entity* Entity, Vec2F Screen);
 void ClipToEntity(Entity* e1, Entity* e2, int adjust);
 
 Entity* CreateNewEntity(Vec2F pos, Vec2F vel, const char * texture , int width , int height);

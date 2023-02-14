@@ -8,7 +8,7 @@ int InitAnimations()
 
 	if (AnimationBuffer == NULL)
 	{
-		return NULL;
+		return 0;
 	}
 	else
 	{

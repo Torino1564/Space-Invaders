@@ -135,7 +135,7 @@ Entity* Spaceship;
 #ifndef RASPI
 #define SHIP_SPEED 500
 
-Vec2 ScreenDimensions;
+Vec2F ScreenDimensions;
 
 static int running = 1;
 
