@@ -56,13 +56,12 @@ int SystemInit()
 
 	ScreenDimensions = NewVec2(1920, 1080);
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
-	al_set_display_flag(DISPLAY, ALLEGRO_FULLSCREEN_WINDOW);
 	if (DISPLAY == NULL)
 	{
 		printf("There has been an error with the display initialization");
 		error = 1;
 	}
-	//al_set_display_flag(DISPLAY, ALLEGRO_FULLSCREEN_WINDOW, true);
+	al_set_display_flag(DISPLAY, ALLEGRO_FULLSCREEN_WINDOW, true);
 
 	KeyboardEventSource = al_get_keyboard_event_source();
 	if (KeyboardEventSource == NULL)
@@ -1300,7 +1299,7 @@ void GameLogic()
 	{
 		fire_ready = 1;
 	}
-	//fire_ready = 1;
+	fire_ready = 1;
 	if ((clock() / CLOCKS_PER_SEC) > Mothership_time && AlienGrid->AlienCount <= AlienGrid->XAliens * AlienGrid->YAliens * 0.6 && AlienGrid->AlienCount > 0)
 	{
 		Mothership_time = (clock() / CLOCKS_PER_SEC) + MotherShip_cooldown;
