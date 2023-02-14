@@ -555,7 +555,7 @@ int GameInit()
 		error = -1;
 	}
 
-	AlienGrid = NewMatrix(AlienPaddingX, AlienPaddingY, AlienWidth, AlienHeight, XAliens, YAliens, 15);
+	AlienGrid = NewMatrix(AlienPaddingX, AlienPaddingY, AlienWidth, AlienHeight, XAliens, YAliens, 15, 150);
 	if (AlienGrid == NULL)
 	{
 		printf("There has been an error creating the Alien Matrix");
@@ -1266,6 +1266,7 @@ void GameLogic()
 
 	static double Cooldown = 0;
 	int fire_ready = 0;
+	int temporal = 1;
 	static int once = 1;
 	static double Mothership_time = 0;
 
@@ -1296,6 +1297,7 @@ void GameLogic()
 	{
 		fire_ready = 1;
 	}
+	fire_ready = 1;
 	if ((clock() / CLOCKS_PER_SEC) > Mothership_time && AlienGrid->AlienCount <= AlienGrid->XAliens * AlienGrid->YAliens * 0.6 && AlienGrid->AlienCount > 0)
 	{
 		Mothership_time = (clock() / CLOCKS_PER_SEC) + MotherShip_cooldown;
@@ -1388,8 +1390,13 @@ void GameLogic()
 		
 	}
 
-	UpdateMatrixDynamic(AlienGrid, PastFrameTime , PlaySpacePos , PlaySpaceArea);
+	temporal = UpdateMatrixDynamic(AlienGrid, PastFrameTime , PlaySpacePos , PlaySpaceArea, Spaceship);
 	AnimateMatrix(AlienGrid, DeltaTime);
+
+	if (!temporal)
+	{
+		GAMESTATE = END;
+	}
 
 	CullBullets();
 	UpdateBullets();
@@ -1488,7 +1495,7 @@ void GameLogic()
 	}
 #endif
 #ifdef RASPI
-	UpdateMatrixDynamic( AlienGrid,DeltaTime,NewVec2(0,0) , NewVec2(0, 0));
+	UpdateMatrixDynamic( AlienGrid,DeltaTime,NewVec2(0,0) , NewVec2(0, 0), Spaceship);
 	UpdateEntity(Spaceship , DeltaTime);
 
 	shootCooldown = 1 * TIME_MULTIPLIER;

@@ -35,7 +35,7 @@ struct AlienMatrix_t
 
 typedef struct AlienMatrix_t AlienMatrix;
 
-AlienMatrix* NewMatrix(int AlienPaddingX, int AlienPaddingY, int Awidth_p, int Aheight_p, int XAliens_p, int YAliens_p, int speed);
+AlienMatrix* NewMatrix(int AlienPaddingX, int AlienPaddingY, int Awidth_p, int Aheight_p, int XAliens_p, int YAliens_p, int hspeed, int vspeed);
 void DestroyMatrix( AlienMatrix * matrix );
 int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix, int * aliensDestroyed, SpriteSheet* ExplosionSpritesheet);
 int CollideEntity(Entity* BifUFOent, Entity* Bullet[]);
@@ -43,7 +43,7 @@ void DrawGrid(AlienMatrix* Matrix);
 void FillMatrix(AlienMatrix* Matrix , ALLEGRO_BITMAP * texture);
 void FillMatrixAnimated(AlienMatrix* Matrix, SpriteSheet* SpriteSheet_p);
 void UpdateMatrix(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim);
-void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim);
+int UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim, Entity* Spaceship);
 Vec2F GetCentredPosition(AlienMatrix* Matrix, Vec2 ScreenDimension);
 void AnimateMatrix(AlienMatrix* Matrix, float dt);
 void DeathAnimation(int i, int j);

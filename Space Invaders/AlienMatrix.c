@@ -1,7 +1,7 @@
 #pragma once
 #include "AlienMatrix.h"
 #ifndef RASPI
-AlienMatrix* NewMatrix( int AlienPaddingX, int AlienPaddingY , int Awidth_p , int Aheight_p, int XAliens_p, int YAliens_p, int speed)
+AlienMatrix* NewMatrix( int AlienPaddingX, int AlienPaddingY , int Awidth_p , int Aheight_p, int XAliens_p, int YAliens_p, int hspeed, int vspeed)
 {
 	AlienMatrix* TempMatrix = malloc(sizeof(AlienMatrix));
 	if (TempMatrix != NULL)
@@ -18,8 +18,8 @@ AlienMatrix* NewMatrix( int AlienPaddingX, int AlienPaddingY , int Awidth_p , in
 		TempMatrix->width = Awidth_p * XAliens_p + (XAliens_p - 1) * AlienPaddingX;
 		TempMatrix->height = Aheight_p * YAliens_p + (YAliens_p - 1) * AlienPaddingY;
 
-		TempMatrix->HorizontalSpeed = speed;
-		TempMatrix->VerticalSpeed = 6;
+		TempMatrix->HorizontalSpeed = hspeed;
+		TempMatrix->VerticalSpeed = vspeed;
 
 		TempMatrix->MicroTimeBuffer = 0.005;
 
@@ -360,7 +360,7 @@ void DrawGrid(AlienMatrix* Matrix)
 	}
 }
 
-void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim)
+int UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim, Entity* Spaceship)
 {
 	static double UpdateTimeBuffer;
 	static double MicroTimeBuffer;
@@ -370,6 +370,8 @@ void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 
 
 	static int Xcoord;
 	static int Ycoord;
+
+	int r = 1;
 
 	MicroTimeBuffer += dt;
 
@@ -466,10 +468,14 @@ void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 
 				if (Matrix->matrix[i][j] != NULL)
 				{
 					Matrix->matrix[i][j]->Pos.y += Matrix->VerticalSpeed;
+					if (Matrix->matrix[i][j]->Pos.y >= Spaceship->Pos.y - 250)
+					{
+						r=0;
+					}
 				}
 			}
 		}
 
 	}
-
+	return r;
 }
