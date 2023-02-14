@@ -435,6 +435,37 @@ int UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 P
 					bounce = true;
 
 				}
+				static int once = 1;
+				if ((Matrix->AlienCount <= 15) && (once == 1))
+				{
+					Matrix->HorizontalSpeed += 10;
+					once = 2;
+				}
+				if ((Matrix->AlienCount <= 10) && (once == 2))
+				{
+					Matrix->HorizontalSpeed += 10;
+					once = 3;
+				}
+				if ((Matrix->AlienCount <= 5) && (once == 3))
+				{
+					Matrix->HorizontalSpeed += 10;
+					once = 4;
+				}
+				if ((Matrix->AlienCount <= 2) && (once == 4))
+				{
+					Matrix->HorizontalSpeed += 10;
+					once = 5;
+				}
+				if ((Matrix->AlienCount <= 1) && (once == 5))
+				{
+					Matrix->HorizontalSpeed += 10;
+					once = 6;
+				}
+				if ((Matrix->AlienCount == 0) && (once == 2))
+				{
+					Matrix->HorizontalSpeed += 10;
+					once = 1;
+				}
 #endif
 #ifdef RASPI
 				if (Matrix->matrix[Xcoord][Ycoord]->Pos.x + Matrix->matrix[Xcoord][Ycoord]->dimensions.x >= 16 ||

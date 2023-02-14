@@ -557,7 +557,7 @@ int GameInit()
 		error = -1;
 	}
 
-	AlienGrid = NewMatrix(AlienPaddingX, AlienPaddingY, AlienWidth, AlienHeight, XAliens, YAliens, 15, 10);
+	AlienGrid = NewMatrix(AlienPaddingX, AlienPaddingY, AlienWidth, AlienHeight, XAliens, YAliens, 15, 15);
 	if (AlienGrid == NULL)
 	{
 		printf("There has been an error creating the Alien Matrix");
@@ -1263,7 +1263,7 @@ void GameLogic()
 #ifndef RASPI
 
 	static double Cooldown = 0;
-	int fire_ready = 0;
+	int fire_ready = 1;
 	int temporal = 1;
 	static int once = 1;
 	static double Mothership_time = 0;
