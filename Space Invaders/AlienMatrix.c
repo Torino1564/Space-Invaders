@@ -19,7 +19,7 @@ AlienMatrix* NewMatrix( int AlienPaddingX, int AlienPaddingY , int Awidth_p , in
 		TempMatrix->height = Aheight_p * YAliens_p + (YAliens_p - 1) * AlienPaddingY;
 
 		TempMatrix->HorizontalSpeed = speed;
-		TempMatrix->VerticalSpeed = 6;
+		TempMatrix->VerticalSpeed = 10;
 
 		TempMatrix->MicroTimeBuffer = 0.005;
 

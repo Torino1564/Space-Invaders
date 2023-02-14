@@ -13,6 +13,9 @@ shield* CreateNewShield(Vec2F pos, Vec2F vel, Vec2F Dimensions, uint16_t Xdivisi
 	TempShield->pos = pos;
 	TempShield->vel = vel;
 	TempShield->dimensions = Dimensions;
+	TempShield->width = Dimensions.x;
+	TempShield->height = Dimensions.y;
+
 
 	TempShield->Xdivisions = XDivisions;
 	TempShield->Ydivisions = YDivisions;
@@ -57,6 +60,7 @@ void FillShieldParticles(shield* shield)
 	float OXDelta = Owidth / XDivisions;
 	shield->OXdelta = OXDelta;
 	float OYDelta = Oheight / YDivisions;
+	shield->OYdelta = OYDelta;
 	shield->Factors = NewVec2F(shield->dimensions.x / Owidth, shield->dimensions.y / Oheight);
 
 	shield->particleSize.x = OXDelta * shield->Factors.x;

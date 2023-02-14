@@ -601,7 +601,7 @@ int GameInit()
 //	BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(500, 500), NewVec2F(100, 0), BigUFO, 56, 38);
 
 	numberOfShields = 3;
-	shieldSize = NewVec2F(150, 70);
+	shieldSize = NewVec2F(200, 100);
 	shieldPadding = (PlaySpaceArea.x - shieldSize.x * numberOfShields) / (numberOfShields + 1);
 	float shieldYpos = Spaceship->Pos.y - PlaySpaceArea.y * 0.15;
 
@@ -612,7 +612,7 @@ int GameInit()
 	{
 		for (int i = 0; i < numberOfShields; i++)
 		{
-			shieldArray[i] = CreateNewShield(NewVec2F(PlaySpacePos.x + shieldPadding + (i * (shieldSize.x + shieldPadding)), shieldYpos), NewVec2F(0, 0), NewVec2F(150, 70), 10, ShieldTexture);
+			shieldArray[i] = CreateNewShield(NewVec2F(PlaySpacePos.x + shieldPadding + (i * (shieldSize.x + shieldPadding)), shieldYpos), NewVec2F(0, 0), shieldSize, 10, ShieldTexture);
 			FillShieldParticles(shieldArray[i]);
 		}
 	}
@@ -1269,17 +1269,17 @@ void GameLogic()
 					Cooldown = clock() / CLOCKS_PER_SEC + Cooldown_c;
 					fire_ready = 0;
 					shot = true;
-					for (int i = 0; i < 10; i++)
+					for (int i = 1; i < MAX_BULLETS; i++)
 					{
 						if (i == 9)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y - 2), NewVec2F(0, -900), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y + 5), NewVec2F(0, -900), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
 
 						if (Bullets[i] == NULL)
 						{
-							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y - 2), NewVec2F(0, -900), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
+							Bullets[i] = CreateNewEntityLoadedTexture(NewVec2F((int)(Spaceship->Pos.x) + Spaceship->width / 2 - 24 / 2, Gun->Pos.y + 5), NewVec2F(0, -900), BulletTexture, al_get_bitmap_width(BulletTexture), al_get_bitmap_height(BulletTexture));
 							break;
 						}
 
@@ -1320,7 +1320,7 @@ void GameLogic()
 	UpdateAnimations(DeltaTime);
 
 	ComputeAlienShot();
-
+	CollidePlayerBulletsWithShields();
 	UpdateEntity(Spaceship, DeltaTime);
 	UpdateEntity(Gun, DeltaTime);
 	aliendeath = CollideGrid(Bullets, AlienGrid, &aliensDestroyed, MiniUFO_Explosion);
@@ -1352,7 +1352,7 @@ void GameLogic()
 	score = aliensDestroyed * 10 + (Level - 1) * 100 + BigUFOsDestroyed * 100;
 
 	ClipToScreen(Spaceship, ScreenDimensions);
-	ClipToEntity(Gun, Spaceship, 20);
+	ClipToEntity(Gun, Spaceship, 25);
 
 	AnimateBullets();
 	CollideAlienBullets();
@@ -1394,8 +1394,7 @@ void GameLogic()
 			}
 		}
 		AlienGrid->Pos = GetCentredPosition(AlienGrid, ScreenDimensions);
-		AlienGrid->Pos.y += 60;
-		//FillMatrix(AlienGrid, AlienTexture);
+		AlienGrid->Pos.y = ScreenDimensions.y * 0.2;
 		FillMatrixAnimated(AlienGrid, MiniUFO);
 
 
@@ -1847,102 +1846,52 @@ void CollideAlienBullets()
 				{
 					if (shieldArray[AlienBullets[i]->data - 1]->destroyed == false)
 					{
-						if ((AlienBullets[i]->Pos.y >= shieldArray[AlienBullets[i]->data - 1]->pos.y) &&
-							(AlienBullets[i]->Pos.y - AlienBullets[i]->height <= shieldArray[AlienBullets[i]->data - 1]->pos.y + shieldArray[AlienBullets[i]->data - 1]->dimensions.y))
+						if (AlienBullets[i]->Pos.y + AlienBullets[i]->height >= shieldArray[AlienBullets[i]->data - 1]->pos.y &&
+							AlienBullets[i]->Pos.y <= shieldArray[AlienBullets[i]->data - 1]->pos.y + shieldArray[AlienBullets[i]->data - 1]->dimensions.y)
 						{
 							float hitShieldAt = (AlienBullets[i]->Pos.x + AlienBullets[i]->width) - shieldArray[AlienBullets[i]->data - 1]->pos.x;
-							int divisionNumer = IMaxClampTo((hitShieldAt / shieldArray[AlienBullets[i]->data - 1]->Factors.x) / shieldArray[AlienBullets[i]->data - 1]->OXdelta, 29);
-#ifdef _DEBUG
-							al_draw_filled_circle(AlienBullets[i]->Pos.x, AlienBullets[i]->Pos.y, 20, al_map_rgb(255, 0, 0));
-							al_flip_display();
-#endif
-							for (int l = 0; l < shieldArray[AlienBullets[i]->data - 1]->Ydivisions; l++)
+							int divisionNumer = IMaxClampTo((hitShieldAt / shieldArray[AlienBullets[i]->data - 1]->Factors.x) / shieldArray[AlienBullets[i]->data - 1]->OXdelta, shieldArray[AlienBullets[i]->data - 1]->Xdivisions - 1);
+
+							float hitshieldAtY = (AlienBullets[i]->Pos.y + AlienBullets[i]->height) - shieldArray[AlienBullets[i]->data - 1]->pos.y;
+							int divisionNumberY = IMaxClampTo((hitshieldAtY / shieldArray[AlienBullets[i]->data - 1]->Factors.y) / shieldArray[AlienBullets[i]->data - 1]->OYdelta, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1);
+
+							if (shieldArray[AlienBullets[i]->data - 1]->Particles[divisionNumer][divisionNumberY] == true)
 							{
-								if (shieldArray[AlienBullets[i]->data - 1]->Particles[divisionNumer][l] == true)
+								DestroyRadiusAround(4, shieldArray[AlienBullets[i]->data - 1], (Vec2) { divisionNumer, divisionNumberY});
+
+								int aliveParticleCount = 0;
+								for (int k = 0; k < shieldArray[AlienBullets[i]->data - 1]->Xdivisions; k++)
 								{
-									int OriginalX = divisionNumer;
-									int OriginalY = l;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[divisionNumer][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[divisionNumer][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[divisionNumer][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[divisionNumer][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[divisionNumer][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-
-									shieldArray[AlienBullets[i]->data - 1]->Particles[divisionNumer][IMaxClampTo(l + 2, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[divisionNumer][IMaxClampTo(l + 4, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-
-
-									l = OriginalY;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMinClampTo(divisionNumer--, 0)][IMinClampTo(--l, 0)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMinClampTo(divisionNumer, 0)][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMinClampTo(divisionNumer, 0)][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMinClampTo(divisionNumer, 0)][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMinClampTo(divisionNumer, 0)][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMinClampTo(divisionNumer, 0)][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMinClampTo(divisionNumer, 0)][IMaxClampTo(l + 2, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-
-									l = OriginalY;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMinClampTo(divisionNumer, 0)][IMaxClampTo(l, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMinClampTo(--divisionNumer, 0)][IMaxClampTo(l + 2, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMinClampTo(divisionNumer, 0)][IMaxClampTo(l + 4, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMinClampTo(--divisionNumer, 0)][IMaxClampTo(l + 3, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-
-									divisionNumer = OriginalX;
-									l = OriginalY;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(++divisionNumer, shieldArray[AlienBullets[i]->data - 1]->Xdivisions - 1)][IMaxClampTo(l, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(divisionNumer, shieldArray[AlienBullets[i]->data - 1]->Xdivisions - 1)][IMaxClampTo(l + 1, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(divisionNumer, shieldArray[AlienBullets[i]->data - 1]->Xdivisions - 1)][IMaxClampTo(l + 2, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(divisionNumer, shieldArray[AlienBullets[i]->data - 1]->Xdivisions - 1)][IMaxClampTo(l + 3, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(divisionNumer, shieldArray[AlienBullets[i]->data - 1]->Xdivisions - 1)][IMaxClampTo(l + 5, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(divisionNumer, shieldArray[AlienBullets[i]->data - 1]->Xdivisions - 1)][IMaxClampTo(l + 7, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(++divisionNumer, shieldArray[AlienBullets[i]->data - 1]->Xdivisions - 1)][IMaxClampTo(l + 2, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(++divisionNumer, shieldArray[AlienBullets[i]->data - 1]->Xdivisions - 1)][IMaxClampTo(l + 4, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-
-
-									divisionNumer = OriginalX;
-									l = OriginalY;
-
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(++divisionNumer, 29)][IMinClampTo(--l, 0)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(divisionNumer, 29)][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(divisionNumer, 29)][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(divisionNumer, 29)][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(divisionNumer, 29)][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(divisionNumer, 29)][IMaxClampTo(l++, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-									shieldArray[AlienBullets[i]->data - 1]->Particles[IMaxClampTo(divisionNumer, 29)][IMaxClampTo(l + 1, shieldArray[AlienBullets[i]->data - 1]->Ydivisions - 1)] = false;
-
-									int aliveParticleCount = 0;
-									for (int k = 0; k < shieldArray[AlienBullets[i]->data - 1]->Xdivisions; k++)
+									for (int l = 0; l < shieldArray[AlienBullets[i]->data - 1]->Ydivisions; l++)
 									{
-										for (int l = 0; l < shieldArray[AlienBullets[i]->data - 1]->Ydivisions; l++)
+										if (shieldArray[AlienBullets[i]->data - 1]->Particles[k][l] == true)
 										{
-											if (shieldArray[AlienBullets[i]->data - 1]->Particles[k][l] == true)
-											{
-												aliveParticleCount++;
-											}
+											aliveParticleCount++;
 										}
 									}
-
-									if (aliveParticleCount <= (shieldArray[AlienBullets[i]->data - 1]->originalSize) * 0.6)
-									{
-										shieldArray[AlienBullets[i]->data - 1]->destroyed = true;
-										CreateNewAnimation(NewVec2F(shieldArray[AlienBullets[i]->data - 1]->pos.x - shieldArray[AlienBullets[i]->data - 1]->dimensions.x / 2 + ShieldExplosion->frameWidth / 2,
-											shieldArray[AlienBullets[i]->data - 1]->pos.y - shieldArray[AlienBullets[i]->data - 1]->dimensions.y + ShieldExplosion->frameHeight / 3 ),
-											NewVec2F(0, 0), 0, ShieldExplosion, shieldArray[AlienBullets[i]->data - 1]->dimensions.x * 1.4, shieldArray[AlienBullets[i]->data - 1]->dimensions.y * 2);
-									
-										al_play_sample(ShieldDestroyed, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
-									}
-
-									CreateNewAnimation(NewVec2F(AlienBullets[i]->Pos.x + AlienBullets[i]->spriteS->frameWidth /4 - BulletExplosion->frameWidth / 2,
-										AlienBullets[i]->Pos.y + AlienBullets[i]->spriteS->frameHeight / 5 - BulletExplosion->frameHeight / 2), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
-
-									al_play_sample(ShieldImpact, 0.3, 0, 0.8, ALLEGRO_PLAYMODE_ONCE, NULL);
-
-									DestroyAnimatedEntitySharedSprite(AlienBullets[i]);
-									AlienBullets[i] = NULL;
-									break;
-
 								}
+
+								if (aliveParticleCount <= (shieldArray[AlienBullets[i]->data - 1]->originalSize) * 0.4)
+								{
+									shieldArray[AlienBullets[i]->data - 1]->destroyed = true;
+									CreateNewAnimation(NewVec2F(shieldArray[AlienBullets[i]->data - 1]->pos.x - shieldArray[AlienBullets[i]->data - 1]->dimensions.x / 2 + ShieldExplosion->frameWidth / 2,
+										shieldArray[AlienBullets[i]->data - 1]->pos.y - shieldArray[AlienBullets[i]->data - 1]->dimensions.y + ShieldExplosion->frameHeight / 3 ),
+										NewVec2F(0, 0), 0, ShieldExplosion, shieldArray[AlienBullets[i]->data - 1]->dimensions.x * 1.4, shieldArray[AlienBullets[i]->data - 1]->dimensions.y * 2);
+									
+									al_play_sample(ShieldDestroyed, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+								}
+
+								CreateNewAnimation(NewVec2F(AlienBullets[i]->Pos.x + AlienBullets[i]->spriteS->frameWidth /4 - BulletExplosion->frameWidth / 2,
+									AlienBullets[i]->Pos.y + AlienBullets[i]->height / 2 - BulletExplosion->frameHeight / 2), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
+
+								al_play_sample(ShieldImpact, 0.3, 0, 0.8, ALLEGRO_PLAYMODE_ONCE, NULL);
+
+								DestroyAnimatedEntitySharedSprite(AlienBullets[i]);
+								AlienBullets[i] = NULL;
+								break;
+
 							}
+		
 						}
 					}
 				}
@@ -2161,19 +2110,101 @@ void ProcessHP()
 
 int CollidePlayerBulletsWithShields()
 {
-	for (int i = 0; i < MAX_BULLETS; i++)
+	for (int i = 1; i < MAX_BULLETS; i++)
 	{
-		if (Bullets[i] == NULL)
-		{
-			break;
-		}
+		if (Bullets[i] == NULL) continue;
+		
 		for (int j = 0; j < numberOfShields; j++)
 		{
-			if (shieldArray[j] == NULL)
+			if (shieldArray[j] != NULL && Bullets[i] != NULL)
 			{
-				break;
+				if (shieldArray[j]->destroyed == true) continue;
+				if (Bullets[i]->Pos.y + Bullets[i]->height >= shieldArray[j]->pos.y &&
+					Bullets[i]->Pos.y <= shieldArray[j]->pos.y + shieldArray[j]->dimensions.y)
+				{
+					float right0 = Bullets[i]->Pos.x + Bullets[i]->width;
+					float bottom0 = Bullets[i]->Pos.y + Bullets[i]->height;
+					float right1 = shieldArray[j]->pos.x + shieldArray[j]->width;
+					float bottom1 = shieldArray[j]->pos.y + shieldArray[j]->height;
+
+					if (right0 >= shieldArray[j]->pos.x &&
+						Bullets[i]->Pos.x <= right1 &&
+						bottom0 >= shieldArray[j]->pos.y &&
+						Bullets[i]->Pos.y <= bottom1)
+					{
+
+						float hitShieldAt = (Bullets[i]->Pos.x + Bullets[i]->width / 2) - shieldArray[j]->pos.x;
+						int divisionNumer = IMaxClampTo((hitShieldAt / shieldArray[j]->Factors.x) / shieldArray[j]->OXdelta, shieldArray[j]->Xdivisions - 1);
+
+						float hitShieldAtY = (Bullets[i]->Pos.y) - shieldArray[j]->pos.y;
+						int YdivisionNumber = IMaxClampTo((hitShieldAtY / shieldArray[j]->Factors.y) / shieldArray[j]->OYdelta, shieldArray[j]->Ydivisions - 1);
+
+						if (shieldArray[j]->Particles[divisionNumer][YdivisionNumber] == true
+							|| shieldArray[j]->Particles[IMinClampTo(divisionNumer - 1, 0)][YdivisionNumber] == true)
+						{
+
+
+							DestroyRadiusAround(3, shieldArray[j], (Vec2) { divisionNumer, YdivisionNumber });
+
+
+							int aliveParticleCount = 0;
+							for (int k = 0; k < shieldArray[j]->Xdivisions; k++)
+							{
+								for (int l = 0; l < shieldArray[j]->Ydivisions; l++)
+								{
+									if (shieldArray[j]->Particles[k][l] == true)
+									{
+										aliveParticleCount++;
+									}
+								}
+							}
+
+							if (aliveParticleCount <= (shieldArray[j]->originalSize) * 0.4)
+							{
+								shieldArray[j]->destroyed = true;
+								CreateNewAnimation(NewVec2F(shieldArray[j]->pos.x - shieldArray[j]->dimensions.x / 2 + ShieldExplosion->frameWidth / 2,
+									shieldArray[j]->pos.y - shieldArray[j]->dimensions.y + ShieldExplosion->frameHeight / 3),
+									NewVec2F(0, 0), 0, ShieldExplosion, shieldArray[j]->dimensions.x * 1.4, shieldArray[j]->dimensions.y * 2);
+
+								al_play_sample(ShieldDestroyed, 0.3, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
+							}
+							else
+							{
+								CreateNewAnimation(NewVec2F(Bullets[i]->Pos.x - BulletExplosion->frameWidth / 2,
+									Bullets[i]->Pos.y - Bullets[i]->height / 2 - BulletExplosion->frameHeight / 2), NewVec2F(0, 0), 0, BulletExplosion, 50, 50);
+
+								al_play_sample(ShieldImpact, 0.3, 0, 0.8, ALLEGRO_PLAYMODE_ONCE, NULL);
+							}
+
+							DestroyAnimatedEntitySharedSprite(Bullets[i]);
+							Bullets[i] = NULL;
+							i = MAX_BULLETS;
+							j = numberOfShields;
+							break;
+
+						}
+
+
+					}
+				}
 			}
-			if (AreColiding(Bullets[i] , shieldArray[j].))
+		}
+	}
+}
+
+void DestroyRadiusAround(int Radius, shield* shield , Vec2 HitPosition)
+{
+	for (int i = 0; i < shield->Xdivisions; i++)
+	{
+		for (int j = 0; j < shield->Ydivisions ;j++)
+		{
+			if (SquaredModulus(SubVec2(&HitPosition, &(Vec2) { i, j })) <= Radius * Radius)
+			{
+				if (i >= 0 && i < shield->Xdivisions && j >= 0 && j < shield->Ydivisions)
+				{
+					shield->Particles[i][j] = false;
+				}
+			}
 		}
 	}
 }

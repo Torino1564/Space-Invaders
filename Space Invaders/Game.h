@@ -117,12 +117,13 @@ int AlienBulletsHit();
 void ProcessHP();
 #ifndef RASPI
 void AnimateBullets();
+int CollidePlayerBulletsWithShields();
 void CollideAlienBullets();
+void DestroyRadiusAround(int Radius, shield* shield, Vec2 HitPosition);
+
 #endif
 #ifdef RASPI
 int ColideAlienBullets();
-
-
 #endif
 
 Entity* Spaceship;

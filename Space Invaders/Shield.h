@@ -15,6 +15,8 @@ struct shield_t
 	Vec2F vel;
 
 	Vec2F dimensions;
+	int width;
+	int height;
 	uint16_t Xdivisions;
 	uint16_t Ydivisions;
 
@@ -22,6 +24,7 @@ struct shield_t
 	Vec2F Factors;
 
 	float OXdelta;
+	float OYdelta;
 
 	ALLEGRO_BITMAP* Texture;
 	SpriteSheet* Sprite;
