@@ -7,7 +7,7 @@
 #include <allegro5/allegro_primitives.h>
 
 #define XDivisions 30
-#define YDivisions 20
+#define YDivisions 30
 
 struct shield_t
 {

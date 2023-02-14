@@ -10,6 +10,7 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <allegro5/allegro_primitives.h>
+#include <math.h>
 #endif
 #include <stdio.h>
 #include "Entity.h"
@@ -47,7 +48,6 @@ void MotherShip();
 
 #define ALIEN_TEXTURE1 "Resources/Assets/alien1.png"
 #define BULLET_TEXTURE1 "Resources/Assets/bullet.png"
-#define DEATH_TEXTURE "Resources/Assets/death.png"
 #define EXPLOSION_SPRITE "Resources/Assets/MiniUFOExplosion.png"
 #define SHIP_TEXTURE	"Resources/Assets/Ship.png"
 #define GUN_TEXTURE "Resources/Assets/Gun.png"
@@ -235,7 +235,6 @@ Entity* AlienBullets[MAX_ALIEN_BULLETS];
 Entity* BigUFOent;
 #ifndef RASPI
 ALLEGRO_BITMAP* BulletTexture;
-ALLEGRO_BITMAP* DeathTexture;
 #endif
 int numberOfShields;
 double motherShipCooldown;
@@ -368,7 +367,7 @@ enum GAMESTATE {PLAYING_STATE , PAUSE, END , EXIT};
 /* =============================
 			global variables
 =============================== */
-
+int RestartGame;
 int Level;
 int Once;
 int Moving;
@@ -387,5 +386,6 @@ double AlienShootInterval;
 double AlienShotSpeed;
 double Cooldown_c;
 int BigUfo_passing;
+int BigUFOalive;
 int BigUFOsDestroyed;
 int wasMotherShipDestroyed;

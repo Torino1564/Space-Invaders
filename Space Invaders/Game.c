@@ -214,7 +214,16 @@ int Menu()
 		al_flip_display();
 
 	}
+
+	al_destroy_bitmap(Start1);
+	al_destroy_bitmap(Start2);
+	al_destroy_bitmap(Exit1);
+	al_destroy_bitmap(Exit2);
+
+	al_destroy_bitmap(menu);
+
 	al_stop_samples();
+	al_destroy_sample(menuMusic);
 #endif
 #ifdef RASPI
 	ClearGrid();
@@ -524,9 +533,9 @@ int GameInit()
 	int AlienPaddingX = 20;
 	int AlienPaddingY = 10;
 	XAliens = 11;
-	YAliens = 5;
-	AlienWidth = 45;
-	AlienHeight = 45;
+	YAliens = 4;
+	AlienWidth = 60;
+	AlienHeight = 60;
 
 	int	SpaceshipWidth = 180;
 	int	SpaceshipHeight = 100;
@@ -630,8 +639,6 @@ int GameInit()
 
 	BulletExplosion = NewSpriteSheet(BULLET_EXPLOSION_SS, (float)((float)1 / (float)20), 14, 35, 35, 1);
 
-	DeathTexture = al_load_bitmap(DEATH_TEXTURE);
-
 	MiniUFO = NewSpriteSheet(MINIUFO1SP, (float)((float)1 / (float)12), 16, 44, 38, 1);
 
 	MiniUFO_Explosion = NewSpriteSheet(EXPLOSION_SPRITE, (float)((float)1 / (float)15), 22, 70, 70, 1);
@@ -648,7 +655,7 @@ int GameInit()
 //	BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(500, 500), NewVec2F(100, 0), BigUFO, 56, 38);
 
 	numberOfShields = 3;
-	shieldSize = NewVec2F(200, 100);
+	shieldSize = NewVec2F(150, 150);
 	shieldPadding = (PlaySpaceArea.x - shieldSize.x * numberOfShields) / (numberOfShields + 1);
 	float shieldYpos = Spaceship->Pos.y - PlaySpaceArea.y * 0.2;
 
@@ -664,9 +671,12 @@ int GameInit()
 		}
 	}
 
+	BigUFOalive = 0;
+
 	//Score system init
 
 	Once = 0;
+	RestartGame = 1;
 	lives = 3;
 	ALLEGRO_EVENT TempEvent;
 	while (!al_get_next_event(InputEventQueue , &TempEvent));
@@ -767,14 +777,20 @@ void GameDestroy()
 	al_destroy_bitmap(deadheart);
 
 	DeleteSpriteSheet(BulletExplosion);
-	al_destroy_bitmap(DeathTexture);
 	DeleteSpriteSheet(MiniUFO_Explosion);
 	DeleteSpriteSheet(ShieldExplosion);
 
 	DestroyEntity(Gun);
+	if (BigUFOalive == 1)
+	{
+		DestroyAnimatedEntitySharedSprite(BigUFOent);
+	}
 	DeleteSpriteSheet(MiniUFO);
 	DeleteSpriteSheet(BigUFO);
+	DeleteSpriteSheet(BigExplosion);
 	DeleteSpriteSheet(Slug);
+	DeleteSpriteSheet(Stp_b);
+	DeleteSpriteSheet(Stp_f);
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -836,7 +852,6 @@ void SystemDestroy()
 #ifndef RASPI
 	al_destroy_font(font);
 	al_destroy_font(BigFont);
-	al_destroy_bitmap(menu);
 	al_destroy_display(DISPLAY);
 	al_destroy_user_event_source(KeyboardEventSource);
 	al_destroy_user_event_source(MouseEventSource);
@@ -1250,6 +1265,14 @@ void GameLogic()
 	static int once = 1;
 	static double Mothership_time = 0;
 
+	if (RestartGame == 1)
+	{
+		Mothership_time = 0;
+
+		RestartGame = 0;
+	}
+
+
 	/*switch (Level)
 	{
 	case 1: 
@@ -1269,12 +1292,12 @@ void GameLogic()
 	{
 		fire_ready = 1;
 	}
-	if ((clock() / CLOCKS_PER_SEC) > Mothership_time)
+	if ((clock() / CLOCKS_PER_SEC) > Mothership_time && AlienGrid->AlienCount <= AlienGrid->XAliens * AlienGrid->YAliens * 0.6 && AlienGrid->AlienCount > 0)
 	{
 		Mothership_time = (clock() / CLOCKS_PER_SEC) + MotherShip_cooldown;
-		BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(430, 50), NewVec2F(200, 0), BigUFO, 56, 38);
+		BigUFOent = CreateNewAnimatedEntityLoadedTexture(NewVec2F(430, 50), NewVec2F(200, 0), BigUFO, 120, 80);
 		BigUfo_passing = 1;
-//		i = CreateNewAnimation(NewVec2F(500, 500), NewVec2F(100, 0), 10, BigUFO, 56, 38);
+		BigUFOalive = 1;
 	}
 
 
@@ -1301,7 +1324,6 @@ void GameLogic()
 				break;
 			case ALLEGRO_KEY_S:
 				Level += 1;
-				lives -= 1;
 				Once = 0;
 				break;
 			case ALLEGRO_KEY_F4:
@@ -1373,30 +1395,37 @@ void GameLogic()
 	UpdateEntity(Spaceship, DeltaTime);
 	UpdateEntity(Gun, DeltaTime);
 	aliendeath = CollideGrid(Bullets, AlienGrid, &aliensDestroyed, MiniUFO_Explosion);
-	UpdateEntity(BigUFOent, DeltaTime);
-	Animate(BigUFOent, DeltaTime);
-
-
-	for (int i = 0; i < 10; i++)
+	if (BigUFOalive == true)
 	{
-		if (Bullets[i] != NULL && BigUFOent != NULL)
+		UpdateEntity(BigUFOent, DeltaTime);
+		Animate(BigUFOent, DeltaTime);
+	}
+	
+	if (BigUFOalive == 1)
+	{
+		for (int i = 0; i < 10; i++)
 		{
-			if (AreColiding(BigUFOent, Bullets[i]))
+			if (Bullets[i] != NULL && BigUFOent != NULL)
 			{
-				CreateNewAnimation(BigUFOent->Pos, NewVec2F(0, 0), 0, BigExplosion, 79, 94);
+				if (AreColiding(BigUFOent, Bullets[i]))
+				{
+					CreateNewAnimation(BigUFOent->Pos, NewVec2F(0, 0), 0, BigExplosion, BigUFOent->width * 1.3, BigUFOent->height * 1.7);
 
-				DestroyEntityLoadedTexture(Bullets[i]);
-				Bullets[i] = NULL;
-				
-				DestroyAnimatedEntitySharedSprite(BigUFOent);
-				BigUFOent = NULL;
+					DestroyEntityLoadedTexture(Bullets[i]);
+					Bullets[i] = NULL;
 
-				BigUFOsDestroyed++;
+					DestroyAnimatedEntitySharedSprite(BigUFOent);
+					BigUFOent = NULL;
 
-				return true;
+					BigUFOsDestroyed++;
+
+					BigUFOalive = 1;;
+					return true;
+				}
 			}
 		}
 	}
+	
 
 	score = aliensDestroyed * 10 + (Level - 1) * 100 + BigUFOsDestroyed * 100;
 
@@ -1445,6 +1474,10 @@ void GameLogic()
 		AlienGrid->Pos = GetCentredPosition(AlienGrid, ScreenDimensions);
 		AlienGrid->Pos.y = ScreenDimensions.y * 0.2;
 		FillMatrixAnimated(AlienGrid, MiniUFO);
+		for (int i = 0; i < numberOfShields; i++)
+		{
+			FillShieldParticles(shieldArray[i]);
+		}
 
 
 	}
@@ -1645,7 +1678,10 @@ void GameRender()
 	DrawEntity(Gun);
 	DrawEntity(Spaceship);
 	
-	DrawEntity(BigUFOent);
+	if (BigUFOalive)
+	{
+		DrawEntity(BigUFOent);
+	}
 
 	//Enemies
 
@@ -1817,7 +1853,7 @@ void ComputeAlienShot()
 
 	timeBuffer += DeltaTime;
 
-	if (timeBuffer >= BASE_ALIEN_SHOT_SPEED)
+	if (timeBuffer >= BASE_ALIEN_SHOT_SPEED * 1/log(MinClampTo(Level,2)) * (MinClampTo((float)AlienGrid->AlienCount / (float)(AlienGrid->XAliens * AlienGrid->YAliens), 1 / 2)))
 	{
 		timeBuffer = 0;
 
