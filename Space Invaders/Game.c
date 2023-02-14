@@ -594,6 +594,7 @@ int GameInit()
 	level4Music = al_load_sample(MUSIC_LEVEL4);
 	BigUFO_sound = al_load_sample(BIGUFO_MUSIC);
 	ok_sound = al_load_sample(OK_MUSIC);
+	letter_sound = al_load_sample(LET_SOUND);
 
 
 	Bullet_sound = al_load_sample(PLAYERSHOTSFX);
@@ -836,6 +837,7 @@ void GameDestroy()
 	al_destroy_sample(alien_death_sound);
 	al_destroy_sample(BigUFO_sound);
 	al_destroy_sample(ok_sound);
+	al_destroy_sample(letter_sound);
 
 	al_destroy_sample(ShieldImpact);
 	al_destroy_sample(ShieldDestroyed);
@@ -1097,6 +1099,7 @@ void EndScreen()
 			switch (TempEvent.type)
 			{
 			case ALLEGRO_EVENT_KEY_DOWN:
+				al_play_sample(letter_sound, 0.2, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 				switch (TempEvent.keyboard.keycode)
 				{
 				case ALLEGRO_KEY_SPACE:
@@ -1105,6 +1108,7 @@ void EndScreen()
 					break;
 				case ALLEGRO_KEY_ENTER:
 					finished = 1;
+					al_stop_samples();
 					al_play_sample(ok_sound, 0.5, 0, 1, ALLEGRO_PLAYMODE_ONCE, NULL);
 				}
 			}
@@ -1322,10 +1326,11 @@ void GameLogic()
 				Spaceship->Vel.x += SHIP_SPEED;
 				Gun->Vel.x += SHIP_SPEED;
 				break;
-			case ALLEGRO_KEY_S:
-				Level += 1;
-				Once = 0;
-				break;
+//			case ALLEGRO_KEY_S:
+//				Level += 1;
+//				lives -= 1;
+//				Once = 0;
+//				break;
 			case ALLEGRO_KEY_F4:
 				if (al_key_down(&KeyboardCurrentState, ALLEGRO_KEY_ALT))
 				{

@@ -292,6 +292,7 @@ int YAliens;
 #define BACKGROUNDMUSIC2 NULL
 
 #define ALIENDEATHSFX "Resources/Audio/AlienExplosion2.wav"
+#define ALIEN_DYING "Resources/Audio/aliendeathsound.mp3"
 #define ALIEN1SFX	"Resources/Audio/fastinvader1.wav"
 #define ALIEN2SFX	"Resources/Audio/fastinvader2.wav"
 #define ALIEN3SFX	"Resources/Audio/fastinvader3.wav"
@@ -313,6 +314,7 @@ int YAliens;
 #define SHIELD_EXPLOSION "Resources/Audio/ShieldExplosion.wav"
 #define BIGUFO_MUSIC "Resources/Audio/ufo_lowpitch.wav"
 #define OK_MUSIC "Resources/Audio/ok-metal-slug-sound.mp3"
+#define LET_SOUND "Resources/Audio/l.mp3"
 
 ALLEGRO_MIXER* Mixer;
 
@@ -346,6 +348,7 @@ ALLEGRO_SAMPLE* Bullet_sound;
 ALLEGRO_SAMPLE* alien_death_sound;
 ALLEGRO_SAMPLE* BigUFO_sound;
 ALLEGRO_SAMPLE* ok_sound;
+ALLEGRO_SAMPLE* letter_sound;
 
 ALLEGRO_SAMPLE_ID* BigUFO_sound_id;
 
