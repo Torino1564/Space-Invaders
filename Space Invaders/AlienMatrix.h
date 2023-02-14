@@ -46,6 +46,7 @@ void UpdateMatrix(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAre
 int UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim, Entity* Spaceship);
 Vec2F GetCentredPosition(AlienMatrix* Matrix, Vec2 ScreenDimension);
 void AnimateMatrix(AlienMatrix* Matrix, float dt);
+void DeathAnimation(int i, int j);
 #endif
 
 #ifdef RASPI
