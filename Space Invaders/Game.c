@@ -472,6 +472,11 @@ int Menu()
 int GameInit()
 {
 #ifndef RASPI
+
+	al_clear_to_color(al_map_rgb(0, 0, 0));
+	al_draw_text(font, al_map_rgb(255, 255, 255), ScreenDimensions.x / 2, ScreenDimensions.y / 2, ALLEGRO_ALIGN_CENTER, "LOADING . . .");
+	al_flip_display();
+
 	int error = 0;
 
 	int AlienPaddingX = 20;
@@ -557,7 +562,7 @@ int GameInit()
 	Stp_b = NewSpriteSheet(STOP_BACKWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
 	Stp_f = NewSpriteSheet(STOP_FORWARDS, (float)((float)1 / (float)20), 20, 66, 38, 1);
 
-	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x / 2 - 50 / 2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
+	Spaceship = CreateNewAnimatedEntityLoadedTexture(NewVec2F(ScreenDimensions.x / 2 - SpaceshipWidth / 2, SpaceshipYcoord), NewVec2F(0, 0), Slug, SpaceshipWidth, SpaceshipHeight);
 	Spaceship->data = 0; //El Spaceship esta quieto esperando movimiento
 
 	if (Spaceship == NULL)
@@ -603,7 +608,7 @@ int GameInit()
 	numberOfShields = 3;
 	shieldSize = NewVec2F(200, 100);
 	shieldPadding = (PlaySpaceArea.x - shieldSize.x * numberOfShields) / (numberOfShields + 1);
-	float shieldYpos = Spaceship->Pos.y - PlaySpaceArea.y * 0.15;
+	float shieldYpos = Spaceship->Pos.y - PlaySpaceArea.y * 0.2;
 
 	shieldArray[0] = calloc(numberOfShields, sizeof(shield));
 
@@ -1448,6 +1453,10 @@ void GameLogic()
 	{
 		PlayAudio(INVADER_DEATH_t);
 	}
+	if (CollidePlayerBulletsWithShields())
+	{
+		PlayAudio(SHIELD_HIT_t);
+	}
 	ClamToScreen(Spaceship);
 	MotherShip();
 	ComputeAlienShot();
@@ -1900,6 +1909,23 @@ void CollideAlienBullets()
 		}
 	}
 }
+
+void DestroyRadiusAround(int Radius, shield* shield, Vec2 HitPosition)
+{
+	for (int i = 0; i < shield->Xdivisions; i++)
+	{
+		for (int j = 0; j < shield->Ydivisions; j++)
+		{
+			if (SquaredModulus(SubVec2(&HitPosition, &(Vec2) { i, j })) <= Radius * Radius)
+			{
+				if (i >= 0 && i < shield->Xdivisions && j >= 0 && j < shield->Ydivisions)
+				{
+					shield->Particles[i][j] = false;
+				}
+			}
+		}
+	}
+}
 #endif
 #ifdef RASPI
 void ComputeAlienShot()
@@ -2118,6 +2144,7 @@ int CollidePlayerBulletsWithShields()
 		{
 			if (shieldArray[j] != NULL && Bullets[i] != NULL)
 			{
+#ifndef RASPI
 				if (shieldArray[j]->destroyed == true) continue;
 				if (Bullets[i]->Pos.y + Bullets[i]->height >= shieldArray[j]->pos.y &&
 					Bullets[i]->Pos.y <= shieldArray[j]->pos.y + shieldArray[j]->dimensions.y)
@@ -2187,27 +2214,25 @@ int CollidePlayerBulletsWithShields()
 
 					}
 				}
+#endif
+#ifdef RASPI
+				if (ColideAndDestroy(shieldArray[j], Bullets[i]))
+				{
+					DestroyEntity(Bullets[i]);
+					Bullets[i] = NULL;
+
+					return true;
+
+				}
+
+#endif
 			}
 		}
 	}
+	return false;
 }
 
-void DestroyRadiusAround(int Radius, shield* shield , Vec2 HitPosition)
-{
-	for (int i = 0; i < shield->Xdivisions; i++)
-	{
-		for (int j = 0; j < shield->Ydivisions ;j++)
-		{
-			if (SquaredModulus(SubVec2(&HitPosition, &(Vec2) { i, j })) <= Radius * Radius)
-			{
-				if (i >= 0 && i < shield->Xdivisions && j >= 0 && j < shield->Ydivisions)
-				{
-					shield->Particles[i][j] = false;
-				}
-			}
-		}
-	}
-}
+
 
 #ifdef RASPI
 void MotherShip()

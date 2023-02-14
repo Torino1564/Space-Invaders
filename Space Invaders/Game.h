@@ -115,9 +115,9 @@ void ComputeAlienShot();
 void DrawBullets();
 int AlienBulletsHit();
 void ProcessHP();
+int CollidePlayerBulletsWithShields();
 #ifndef RASPI
 void AnimateBullets();
-int CollidePlayerBulletsWithShields();
 void CollideAlienBullets();
 void DestroyRadiusAround(int Radius, shield* shield, Vec2 HitPosition);
 
