@@ -555,7 +555,7 @@ int GameInit()
 		error = -1;
 	}
 
-	AlienGrid = NewMatrix(AlienPaddingX, AlienPaddingY, AlienWidth, AlienHeight, XAliens, YAliens, 15, 150);
+	AlienGrid = NewMatrix(AlienPaddingX, AlienPaddingY, AlienWidth, AlienHeight, XAliens, YAliens, 15, 10);
 	if (AlienGrid == NULL)
 	{
 		printf("There has been an error creating the Alien Matrix");
@@ -1297,7 +1297,7 @@ void GameLogic()
 	{
 		fire_ready = 1;
 	}
-	fire_ready = 1;
+	//fire_ready = 1;
 	if ((clock() / CLOCKS_PER_SEC) > Mothership_time && AlienGrid->AlienCount <= AlienGrid->XAliens * AlienGrid->YAliens * 0.6 && AlienGrid->AlienCount > 0)
 	{
 		Mothership_time = (clock() / CLOCKS_PER_SEC) + MotherShip_cooldown;
@@ -1390,13 +1390,11 @@ void GameLogic()
 		
 	}
 
-	temporal = UpdateMatrixDynamic(AlienGrid, PastFrameTime , PlaySpacePos , PlaySpaceArea, Spaceship);
-	AnimateMatrix(AlienGrid, DeltaTime);
-
-	if (!temporal)
+	if (!UpdateMatrixDynamic(AlienGrid, PastFrameTime, PlaySpacePos, PlaySpaceArea, Spaceship))
 	{
 		GAMESTATE = END;
 	}
+	AnimateMatrix(AlienGrid, DeltaTime);
 
 	CullBullets();
 	UpdateBullets();
@@ -1630,6 +1628,8 @@ void GameRender()
 		break;
 	}
 
+	al_draw_line(PlaySpacePos.x, Spaceship->Pos.y - 250, PlaySpacePos.x + PlaySpaceArea.x, Spaceship->Pos.y - 250, al_map_rgb(125, 10, 10), 3);
+	al_draw_text(font, al_map_rgb(125, 10, 10), PlaySpacePos.x + PlaySpaceArea.x * 0.85, Spaceship->Pos.y - 250 - 40, ALLEGRO_ALIGN_CENTRE, "Danger!");
 	//Music
 
 	switch ((Level - 1) % 4)
@@ -1865,7 +1865,7 @@ void ComputeAlienShot()
 
 	timeBuffer += DeltaTime;
 
-	if (timeBuffer >= BASE_ALIEN_SHOT_SPEED * 1/log(MinClampTo(Level,2)) * (MinClampTo((float)AlienGrid->AlienCount / (float)(AlienGrid->XAliens * AlienGrid->YAliens), 1 / 2)))
+	if (timeBuffer >= BASE_ALIEN_SHOT_SPEED * 1/log(MinClampTo(Level,2)) * (MinClampTo((float)AlienGrid->AlienCount / (float)(AlienGrid->XAliens * AlienGrid->YAliens), (float)1 / (float)2)))
 	{
 		timeBuffer = 0;
 
