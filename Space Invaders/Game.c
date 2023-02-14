@@ -56,6 +56,7 @@ int SystemInit()
 
 	ScreenDimensions = NewVec2(1920, 1080);
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
+	al_set_display_flag(DISPLAY, ALLEGRO_FULLSCREEN_WINDOW);
 	if (DISPLAY == NULL)
 	{
 		printf("There has been an error with the display initialization");
