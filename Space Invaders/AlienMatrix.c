@@ -129,11 +129,6 @@ int CollideEntity(Entity* BigUFOent, Entity* Bullets[])
 	}
 }
 
-void DeathAnimation(int i, int j)
-{
-	return;
-}
-
 void UpdateMatrix(AlienMatrix* Matrix, double dt , Vec2 PlayAreaPos , Vec2 PlayAreaDim)
 {
 	static double timeBuffer;
@@ -371,8 +366,6 @@ int UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 P
 	static int Xcoord;
 	static int Ycoord;
 
-	int r = 1;
-
 	MicroTimeBuffer += dt;
 
 	if (Xcoord >= Matrix->XAliens)
@@ -470,12 +463,12 @@ int UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 P
 					Matrix->matrix[i][j]->Pos.y += Matrix->VerticalSpeed;
 					if (Matrix->matrix[i][j]->Pos.y >= Spaceship->Pos.y - 250)
 					{
-						r=0;
+						return true;
 					}
 				}
 			}
 		}
 
 	}
-	return r;
+	return false;
 }
