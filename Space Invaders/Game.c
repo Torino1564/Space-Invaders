@@ -111,6 +111,7 @@ int SystemInit()
 	HasMovedAlready = 0;
 #endif
 	ESTADO = MENU;
+	return 1;
 }
 
 int Menu()
@@ -518,6 +519,7 @@ int Menu()
 	{
 		ESTADO = GAME;
 	}
+	return 1;
 }
 
 int GameInit()
@@ -1493,7 +1495,11 @@ void GameLogic()
 	}
 #endif
 #ifdef RASPI
-	UpdateMatrixDynamic( AlienGrid,DeltaTime,NewVec2(0,0) , NewVec2(0, 0), Spaceship);
+	if (!UpdateMatrixDynamic(AlienGrid, DeltaTime, NewVec2(0, 0), NewVec2(0, 0), Spaceship))
+	{
+		lives = 0;
+	}
+	
 	UpdateEntity(Spaceship , DeltaTime);
 
 	shootCooldown = 1 * TIME_MULTIPLIER;
@@ -2041,7 +2047,7 @@ void ComputeAlienShot()
 			{
 				if (AlienGrid->matrix[i][j] != NULL)
 				{
-					TempDistanceToPlayer = AbsoluteValue(AlienGrid->matrix[i][j]->Pos.x + (AlienGrid->matrix[i][j]->dimensions.x / 2) - (Spaceship->Pos.x + (Spaceship->dimensions.x / 2)));
+					TempDistanceToPlayer = AbsoluteValue(AlienGrid->matrix[i][j]->Pos.x + ((float)AlienGrid->matrix[i][j]->dimensions.x / 2.0) - (Spaceship->Pos.x + ((float)Spaceship->dimensions.x / 2.0)));
 
 					if (TempDistanceToPlayer < minimumDistanceToPlayer)
 					{

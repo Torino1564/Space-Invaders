@@ -466,8 +466,14 @@ int UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 P
 				if (Matrix->matrix[i][j] != NULL)
 				{
 					Matrix->matrix[i][j]->Pos.y += Matrix->VerticalSpeed;
+#ifndef RASPI
 					if (Matrix->matrix[i][j]->Pos.y + Matrix->matrix[i][j]->height >= Spaceship->Pos.y - 250)
 					{
+#endif
+#ifdef RASPI
+					if(Matrix->matrix[i][j]->Pos.y + Matrix->matrix[i][j]->dimensions.y - 1 >= 10 )
+					{
+#endif
 						return false;
 					}
 				}

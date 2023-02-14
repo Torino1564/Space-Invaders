@@ -75,7 +75,7 @@ typedef struct AlienMatrix_t AlienMatrix;
 
 AlienMatrix* CreateNewAlienMatrix(Vec2 Pos, int HorizontalSpeed, int XAliens, int YAliens , Vec2 AlienDimensions , int Padding , char shape[]);
 void FillMatrix(AlienMatrix* Matrix);
-void UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim);
+int UpdateMatrixDynamic(AlienMatrix* Matrix, double dt, Vec2 PlayAreaPos, Vec2 PlayAreaDim, Entity* Spaceship);
 void DrawGrid(AlienMatrix* Matrix);
 void DestroyAlienMatrix(AlienMatrix* Matrix);
 int CollideGrid(Entity* Bullet[], AlienMatrix* Matrix, int* aliensDestroyed);
