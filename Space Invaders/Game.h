@@ -69,8 +69,12 @@ void MotherShip();
 
 //	Backgrounds
 
-#define MENU_BG	"Resources/Backgrounds/menulogo.png"
-#define START_BG "Resources/Backgrounds/start.png"
+#define MENU_BG	"Resources/Backgrounds/menulogo2.png"
+#define START_BG "Resources/Backgrounds/Start1.png"
+#define START2_BG "Resources/Backgrounds/Start2.png"
+
+#define EXIT1 "Resources/Backgrounds/Exit1.png"
+#define EXIT2 "Resources/Backgrounds/Exit2.png"
 
 #define LVL1_BG	"Resources/Backgrounds/bg1.png"
 #define LVL2_BG	"Resources/Backgrounds/bg2.png"

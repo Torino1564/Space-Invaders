@@ -55,13 +55,13 @@ int SystemInit()
 	InitAnimations();
 
 	ScreenDimensions = NewVec2(1920, 1080);
-
 	DISPLAY = al_create_display(ScreenDimensions.x, ScreenDimensions.y);
 	if (DISPLAY == NULL)
 	{
 		printf("There has been an error with the display initialization");
 		error = 1;
 	}
+	//al_set_display_flag(DISPLAY, ALLEGRO_FULLSCREEN_WINDOW, true);
 
 	KeyboardEventSource = al_get_keyboard_event_source();
 	if (KeyboardEventSource == NULL)
@@ -124,14 +124,17 @@ int Menu()
 		return -1;
 	}
 
-	start = al_load_bitmap(START_BG);
-	if (start == NULL)
-	{
-		return -1;
-	}
+	ALLEGRO_BITMAP* Start1 = al_load_bitmap(START_BG);
+	ALLEGRO_BITMAP* Start2 = al_load_bitmap(START2_BG);
+	ALLEGRO_BITMAP* Exit1 = al_load_bitmap(EXIT1);
+	ALLEGRO_BITMAP* Exit2 = al_load_bitmap(EXIT2);
 
 
-	bool ready = 0;
+	Vec2 TempMousePos;
+	Vec2 StartPos = (Vec2){ ScreenDimensions.x * 3.2 / 5 , ScreenDimensions.y * 0.2 };
+	Vec2 LeavePos = (Vec2){ ScreenDimensions.x * 3.2 / 5 , ScreenDimensions.y * 0.6 };
+	Vec2 StartDimensions = (Vec2){ ScreenDimensions.x * 4.5 / 5 - ScreenDimensions.x * 3.2 / 5 , ScreenDimensions.y * 0.2 };
+	Vec2 LeaveDimensions = (Vec2){ ScreenDimensions.x * 4.5 / 5 - ScreenDimensions.x * 3.2 / 5 , ScreenDimensions.y * 0.2 };
 	float width = al_get_bitmap_width(menu);
 	float height = al_get_bitmap_height(menu);
 
@@ -139,19 +142,21 @@ int Menu()
 
 	al_play_sample(menuMusic, 1, 0, 1, ALLEGRO_PLAYMODE_LOOP, NULL);
 
-	//	ALLEGRO_SAMPLE_INSTANCE* playMenuMusic = al_create_sample_instance(menuMusic);
-	//	al_set_sample_instance_playmode(playMenuMusic, ALLEGRO_PLAYMODE_LOOP);
-	//	al_attach_sample_instance_to_mixer(playMenuMusic, Mixer);
 
-	//	al_play_sample_instance(playMenuMusic);
-
-	while (!ready)
+	while (ESTADO == MENU)
 	{
 		int margin = 40;
 		al_draw_scaled_rotated_bitmap(menu, width, height, ScreenDimensions.x, ScreenDimensions.y, ScreenDimensions.x/width, ScreenDimensions.y/height, 0, NULL);
-		float width = al_get_bitmap_width(start);
-		float height = al_get_bitmap_height(start);
-		al_draw_scaled_rotated_bitmap(start, width, height, ScreenDimensions.x/3 - margin, ScreenDimensions.y -50, 1, 1, 0, NULL);
+		
+
+		al_draw_filled_rounded_rectangle(StartPos.x , StartPos.y,
+			StartDimensions.x + StartPos.x, StartPos.y + StartDimensions.y, 10, 10, al_map_rgb(125, 5, 5));
+		al_draw_rounded_rectangle(StartPos.x, StartPos.y,
+			StartDimensions.x + StartPos.x, StartPos.y + StartDimensions.y, 10, 10, al_map_rgb(80, 5, 5) , 25);
+		al_draw_filled_rounded_rectangle(LeavePos.x, LeavePos.y,
+			LeaveDimensions.x + LeavePos.x, LeavePos.y + LeaveDimensions.y, 10, 10, al_map_rgb(125, 5, 5));
+		al_draw_rounded_rectangle(LeavePos.x, LeavePos.y,
+			LeaveDimensions.x + LeavePos.x, LeavePos.y + LeaveDimensions.y, 10, 10, al_map_rgb(80, 5, 5), 25);
 
 		if (!al_is_event_queue_empty(InputEventQueue))
 		{
@@ -159,13 +164,50 @@ int Menu()
 
 			switch (MenuEvent.type)
 			{
-			case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
-				if ((MenuEvent.mouse.x < ScreenDimensions.x / 3 - margin) && (MenuEvent.mouse.x > (ScreenDimensions.x / 3 - margin -width)
-					&& (MenuEvent.mouse.y < (ScreenDimensions.y - 50)) && (MenuEvent.mouse.y > (ScreenDimensions.y - 50 - height))))
+				case ALLEGRO_EVENT_MOUSE_BUTTON_DOWN:
+					if (MenuEvent.mouse.x > StartPos.x && MenuEvent.mouse.x < StartPos.x + StartDimensions.x &&
+						MenuEvent.mouse.y > StartPos.y && MenuEvent.mouse.y < StartPos.y + StartDimensions.y)
+					{
+							ESTADO = GAME;
+					}
+					if (MenuEvent.mouse.x > LeavePos.x && MenuEvent.mouse.x < LeavePos.x + LeaveDimensions.x &&
+						MenuEvent.mouse.y > LeavePos.y && MenuEvent.mouse.y < LeavePos.y + LeaveDimensions.y)
+					{
+						ESTADO = STOP;
+					}
+					break;
+				case ALLEGRO_EVENT_MOUSE_AXES:
+					TempMousePos.x = MenuEvent.mouse.x;
+					TempMousePos.y = MenuEvent.mouse.y;
+					break;
+				case ALLEGRO_EVENT_DISPLAY_CLOSE:
 				{
-						ready = 1;
+					ESTADO = STOP;
+					break;
 				}
-			}			
+			}
+
+		}
+		if ((MenuEvent.mouse.x > StartPos.x && MenuEvent.mouse.x < StartPos.x + StartDimensions.x &&
+			MenuEvent.mouse.y > StartPos.y && MenuEvent.mouse.y < StartPos.y + StartDimensions.y))
+		{
+			al_draw_scaled_bitmap(Start2, 0, 0, al_get_bitmap_width(Start2), al_get_bitmap_height(Start2), StartPos.x + 40, StartPos.y + 60, 430, 85, NULL);
+
+		}
+		else
+		{
+			al_draw_scaled_bitmap(Start1, 0, 0, al_get_bitmap_width(Start1), al_get_bitmap_height(Start1), StartPos.x + 40, StartPos.y + 60, 430, 85, NULL);
+
+		}
+		if ((MenuEvent.mouse.x > LeavePos.x && MenuEvent.mouse.x < LeavePos.x + LeaveDimensions.x &&
+			MenuEvent.mouse.y > LeavePos.y && MenuEvent.mouse.y < LeavePos.y + LeaveDimensions.y))
+		{
+			al_draw_scaled_bitmap(Exit2, 0, 0, al_get_bitmap_width(Exit2), al_get_bitmap_height(Exit2), LeavePos.x + 40, LeavePos.y + 60, 430, 85, NULL);
+
+		}
+		else
+		{
+			al_draw_scaled_bitmap(Exit1, 0, 0, al_get_bitmap_width(Exit1), al_get_bitmap_height(Exit1), LeavePos.x + 40, LeavePos.y + 60, 430, 85, NULL);
 
 		}
 
@@ -1208,7 +1250,7 @@ void GameLogic()
 	static int once = 1;
 	static double Mothership_time = 0;
 
-	switch (Level)
+	/*switch (Level)
 	{
 	case 1: 
 		Cooldown_c = 0.1;
@@ -1219,7 +1261,9 @@ void GameLogic()
 		Cooldown_c = 0.4;
 	default:
 		break;
-	}
+	}*/
+
+	Cooldown_c = 0.2;
 
 	if ((clock()/ CLOCKS_PER_SEC) > Cooldown)
 	{
